@@ -4,9 +4,9 @@
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
+#include <stack>
 
-
-namespace day12a
+namespace day13a
 {
 	class Solution {
 		int nSinglePass(std::vector<int>& nums, int& max_len)
@@ -38,7 +38,7 @@ namespace day12a
 		}
 	};
 }
-namespace day12b
+namespace day13b
 {
 	class Solution {
 
@@ -70,7 +70,7 @@ namespace day12b
 		}
 	};
 }
-namespace day13
+namespace day14
 {
 	class Solution {
 	public:
@@ -103,11 +103,11 @@ namespace day13
 	{
 		std::vector<std::vector<int>> shift = { {1,1},{1,1},{0,2},{1,3} };
 		std::string str13 = "abcdefg";
-		std::cout << day13::Solution().stringShift(str13, shift);
+		std::cout << day14::Solution().stringShift(str13, shift);
 	}
 }
 
-namespace day14
+namespace day15
 {
 	class Solution {
 	public:
@@ -137,13 +137,79 @@ namespace day14
 	void RunExample()
 	{
 		std::vector<int> vec_in = { 1,2,3,4 };
-		std::vector<int> vec_out = day14::Solution().productExceptSelf(vec_in);
+		std::vector<int> vec_out = day15::Solution().productExceptSelf(vec_in);
+	}
+}
+namespace day16
+{
+	class Solution {
+	public:
+		bool checkValidString(std::string s)
+		{
+			if (s.size() < 1) return true;
+			if (s.front() == ')' || s.back() == '(') return false;
+			std::stack<int> open;
+			std::stack<int> stars;
+			for (int i = 0; i < s.size(); i++)
+			{
+				if (s[i] == '(')
+				{
+					open.push(i);
+				}
+				else if (s[i] == '*')
+				{
+					stars.push(i);
+				}
+				else if (s[i] == ')')
+				{
+					if (!open.empty())
+					{
+						open.pop();
+					}
+					else
+					{
+						if (stars.empty())
+						{
+							return false;
+						}
+						else
+						{
+							stars.pop();
+						}
+					}
+				}
+			}
+			if (open.empty())
+			{
+				return true;
+			}
+
+			while (!open.empty() && !stars.empty() && open.top() < stars.top())
+			{
+				open.pop();
+				stars.pop();
+			}
+			if (open.empty())
+			{
+				return true;
+			}
+			return false;
+		}
+	};
+	void RunExample()
+	{
+		std::cout << day16::Solution().checkValidString("*(()*))");//T
+		std::cout << day16::Solution().checkValidString(")*()");//F
+		std::cout << day16::Solution().checkValidString("**())");//T
+		std::cout << day16::Solution().checkValidString("(*))");//T
+		std::cout << day16::Solution().checkValidString("(*()");//T
 	}
 }
 
+
 int main()
 {
-	day14::RunExample();
+	day16::RunExample();
 
 	std::cin.get();
 	return 0;
