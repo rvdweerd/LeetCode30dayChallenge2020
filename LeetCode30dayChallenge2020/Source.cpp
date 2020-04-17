@@ -634,10 +634,86 @@ namespace day16
 	}
 }
 
+namespace day17
+{
+	class Solution
+	{
+	public:
+		int numIslands(std::vector<std::vector<char>>& grid) 
+		{
+			if (grid.size() == 0) return 0;
+			int count = 0;
+			for (size_t x = 0; x < grid[0].size(); x++)
+			{
+				for (size_t y = 0; y < grid.size(); y++)
+				{
+					if (grid[y][x] == '1')
+					{
+						count++;
+						gridBFS(grid, x, y);
+					}
+				}
+			}
+			return count;
+		};
+	private:
+		struct Pos
+		{
+			size_t x;
+			size_t y;
+		};
+		void gridBFS(std::vector<std::vector<char>>& grid, size_t x, size_t y)
+		{
+			Pos startpos = { x,y };
+			std::queue<Pos> queue; queue.push(startpos);
+			grid[startpos.y][startpos.x] = '0';
+			while (!queue.empty())
+			{
+				const Pos curpos = queue.front(); queue.pop();
+				x = curpos.x;
+				y = curpos.y;
+				// check WEST
+				if (x > 0 && grid[y][x - 1] == '1')
+				{
+					grid[y][x - 1] = '0';
+					queue.push({ x - 1,y });
+				}
+				// check NORTH
+				if (y > 0 && grid[y-1][x] == '1')
+				{
+					grid[y-1][x] = '0';
+					queue.push({ x,y-1 });
+				}
+				// check EAST
+				if (x < grid[0].size()-1 && grid[y][x + 1] == '1')
+				{
+					grid[y][x + 1] = '0';
+					queue.push({ x + 1,y });
+				}
+				// check NORTH
+				if (y < grid.size()-1 && grid[y + 1][x] == '1')
+				{
+					grid[y + 1][x] = '0';
+					queue.push({ x,y + 1 });
+				}
+			}
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> grid = {
+			{'1','0','1','1','0','1','1'}//,
+			//{'1','1','0','0','0'},
+			//{'0','0','1','0','0'},
+			//{'0','0','0','1','1'},
+		};
+		std::cout << day17::Solution().numIslands(grid);
+	}
+}
 
 int main()
 {
-	day16::RunExample();
+	day17::RunExample();
 
 	std::cin.get();
 	return 0;
