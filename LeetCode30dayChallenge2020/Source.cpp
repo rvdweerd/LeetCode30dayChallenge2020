@@ -4,9 +4,9 @@
 #include <cstring>
 #include <vector>
 #include <set>
-#include <unordered_map>
 #include <map>
 #include <unordered_set>
+#include <unordered_map>
 #include <stack>
 #include <queue>
 
@@ -633,7 +633,6 @@ namespace day16
 		std::cout << day16::Solution().checkValidString("(*()");//T
 	}
 }
-
 namespace day17
 {
 	class Solution
@@ -710,10 +709,120 @@ namespace day17
 		std::cout << day17::Solution().numIslands(grid);
 	}
 }
+namespace day18
+{
+	class Solution {
+	public:
+		struct Pos
+		{
+			bool operator==(const Pos& rhs)
+			{
+				return (x == rhs.x && y == rhs.y);
+			}
+			bool operator!=(const Pos& rhs)
+			{
+				return !(*this == rhs);
+			}
+			int x;
+			int y;
+		};
+		int minPathSum(std::vector<std::vector<int>>& grid)
+		{
+			auto cmp = [](std::pair<std::vector<Pos>, int> left, std::pair<std::vector<Pos>, int> right) {return left.second > right.second; };
+			std::pair<std::vector<Pos>,int> path;
+			std::priority_queue < 
+				std::pair<std::vector<Pos>,int>, 
+				std::vector<std::pair<std::vector<Pos>,int>>,
+				decltype(cmp) > queue(cmp);
+			std::map<int, std::pair<std::vector<Pos>, int>> fixed;
+
+			const int height = grid.size();
+			const int width = grid[0].size();
+			Pos start = { 0,0 };
+			Pos finish = { width-1 ,height-1};
+			path.first.push_back(start); path.second = grid[start.y][start.x];
+			fixed[start.y * width + start.x] = path;
+
+			while (start != finish)
+			{
+				if (path.first.back().x != width - 1 && fixed.find(start.y*width+start.x+1)==fixed.end() ) // CHECK EAST
+				{
+					path.first.push_back({ start.x + 1,start.y }); path.second += grid[start.y][start.x + 1];
+					queue.push(path);
+					path.first.pop_back(); path.second -= grid[start.y][start.x + 1];
+				}
+				//if (path.first.back().x != 0 && fixed.find(start.y * width + start.x-1) == fixed.end()) // CHECK WEST
+				//{
+				//	path.first.push_back({ start.x - 1,start.y }); path.second += grid[start.y][start.x - 1];
+				//	queue.push(path);
+				//	path.first.pop_back(); path.second -= grid[start.y][start.x - 1];
+				//}
+				if (path.first.back().y != height - 1 && fixed.find((start.y+1) * width + start.x) == fixed.end()) // CHECK SOUTH
+				{
+					path.first.push_back({ start.x ,start.y+1 }); path.second += grid[start.y+1][start.x];
+					queue.push(path);
+					path.first.pop_back(); path.second -= grid[start.y+1][start.x];
+				}
+				//if (path.first.back().y != 0 && fixed.find((start.y-1) * width + start.x) == fixed.end()) // CHECK NORTH
+				//{
+				//	path.first.push_back({ start.x ,start.y - 1 }); path.second += grid[start.y - 1][start.x];
+				//	queue.push(path);
+				//	path.first.pop_back(); path.second -= grid[start.y - 1][start.x];
+				//}
+				path = queue.top(); queue; queue.pop();
+				start = path.first.back();
+				fixed[start.y * width + start.x] = path;
+			}
+			return path.second;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec = { 
+			{7, 1, 3, 5, 8, 9, 9, 2, 1, 9, 0, 8, 3, 1, 6, 6, 9, 5}, 
+			{9, 5, 9, 4, 0, 4, 8, 8, 9, 5, 7, 3, 6, 6, 6, 9, 1, 6}, 
+			{8, 2, 9, 1, 3, 1, 9, 7, 2, 5, 3, 1, 2, 4, 8, 2, 8, 8}, 
+			{6, 7, 9, 8, 4, 8, 3, 0, 4, 0, 9, 6, 6, 0, 0, 5, 1, 4}, 
+			{7, 1, 3, 1, 8, 8, 3, 1, 2, 1, 5, 0, 2, 1, 9, 1, 1, 4}, 
+			{9, 5, 4, 3, 5, 6, 1, 3, 6, 4, 9, 7, 0, 8, 0, 3, 9, 9}, 
+			{1, 4, 2, 5, 8, 7, 7, 0, 0, 7, 1, 2, 1, 2, 7, 7, 7, 4}, 
+			{3, 9, 7, 9, 5, 8, 9, 5, 6, 9, 8, 8, 0, 1, 4, 2, 8, 2}, 
+			{1, 5, 2, 2, 2, 5, 6, 3, 9, 3, 1, 7, 9, 6, 8, 6, 8, 3}, 
+			{5, 7, 8, 3, 8, 8, 3, 9, 9, 8, 1, 9, 2, 5, 4, 7, 7, 7}, 
+			{2, 3, 2, 4, 8, 5, 1, 7, 2, 9, 5, 2, 4, 2, 9, 2, 8, 7}, 
+			{0, 1, 6, 1, 1, 0, 0, 6, 5, 4, 3, 4, 3, 7, 9, 6, 1, 9} 
+		};
+				
+		std::vector<std::vector<int>> vec2 = {
+			{5 , 4 , 2 , 9 , 6 , 0 , 3 , 5 , 1 , 4 , 9 , 8 , 4 , 9 , 7 , 5 , 1} ,
+			{3 , 4 , 9 , 2 , 9 , 9 , 0 , 9 , 7 , 9 , 4 , 7 , 8 , 4 , 4 , 5 , 8} ,
+			{6 , 1 , 8 , 9 , 8 , 0 , 3 , 7 , 0 , 9 , 8 , 7 , 4 , 9 , 2 , 0 , 1} ,
+			{4 , 0 , 0 , 5 , 1 , 7 , 4 , 7 , 6 , 4 , 1 , 0 , 1 , 0 , 6 , 2 , 8} ,
+			{7 , 2 , 0 , 2 , 9 , 3 , 4 , 7 , 0 , 8 , 9 , 5 , 9 , 0 , 1 , 1 , 0} ,
+			{8 , 2 , 9 , 4 , 9 , 7 , 9 , 3 , 7 , 0 , 3 , 6 , 5 , 3 , 5 , 9 , 6} ,
+			{8 , 9 , 9 , 2 , 6 , 1 , 2 , 5 , 8 , 3 , 7 , 0 , 4 , 9 , 8 , 8 , 8} ,
+			{5 , 8 , 5 , 4 , 1 , 5 , 6 , 6 , 3 , 3 , 1 , 8 , 3 , 9 , 6 , 4 , 8} ,
+			{0 , 2 , 2 , 3 , 0 , 2 , 6 , 7 , 2 , 3 , 7 , 3 , 1 , 5 , 8 , 1 , 3} ,
+			{4 , 4 , 0 , 2 , 0 , 3 , 8 , 4 , 1 , 3 , 3 , 0 , 7 , 4 , 2 , 9 , 8} ,
+			{5 , 9 , 0 , 4 , 7 , 5 , 7 , 6 , 0 , 8 , 3 , 0 , 0 , 6 , 6 , 6 , 8} ,
+			{0 , 7 , 1 , 8 , 3 , 5 , 1 , 8 , 7 , 0 , 2 , 9 , 2 , 2 , 7 , 1 , 5} ,
+			{1 , 0 , 0 , 0 , 6 , 2 , 0 , 0 , 2 , 2 , 8 , 0 , 9 , 7 , 0 , 8 , 0} ,
+			{1 , 1 , 7 , 2 , 9 , 6 , 5 , 4 , 8 , 7 , 8 , 5 , 0 , 3 , 8 , 1 , 5} ,
+			{8 , 9 , 7 , 8 , 1 , 1 , 3 , 0 , 1 , 2 , 9 , 4 , 0 , 1 , 5 , 3 , 1} ,
+			{9 , 2 , 7 , 4 , 8 , 7 , 3 , 9 , 2 , 4 , 2 , 2 , 7 , 8 , 2 , 6 , 7} ,
+			{3 , 8 , 1 , 6 , 0 , 4 , 8 , 9 , 8 , 0 , 2 , 5 , 3 , 5 , 5 , 7 , 5} ,
+			{1 , 8 , 2 , 5 , 7 , 7 , 1 , 9 , 9 , 8 , 9 , 2 , 4 , 9 , 5 , 4 , 0} ,
+			{3 , 4 , 4 , 1 , 5 , 3 , 3 , 8 , 8 , 6 , 3 , 5 , 3 , 8 , 7 , 1 , 3} 
+		};
+		
+
+		int sol = Solution().minPathSum(vec2);
+	}
+}
 
 int main()
 {
-	day17::RunExample();
+	day18::RunExample();
 
 	std::cin.get();
 	return 0;
