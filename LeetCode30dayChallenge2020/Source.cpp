@@ -713,6 +713,20 @@ namespace day18 // DP in simple case where you only move east and south
 {
 	class Solution {
 	public:
+		//int minPathSum2(std::vector<std::vector<int>>& grid)
+		//{
+		//	const size_t width = grid[0].size();
+		//	const size_t height = grid.size();
+		//	std::vector<int> arr(width * height, 0);
+
+		//	for (size_t i = width - 1; i >= 0; i--)
+		//	{
+		//		for (size_t j = height - 1; j >= 0; j--)
+		//		{
+
+		//		}
+		//	}
+		//}
 		int minPathSum(std::vector<std::vector<int>>& grid)
 		{
 			if (grid.size() == 0 && grid[0].size() == 0) return 0;
@@ -872,11 +886,131 @@ namespace day18b // With Dijkstra in case you want to move in all directions
 		int sol = Solution().minPathSum(vec2);
 	}
 }
+namespace Rod
+{
+	int maxrev2(std::vector<int>& p, int n)
+	{
+		std::vector<std::vector<int>> table(n, std::vector<int>(n, -1));
+		table[0][0] = 0;
+		for (int l = 1; l <= n; l++)
+		{
+			for (int j = 0; j < l; j++)
+			{
+				if (j == 0) table[l][j] = p[l];
+				//else table[l][j] = std::max(table[0].begin(), table[0].end());
+			}
+		}
+		return 0;
+	}
+	int maxrev(std::vector<int>& p, int n)
+	{
+		std::map<int, int> map;
+		if (n == 0) return 0;
+		int q = -1000;
+		for (int i = 1; i <= n; i++)
+		{
+			if (map.find(i) == map.end())
+			{
+				int res = p[i - 1] + maxrev(p, n - i);//
+				if (res > q) std::cout << i<<", ";
+				q = std::max(q, res);
+				//q = std::max(q, p[i - 1] + maxrev(p, n - i));
+				map[i]=q;
+			}
+			else
+			{
+				q = map[i];
+			}
+		}
+		return q;
+	}
+	void rod()
+	{
+		std::vector<int> p = { 1,5,8,10,13,17,18,22,25,10,25,26,27,28,29,33,2,12,33,33 };
+		int max = maxrev(p, 9);
+	}
+}
+namespace day19 // BS to find pivot, then BS on the right subrange
+{
+	class Solution {
+	private:
+		int binsearch(std::vector<int>& vec, int val, int lo, int hi)
+		{
+			//int len = vec.size();
+			//int hi = len - 1;
+			//int lo = 0;
+			while (lo <= hi)
+			{
+				int m = lo + (hi - lo) / 2;
+				if (vec[m] == val) return m;
+				else if (val < vec[m]) // look left
+				{
+					hi = m - 1;
+				}
+				else // look right
+				{
+					lo = m + 1;
+				}
+			}
+			return -1;
+		}
+		int findpivot(std::vector<int>& v)
+		{
+			int len = v.size();
+			if (len <= 1) return 0;
+			int hi = len - 1;
+			int lo = 0;
+			int m = lo + (hi - lo) / 2;
+
+			while (true)
+			{
+				if (v[m] < v[lo]) // pivot is left
+				{
+					if (m - lo == 1) return m;
+					hi = m;
+					m = lo + (hi - lo) / 2;
+				}
+				else // pivot is right
+				{
+					if (hi - m == 1)
+					{
+						if (v[hi] >= v[m]) return 0;
+						else return hi;
+					}
+					lo = m;
+					m = lo + (hi - lo) / 2;
+				}
+			}
+		}
+	public:
+		int search(std::vector<int>& nums, int target)
+		{
+			if (nums.empty()) return -1;
+			int i = findpivot(nums);
+			if (i == 0) return binsearch(nums, target, 0, nums.size() - 1);
+			else if (target > nums.back()) // look left of pivot
+			{
+				return binsearch(nums, target, 0, i - 1);
+			}
+			else // look right of pivot (pivot position inclusive)
+			{
+				return binsearch(nums, target, i, nums.size() - 1);
+			}
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> v = { 4,5,6,7,0,1,2 };
+		int i = Solution().search(v, 2);
+	}
+
+}
 
 int main()
 {
-	day18::RunExample();
-
+	day19::RunExample();
+	
+	//Rod::rod();
 	std::cin.get();
 	return 0;
 }
