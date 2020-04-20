@@ -924,10 +924,46 @@ namespace Rod
 		}
 		return q;
 	}
+	int maxRevRec(const std::vector<int>& p, int n, std::vector<int>& memo)
+	{
+		if (memo[n] != -1) return memo[n];
+		int q = -1;
+		for (int i = 1; i <= n; i++)
+		{
+			int rhs = p[i - 1] + maxRevRec(p, n - i, memo);
+			if (rhs > p[n - 1] && memo[50] == 1) std::cout << "split at: n=" << n << ", i=" << i << "\n";
+			q = std::max(q, rhs);
+			memo[15]++;
+		}
+		memo[n] = q; memo[50]--;
+		return q;
+	}
+	int maxRevBottomUp(const std::vector<int>& p, int n)
+	{
+		std::vector<int> arr(10, 0);
+		for (int i = 0; i < n; i++)
+		{
+			int q = -1;
+			for (int j = 0; j < i; j++)
+			{
+				q = std::max(q, p[j] + arr[i - j]);
+				arr[j+1] = q;
+			}
+		}
+		return arr[n];
+	}
+
 	void rod()
 	{
-		std::vector<int> p = { 1,5,8,10,13,17,18,22,25,10,25,26,27,28,29,33,2,12,33,33 };
-		int max = maxrev(p, 9);
+		std::vector<int> p = { 1,5,8,9,10,17,17,20,24,30,33,35 };
+		for (int n = 1; n <= 9; n++)
+		{
+			std::vector<int> memo(100, -1);
+			memo[0] = 0; memo[50] = n;
+			//int max = maxRevRec(p, n, memo);
+			int max = maxRevBottomUp(p, n);
+			std::cout << "MaxRev for a rod size " << n << " is :" << max<<std::endl;
+		}
 	}
 }
 namespace day19 // BS to find pivot, then BS on the right subrange
@@ -1005,11 +1041,55 @@ namespace day19 // BS to find pivot, then BS on the right subrange
 	}
 
 }
+namespace day20 
+{ 
+	struct TreeNode {
+		int val;
+		TreeNode* left;
+		TreeNode* right;
+		TreeNode(int x) 
+			: 
+			val(x), 
+			left(NULL), 
+			right(NULL) {}
+	};
+	class Solution
+	{
+	public:
+		TreeNode* bstFromPreorder(std::vector<int> & preorder)
+		{
+			if (preorder.size() == 0) return nullptr;
+			TreeNode* root = new TreeNode(preorder.front());
+			if (preorder.size() > 1)
+			{
+				for (int i = 1; i < preorder.size(); i++)
+				{
+					TreeNode* pt = root;
+					int val = preorder[i];
+					while ((val < pt->val && pt->left != nullptr) || (val > pt->val && pt->right != nullptr))
+					{
+						if (val < pt->val) pt = pt->left;
+						else pt = pt->right;
+					}
+					if (val < pt->val) pt->left = new TreeNode(val);
+					else pt->right = new TreeNode(val);
+				}
+			}
+			return root;
+		}
 
+	};
+	void RunExample()
+	{
+		std::vector<int> vec = { 8,5,1,7,10,12 };
+		TreeNode* tn = day20::Solution().bstFromPreorder(vec);
+	}
+
+}
 int main()
 {
-	day19::RunExample();
-	
+	//day19::RunExample();
+	day20::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
