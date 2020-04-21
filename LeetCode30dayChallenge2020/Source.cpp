@@ -1099,14 +1099,35 @@ namespace day21
 	class BinaryMatrix
 	{
 	public:
+		void push(std::vector<int> vec)
+		{
+			if (M.size() == 0)
+			{
+				M.push_back(vec);
+				n++;
+				m = vec.size();
+			}
+			else
+			{
+				if (vec.size() == m)
+				{
+					M.push_back(vec);
+					n++;
+				}
+			}
+		}
 		int get(int x, int y)
 		{
-			return 0;
+			return M[x][y];
 		}
 		std::vector<int> dimensions()
 		{
-			return { 0,0 };
+			return { n,m };
 		}
+	private:
+		std::vector<std::vector<int>> M;
+		int n=0;
+		int m=0;
 	};
 	class Solution
 	{
@@ -1142,16 +1163,63 @@ namespace day21
 			if (ptr.second == m - 1) return -1;
 			return ptr.second + 1;
 		}
+		int leftMostColumnWithOne2(BinaryMatrix& binaryMatrix)
+		{
+			// Approach: start topright, follow the ones until bottom of matrix is reached
+			// Note: challenge definitions: 
+			//  ->  (nxm) matrix means m width, n height (contrary to lin.alg. convention)
+			//  ->  m[x][y] means element on row x (vertical), position y (horizontal)
+			// ->   So, my pointer ptr is defined as pair<x,y>
+			
+			const std::vector<int> dimension = binaryMatrix.dimensions();
+			const int n = dimension[0];
+			const int m = dimension[1];
+			std::vector<int> markers(n, 1e9);
+			for (size_t row = 0; row < n; row++)
+			{
+				markers[row] = binsearch(binaryMatrix, row, m);
+			}
+			auto it = std::min_element(markers.begin(),markers.end());
+			if (*it >= m) return -1;
+			else return *it;
+		}
+		int binsearch(BinaryMatrix& M, int row, int width)
+		{
+			if (width < 1) return 0;
+			int lo = 0;
+			int hi = width-1;
+			int m = lo + (hi - lo) / 2;
+			while (lo <= hi)
+			{
+				if (M.get(row,m) == 1)
+				{
+					hi = m - 1;
+				}
+				else
+				{
+					lo = m + 1;
+				}
+				m = lo + (hi - lo) / 2;
+			}
+			return m;
+		}
 	};
 	void RunExample()
 	{
-		// not implemented, don't have the BinaryMatrix class definition
+		BinaryMatrix M;
+		//M.push({ 0,0,0,1 });
+		//M.push({ 0,0,1,1 });
+		//M.push({ 0,0,0,1 });
+		//M.push({ 0,0,0,1 });
+		M.push({ 0,0 });
+		M.push({ 0,0 });
+		int k = Solution().leftMostColumnWithOne2(M);
 	}
 }
 int main()
 {
 	//day19::RunExample();
-	day20::RunExample();
+	day21::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
