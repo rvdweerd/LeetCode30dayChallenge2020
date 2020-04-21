@@ -1084,7 +1084,69 @@ namespace day20
 		std::vector<int> vec = { 8,5,1,7,10,12 };
 		TreeNode* tn = day20::Solution().bstFromPreorder(vec);
 	}
+}
+namespace day21
+{
+	/**
+	* // This is the BinaryMatrix's API interface.
+	* // You should not implement it, or speculate about its implementation
+	* class BinaryMatrix {
+	*   public:
+	*     int get(int x, int y);
+	*     vector<int> dimensions();
+	* };
+	*/
+	class BinaryMatrix
+	{
+	public:
+		int get(int x, int y)
+		{
+			return 0;
+		}
+		std::vector<int> dimensions()
+		{
+			return { 0,0 };
+		}
+	};
+	class Solution
+	{
+	public:
+		int leftMostColumnWithOne(BinaryMatrix& binaryMatrix)
+		{
+			// Approach: start topright, follow the ones until bottom of matrix is reached
+			// Note: challenge definitions: 
+			//  ->  (nxm) matrix means m width, n height (contrary to lin.alg. convention)
+			//  ->  m[x][y] means element on row x (vertical), position y (horizontal)
+			// ->   So, my pointer ptr is defined as pair<x,y>
+			const std::vector<int> dimension = binaryMatrix.dimensions();
+			const int n = dimension[0];
+			const int m = dimension[1];
+			std::cout << "n=" << n << std::endl;	std::cout << "m=" << m << std::endl;
 
+			std::pair<int, int> ptr = { 0,m - 1 };
+			for (; ptr.first < n;)
+			{
+				if (binaryMatrix.get(ptr.first, ptr.second) == 1) // element is 1, move left
+				{
+					if (ptr.second == 0)
+					{
+						return 0;
+					}
+					ptr.second--;
+				}
+				else // element is 0, move down
+				{
+					ptr.first++;
+				}
+			}
+			if (ptr.second == m - 1) return -1;
+			return ptr.second + 1;
+		}
+	};
+	void RunExample()
+	{
+		// not implemented, don't have the BinaryMatrix class definition
+	}
 }
 int main()
 {
