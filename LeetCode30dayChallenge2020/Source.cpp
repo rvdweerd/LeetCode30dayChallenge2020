@@ -1062,7 +1062,7 @@ namespace day20
 			TreeNode* root = new TreeNode(preorder.front());
 			if (preorder.size() > 1)
 			{
-				for (int i = 1; i < preorder.size(); i++)
+				for (size_t i = 1; i < preorder.size(); i++)
 				{
 					TreeNode* pt = root;
 					int val = preorder[i];
@@ -1174,8 +1174,8 @@ namespace day21
 			const std::vector<int> dimension = binaryMatrix.dimensions();
 			const int n = dimension[0];
 			const int m = dimension[1];
-			std::vector<int> markers(n, 1e9);
-			for (size_t row = 0; row < n; row++)
+			std::vector<int> markers(n, (int)1e9);
+			for (size_t row = 0; row < (size_t)n; row++)
 			{
 				markers[row] = binsearch(binaryMatrix, row, m);
 			}
@@ -1215,11 +1215,45 @@ namespace day21
 		M.push({ 0,0 });
 		int k = Solution().leftMostColumnWithOne2(M);
 	}
+	
+}
+namespace day22
+{
+	class Solution
+	{
+	public:
+		int subarraySum(std::vector<int>& nums, int k) 
+		{	
+			size_t count = 0;
+			std::unordered_map<int, size_t> map;
+			map[0]++;
+			map[nums[0]]++;
+			if (nums[0] == k) count++;
+			for (size_t i = 1; i < nums.size(); i++)
+			{
+				nums[i] = nums[i - 1] + nums[i];
+				auto it = map.find(nums[i] - k);
+				if (it != map.end())
+				{
+					count += it->second;
+				}
+				map[nums[i]]++;
+			}
+			return count;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> nums = {-1,-1,3,1,-1,2 };
+		//std::vector<int> nums = { 1,1,2,3,2,1 };
+		int ans = Solution().subarraySum(nums, 1);
+		std::cout << ans;
+	}
 }
 int main()
 {
 	//day19::RunExample();
-	day21::RunExample();
+	day22::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
