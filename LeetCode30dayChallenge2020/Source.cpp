@@ -1250,10 +1250,63 @@ namespace day22
 		std::cout << ans;
 	}
 }
+namespace day23
+{
+	class Solution {
+	public:
+		int rangeBitwiseAnd(int m, int n) {
+			int count = 0;
+			std::cout << "m     : ";printBitRep(m); 
+			std::cout << "n     : "; printBitRep(n);
+			while (m != n)
+			{
+				m >>= 1;
+				n >>= 1;
+				count++;
+			}
+			int ans = m << count;
+			std::cout << "------------------------------------------------------------------------\n";
+			std::cout << "answer: "; printBitRep(ans);
+			return ans;
+		}
+		int rangeBitwiseAnd2(int m, int n) {
+			int count = 0;
+			int k=m;
+			for (int i=m;i<=n;i++)
+			{
+				k&=i;
+				std::cout << "numbers: "; printBitRep(i);
+			}
+			std::cout << "------------------------------------------------------------------------\n";
+			std::cout << "answer : "; printBitRep(k);
+			return k;
+		}
+		void printBitRep(int k)
+		{
+			int size = sizeof(k);
+			int bits = 8 * size;
+			std::string str;
+			for (int i = bits-1; i >=0; i--)
+			{
+				int mask = 1 << i;
+				if ((k & mask) == mask) str.append("1"); else str.append("0");
+				if (i % 8 == 0 && i!=0) str.append(".");
+			}
+			std::cout << "Bin rep: " << str << " for int value = " << k << '\n';
+		}
+	};
+	void RunExample()
+	{
+		Solution().rangeBitwiseAnd2(32, 35); std::cout << std::endl;
+		Solution().rangeBitwiseAnd2(5, 7); std::cout << std::endl;
+		Solution().rangeBitwiseAnd2(100012, 100015); std::cout << std::endl;
+		Solution().rangeBitwiseAnd(std::numeric_limits<int>::max()/2, std::numeric_limits<int>::max()); std::cout << std::endl;
+
+	}
+}
 int main()
 {
-	//day19::RunExample();
-	day22::RunExample();
+	day23::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
