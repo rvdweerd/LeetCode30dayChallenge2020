@@ -1304,9 +1304,89 @@ namespace day23
 
 	}
 }
+namespace day24
+{
+	/**
+	 * Your LRUCache object will be instantiated and called as such:
+	 * LRUCache* obj = new LRUCache(capacity);
+	 * int param_1 = obj->get(key);
+	 * obj->put(key,value);
+	 */
+	class LRUCache {
+	public:
+		LRUCache(int capacity) 
+			:
+			capacity(capacity)
+		{}
+		int get(int key) 
+		{
+			auto it = map.find(key);
+			if (it == map.end())
+			{
+				return -1;
+			}
+			else
+			{
+				turn++;
+				it->second.second = turn;				
+				return it->second.first;
+			}
+		}
+		void put(int key, int value) 
+		{
+			auto it = map.find(key);
+			if (it == map.end()) // no entry yet
+			{
+				if (map.size() < capacity) // enough room, add entry
+				{
+					turn++;
+					map[key] = { value,turn };
+				}
+				else // map is full, 
+				{
+					int minfreq = std::numeric_limits<int>::max();
+					auto minEntry = map.begin();
+					for (auto it = map.begin(); it != map.end(); ++it)
+					{
+						if (it->second.second < minfreq)
+						{
+							minfreq = it->second.second;
+							minEntry = it;
+						}
+					}
+					map.erase(minEntry);
+					turn++;
+					map[key] = { value,turn };
+				}
+			}
+			else // adjust existing entry
+			{
+				turn++;
+				it->second = { value,turn };
+			}
+		}
+	private:
+		int capacity;
+		int turn = 0;
+		std::unordered_map<int, std::pair<int, int>> map; // valuetype: { value , last extracted }
+	};
+	void RunExample()
+	{
+		LRUCache* cache = new LRUCache(2);
+		cache->put(2, 1);
+		cache->put(1, 1);
+		cache->put(2, 3);
+		cache->put(4, 1);
+		cache->get(1); 
+		cache->get(2);    
+	}
+}
+
+
+
 int main()
 {
-	day23::RunExample();
+	day24::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
