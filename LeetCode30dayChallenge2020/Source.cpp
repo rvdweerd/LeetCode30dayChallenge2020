@@ -1382,11 +1382,83 @@ namespace day24
 	}
 }
 
+namespace day25
+{
+	class Solution 
+	{
+	public:
+		bool canJump(std::vector<int>& nums)
+		{
+			//return canJumpRecursive(nums, 0);
+			//return canJumpStack(nums);
+			int lastpos = nums.size() - 1;
+			for (int i = nums.size() - 1; i >= 0; i--)
+			{
+				if (i + nums[i] >= lastpos) lastpos = i;
+			}
+			return (lastpos == 0);
+		}
+		bool canJumpStack(std::vector<int>& nums) 
+		{
+			int count = 0;
+			std::unordered_set<int> visited;
+			std::stack<int> stack;
+			stack.push(0);
+			while (!stack.empty())
+			{
+				int i = stack.top(); stack.pop(); count++;
+				if (i == nums.size() - 1)
+				{
+					return true;
+				}
+				int num = nums[i];
+				for (int add = i+1; add <= num+i && add<nums.size(); add++)
+				{
+					if (visited.find(add) == visited.end())
+					{
+						stack.push(add);
+						visited.insert(add);
+					}
+				}
+			}
+			return false;
+		}
+		bool canJumpRecursive(std::vector<int>& nums, int start)
+		{
+			if (nums.size() == 1) return true;
+			if (start == nums.size() - 1) return true;
+			else
+			{
 
+				for (int i = 1; i <= nums[start] && i <= nums.size() - 1-start; i++)
+				{
+					if ( canJumpRecursive(nums, start+i )) return true;
+				}
+			}
+			return false;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> vec = {2,3,1,1,4}; // true
+		bool lukt = Solution().canJump(vec);
+		vec = { 3,2,1,0,4 }; // fals
+		lukt = Solution().canJump(vec);
+		vec = { 2,0 }; // true
+		lukt = Solution().canJump(vec);
+		vec = { 1,2,3 }; // true
+		lukt = Solution().canJump(vec);
+		vec = { 10,9,8,7,7,5,4,3,2,1,0,0 }; // true
+		lukt = Solution().canJump(vec);
+		vec = { 2, 0, 6, 9, 8, 4, 5, 0, 8, 9, 1, 2, 9, 6, 8, 8, 0, 6, 3, 1, 2, 2, 1, 2, 6, 5, 3, 1, 2, 2, 6, 4, 2, 4, 3, 0, 0, 0, 3, 8, 2, 4, 0, 1, 2, 0, 1, 4, 6, 5, 8, 0, 7, 9, 3, 4, 6, 6, 5, 8, 9, 3, 4, 3, 7, 0, 4, 9, 0, 9, 8, 4, 3, 0, 7, 7, 1, 9, 1, 9, 4, 9, 0, 1, 9, 5, 7, 7, 1, 5, 8, 2, 8, 2, 6, 8, 2, 2, 7, 5, 1, 7, 9, 6 };
+		lukt = Solution().canJump(vec);
+
+	}
+}
 
 int main()
 {
-	day24::RunExample();
+	day25::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
