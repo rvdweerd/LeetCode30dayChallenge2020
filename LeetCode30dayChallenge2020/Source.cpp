@@ -1381,7 +1381,139 @@ namespace day24
 		cache->get(2);    
 	}
 }
+namespace day24b
+{
+	class LRUCache
+	{
+		class Node
+		{
+		public:
+			Node(int key,int val) : key(key),val(val) {}
+			Node(int key,int val, Node* l, Node* r)
+				:
+				key(key),
+				val(val),
+				left(l),
+				right(r)
+			{}
+		//private:
+			int key;
+			int val;
+			Node* left=nullptr;
+			Node* right = nullptr;
+		};
 
+	private:
+		int capacity;
+		std::unordered_map<int, Node*> cache;
+		Node* listfront=nullptr;
+		Node* listback = nullptr;
+	public:
+		LRUCache(int capacity)
+			:
+			capacity(capacity)
+		{}
+		int get(int key)
+		{
+			auto it = cache.find(key);
+			if (it != cache.end())
+			{
+				int val = it->second->val;
+				movetoback(key, val);
+				return val;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		void put(int key, int val)
+		{
+			if (cache.find(key) == cache.end())
+			{
+				pushback(key,val);
+			}
+			else // value already in cache, but move to back
+			{
+				movetoback(key, val);
+				
+			}
+			if (cache.size() > capacity)
+			{
+				Node* tmp = listfront;
+				cache.erase(listfront->key);
+				listfront = listfront->right;
+				listfront->left = nullptr;
+				delete tmp;
+				tmp = nullptr;
+			}
+		}
+	private:
+		void movetoback(int key, int val)
+		{
+			Node* tomove = cache[key];
+			if (tomove->left == nullptr && tomove->right == nullptr)
+			{
+				tomove->val = val;
+				return;
+			}
+			if (tomove->left == nullptr) // moving the listfront
+			{
+				tomove->right->left = nullptr;
+				listfront = tomove->right;
+			}
+			else if (tomove->right == nullptr)
+			{
+				tomove->left->right = nullptr;
+				listback = listback->left;
+			}
+			else
+			{
+				tomove->left->right = tomove->right;
+				tomove->right->left = tomove->left;
+			}
+			delete tomove;
+			tomove = nullptr;
+			pushback(key, val);
+		}
+		void pushback(int key,int val)
+		{
+			Node* tmp = listback;
+			listback = new Node(key,val);
+			if (tmp == nullptr)
+			{
+				listfront = listback;
+			}
+			else
+			{
+				tmp->right = listback;
+				listback->left = tmp;
+				tmp = nullptr;
+			}
+			cache[key] = listback;
+		}
+	};
+	void RunExample()
+	{
+		LRUCache* cache = new LRUCache(3);
+		
+		cache->put(1, 1);
+		cache->put(2, 2);
+		cache->put(3, 3);
+		cache->put(4, 4);
+		cache->get(4);
+		cache->get(3);
+		cache->get(2);
+		cache->get(1);
+		cache->put(5, 5);
+		cache->get(1);
+		cache->get(2);
+		cache->get(3);
+		cache->get(4);
+		cache->get(5);
+	}
+
+}
 namespace day25
 {
 	class Solution 
@@ -1458,7 +1590,7 @@ namespace day25
 
 int main()
 {
-	day25::RunExample();
+	day24b::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
