@@ -1472,9 +1472,11 @@ namespace day24b
 				tomove->left->right = tomove->right;
 				tomove->right->left = tomove->left;
 			}
-			delete tomove;
-			tomove = nullptr;
-			pushback(key, val);
+			tomove->right = nullptr;
+			tomove->left = listback;
+			listback->right = tomove;
+			listback = tomove;
+			
 		}
 		void pushback(int key,int val)
 		{
