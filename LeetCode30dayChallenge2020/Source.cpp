@@ -1711,11 +1711,77 @@ namespace day26
 	}
 
 }
+namespace day27
+{
+	class Solution
+	{
+	public:
+		void PrintM(std::vector<std::vector<char>>& matrix)
+		{
+			for (auto r : matrix)
+			{
+				for (auto c : r)
+				{
+					std::cout << c;
+				}
+				std::cout << std::endl;
+			}
+			std::cout << "-------------------"<<std::endl;
+		}
+		int maximalSquare(std::vector<std::vector<char>>& matrix)
+		{
+			if (matrix.size() == 0) return 0;
+			bool hasa1 = false;
+			int countouter = 0;
+			int countinner = 0;
+			do
+			{
+				countouter++;
+				countinner = 0;
+				for (int i = 0; i < matrix.size(); i++)
+				{
+					for (int j = 0; j < matrix[0].size(); j++)
+					{
 
+						if (matrix[i][j] == '1')
+						{
+							hasa1 = true;
+							if (i == matrix.size() - 1 || j == matrix[0].size() - 1)
+							{
+								matrix[i][j] = '0';
+							}
+							else if (matrix[i + 1][j] == '0' || matrix[i][j + 1] == '0' || matrix[i + 1][j + 1] == '0')
+							{
+								matrix[i][j] = '0';
+							}
+							else countinner++;
+						}
+					}
+				}
+			} while (countinner > 0);
+			if (countouter == 1)
+			{
+				if (hasa1) return 1; else return 0;
+			}
+			return countouter * countouter;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> M = { 
+			{'1','0','0','0','0'},
+			{'0','1','1','1','0'},
+			{'0','1','1','0','0'},
+			{'0','1','1','1','0'},
+			{'0','0','0','0','0'} };
+		
+		std::cout<<"ans ="<< Solution().maximalSquare(M);
+	}
+}
 
 int main()
 {
-	day26::RunExample();
+	day27::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
