@@ -1474,6 +1474,7 @@ namespace day24b
 			}
 			tomove->right = nullptr;
 			tomove->left = listback;
+			tomove->val = val;
 			listback->right = tomove;
 			listback = tomove;
 			
@@ -1497,9 +1498,14 @@ namespace day24b
 	};
 	void RunExample()
 	{
-		LRUCache* cache = new LRUCache(3);
-		
+		LRUCache* cache = new LRUCache(2);
+		cache->put(2, 1);
 		cache->put(1, 1);
+		cache->put(2, 3);
+		cache->put(4, 1);
+		cache->get(1);
+		cache->get(2);
+		/*cache->put(1, 1);
 		cache->put(2, 2);
 		cache->put(3, 3);
 		cache->put(4, 4);
@@ -1512,9 +1518,8 @@ namespace day24b
 		cache->get(2);
 		cache->get(3);
 		cache->get(4);
-		cache->get(5);
+		cache->get(5);*/
 	}
-
 }
 namespace day25
 {
@@ -1589,10 +1594,128 @@ namespace day25
 
 	}
 }
+namespace day26wrong
+{
+	class Solution {
+	public:
+		int longestCommonSubsequence(std::string text1, std::string text2) 
+		{
+			std::multimap<char, size_t> map1;
+			std::multimap<char, size_t> map2;
+			for (size_t i = 0; i < text1.size(); i++)
+			{
+				map1.insert({ text1[i], i });
+			}
+			for (size_t i = 0; i < text2.size(); i++)
+			{
+				map2.insert({ text2[i], i });
+			}
+
+			std::string out2 = extractM(text2, std::move(map1));
+			std::string out1 = extractM(text1, std::move(map2));
+			return int(out1.size() > out2.size() ? out1.size() : out2.size());
+		}
+		std::string extractM(const std::string& str, std::multimap<char,size_t> map)
+	{
+		std::string out;
+		size_t last = 0;
+		for (size_t i = 0; i < str.size(); i++)
+		{
+			char c = str[i];
+			auto p_it = map.equal_range(c);
+			for (auto it = p_it.first; it != map.end() && it->first==c; ++it)
+			{
+				if (it->second >= last)
+				{
+					out += c;
+					last = it->second;
+					map.erase(it);
+					break;
+				}
+			}
+		}
+		return out;
+	}
+	};
+
+	void RunExample()
+	{
+		std::string str1 = "oxcpqrsvwf";
+		std::string str2 = "shmtulqrypy";
+		int ans = Solution().longestCommonSubsequence(str1,str2);
+	}
+
+}
+namespace day26
+{
+	class Solution {
+	public:
+		void printDP(const std::vector<std::vector<size_t>>& DPP)
+		{
+			for (int i = 0; i < DPP.size(); i++)
+			{
+				for (int j = 0; j < DPP[0].size(); j++)
+				{
+					std::cout << DPP[i][j] << ", ";
+				}
+				std::cout << std::endl;
+			}
+		}
+		int longestCommonSubsequence(std::string text1, std::string text2)
+		{
+			const size_t len1 = text1.size();
+			const size_t len2 = text2.size();
+			if (len1 == 0 || len2 == 0) return 0;
+			std::vector<std::vector<size_t>> DP(len1+1,std::vector<size_t>(len2+1,0));
+			for (size_t i = 1; i <= len1;i++)
+			{
+				for (size_t j = 1; j <= len2; j++)
+				{
+					if (i == 2 && j == 1)
+					{
+						int k = 0;
+					}
+					if (text1[i-1] == text2[j-1])
+					{
+						
+							DP[i][j] = std::min(
+								std::max(DP[i - 1][j], DP[i][j - 1] + 1),
+								DP[i-1][j-1]+1);
+					}
+					else
+					{
+						DP[i][j] = std::max(DP[i - 1][j], DP[i][j - 1]);
+					}
+				}
+			}
+			printDP(DP);
+			return DP[len1][len2];
+		}
+		
+	};
+
+	void RunExample()
+	{
+		//std::string str1 = "oxcpqrsvwf";
+		//std::string str2 = "shmtulqrypy";
+		std::string str1 = "ab";
+		std::string str2 = "bab";
+		//std::string str1 = "pmjghexybyrgzczy";
+		//std::string str2 = "hafcdqbgncrcbihkd";
+		//std::string str1 = "ghbrgc";
+		//std::string str2 = "hcbgcrcbh";
+		//std::string str1 = "bmvcnwrmxccxabkxcvgbozmpspsbnazglyxkpibgzq";
+		//std::string str2 = "bmpmlsoylonkvmqyxmnqzconqobacrcbibgzgx";
+		int ans = Solution().longestCommonSubsequence(str1, str2);
+		std::cout << "ans = " << ans;
+	}
+
+}
+
 
 int main()
 {
-	day24b::RunExample();
+	day26::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
