@@ -1771,17 +1771,85 @@ namespace day27
 		std::vector<std::vector<char>> M = { 
 			{'1','0','0','0','0'},
 			{'0','1','1','1','0'},
-			{'0','1','1','0','0'},
+			{'0','1','1','1','0'},
 			{'0','1','1','1','0'},
 			{'0','0','0','0','0'} };
 		
 		std::cout<<"ans ="<< Solution().maximalSquare(M);
 	}
 }
+namespace day27DP
+{
+	class Solution
+	{
+	public:
+		void PrintM(const std::vector<std::vector<char>>& matrix)
+		{
+			for (auto r : matrix)
+			{
+				for (auto c : r)
+				{
+					std::cout << c;
+				}
+				std::cout << std::endl;
+			}
+			std::cout << "-------------------" << std::endl;
+		}
+		void PrintM(const std::vector<std::vector<int>>& matrix)
+		{
+			for (auto r : matrix)
+			{
+				for (auto c : r)
+				{
+					std::cout << c;
+				}
+				std::cout << std::endl;
+			}
+			std::cout << "-------------------" << std::endl;
+		}
+		int maximalSquare(std::vector<std::vector<char>>& matrix)
+		{
+			//PrintM(matrix);
+			if (matrix.size() == 0) return 0;
+			std::vector<std::vector<int>> DP(matrix.size(), std::vector<int>(matrix[0].size(), 0));
+			int maxside = 0;
+			for (int i = 0; i < matrix.size(); i++)
+			{
+				for (int j = 0; j < matrix[0].size(); j++)
+				{
+					if (matrix[i][j] == '1')
+					{
+						if (j == 0 || i==0)
+						{
+							DP[i][j] = 1;
+							if (DP[i][j] > maxside) maxside = DP[i][j];
+						}
+						else
+						{
+							DP[i][j] = std::min({ DP[i - 1][j - 1],DP[i][j - 1],DP[i-1][j] }) + 1;
+							if (DP[i][j] > maxside) maxside = DP[i][j];
+							//PrintM(DP);
+							
+						}
+					}
+				}
+			}
+			//PrintM(DP);
+			return maxside * maxside;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> M = {
+			{'1'} };
+
+		std::cout << "ans =" << Solution().maximalSquare(M);
+	}
+}
 
 int main()
 {
-	day27::RunExample();
+	day27DP::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
