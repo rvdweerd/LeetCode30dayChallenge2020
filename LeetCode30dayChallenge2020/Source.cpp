@@ -1366,7 +1366,7 @@ namespace day24
 			}
 		}
 	private:
-		int capacity;
+		size_t capacity;
 		int turn = 0;
 		std::unordered_map<int, std::pair<int, int>> map; // valuetype: { value , last extracted }
 	};
@@ -1404,7 +1404,7 @@ namespace day24b
 		};
 
 	private:
-		int capacity;
+		size_t capacity;
 		std::unordered_map<int, Node*> cache;
 		Node* listfront=nullptr;
 		Node* listback = nullptr;
@@ -1551,7 +1551,7 @@ namespace day25
 					return true;
 				}
 				int num = nums[i];
-				for (int add = i+1; add <= num+i && add<nums.size(); add++)
+				for (int add = i+1; add <= num+i && add<(int)nums.size(); add++)
 				{
 					if (visited.find(add) == visited.end())
 					{
@@ -1569,7 +1569,7 @@ namespace day25
 			else
 			{
 
-				for (int i = 1; i <= nums[start] && i <= nums.size() - 1-start; i++)
+				for (int i = 1; i <= nums[start] && i <= (int)nums.size() - 1-start; i++)
 				{
 					if ( canJumpRecursive(nums, start+i )) return true;
 				}
@@ -1652,9 +1652,9 @@ namespace day26
 	public:
 		void printDP(const std::vector<std::vector<size_t>>& DPP)
 		{
-			for (int i = 0; i < DPP.size(); i++)
+			for (size_t i = 0; i < DPP.size(); i++)
 			{
-				for (int j = 0; j < DPP[0].size(); j++)
+				for (size_t j = 0; j < DPP[0].size(); j++)
 				{
 					std::cout << DPP[i][j] << ", ";
 				}
@@ -1734,13 +1734,14 @@ namespace day27
 			bool hasa1 = false;
 			int countouter = 0;
 			int countinner = 0;
-			do
+			do	// approach: sweep the field (1 stay 1 if surrounded by 1's, else decay to zero); 
+				//number of sweeps to zero matrix == dimension of largest 1x1 square
 			{
 				countouter++;
 				countinner = 0;
-				for (int i = 0; i < matrix.size(); i++)
+				for (size_t i = 0; i < matrix.size(); i++)
 				{
-					for (int j = 0; j < matrix[0].size(); j++)
+					for (size_t j = 0; j < matrix[0].size(); j++)
 					{
 
 						if (matrix[i][j] == '1')
@@ -1813,9 +1814,9 @@ namespace day27DP
 			if (matrix.size() == 0) return 0;
 			std::vector<std::vector<int>> DP(matrix.size(), std::vector<int>(matrix[0].size(), 0));
 			int maxside = 0;
-			for (int i = 0; i < matrix.size(); i++)
+			for (size_t i = 0; i < matrix.size(); i++)
 			{
-				for (int j = 0; j < matrix[0].size(); j++)
+				for (size_t j = 0; j < matrix[0].size(); j++)
 				{
 					if (matrix[i][j] == '1')
 					{
@@ -1846,10 +1847,96 @@ namespace day27DP
 		std::cout << "ans =" << Solution().maximalSquare(M);
 	}
 }
+namespace day28
+{
+	class FirstUnique {
+	private:
+		std::unordered_map<int, size_t> map;
+		std::vector<int> uniques;
+
+	public:
+		FirstUnique(std::vector<int>& nums) 
+		{
+		/*	auto vec2 = nums;
+			for (auto it = nums.begin(); it != nums.end();)
+			{
+				if (++map[*it] > 1)
+				{
+					auto it_prev = std::prev(it);
+					nums.erase(std::remove(nums.begin(), nums.end(), *it), nums.end());
+					it = it_prev;
+				}
+				else it++;
+			}*/
+			
+			for (const auto& v : nums)
+			{
+				int count = ++map[v];
+				if (count == 1)
+				{
+					uniques.push_back(v);
+				}
+				else if (count == 2)
+				{
+					uniques.erase(std::remove(uniques.begin(), uniques.end(), v), uniques.end());
+				}
+			}
+			
+		}
+
+		int showFirstUnique() const
+		{
+			if (uniques.size() > 0)
+			return uniques.front();
+			else return -1;
+
+		}
+
+		void add(int value) 
+		{
+			auto it = map.find(value);
+			if (it == map.end()) // not in the queue
+			{
+				map[value] = 1;
+				uniques.push_back(value);
+			}
+			else // already in the queue
+			{
+				if (it->second == 1) // was unique, no longer with this addition
+				{
+					uniques.erase(std::remove(uniques.begin(),uniques.end(),value),uniques.end());
+				}
+				map[value]++;
+			}
+		}
+	};
+
+	/**
+	 * Your FirstUnique object will be instantiated and called as such:
+	 * FirstUnique* obj = new FirstUnique(nums);
+	 * int param_1 = obj->showFirstUnique();
+	 * obj->add(value);
+	 */
+	void RunExample()
+	{
+		std::vector<int> vec = { 2,3,5 };
+		FirstUnique* firstUnique = new FirstUnique(vec);
+		firstUnique->showFirstUnique(); // return 2
+		firstUnique->add(5);            // the queue is now [2,3,5,5]
+		firstUnique->showFirstUnique(); // return 2
+		firstUnique->add(2);            // the queue is now [2,3,5,5,2]
+		firstUnique->showFirstUnique(); // return 3
+		firstUnique->add(3);            // the queue is now [2,3,5,5,2,3]
+		firstUnique->showFirstUnique(); // return -1
+		firstUnique->add(1);
+		firstUnique->showFirstUnique(); // return 1
+	}
+
+}
 
 int main()
 {
-	day27DP::RunExample();
+	day28::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
