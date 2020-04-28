@@ -1851,27 +1851,16 @@ namespace day28
 {
 	class FirstUnique {
 	private:
-		std::unordered_map<int, size_t> map;
+		std::unordered_map<int, std::pair<size_t,std::list<int>::iterator>> map;
 		std::vector<int> uniques;
+		std::list<int> list;
 
 	public:
 		FirstUnique(std::vector<int>& nums) 
 		{
-		/*	auto vec2 = nums;
-			for (auto it = nums.begin(); it != nums.end();)
-			{
-				if (++map[*it] > 1)
-				{
-					auto it_prev = std::prev(it);
-					nums.erase(std::remove(nums.begin(), nums.end(), *it), nums.end());
-					it = it_prev;
-				}
-				else it++;
-			}*/
-			
 			for (const auto& v : nums)
 			{
-				int count = ++map[v];
+				int count = ++map[v].first;
 				if (count == 1)
 				{
 					uniques.push_back(v);
@@ -1881,13 +1870,20 @@ namespace day28
 					uniques.erase(std::remove(uniques.begin(), uniques.end(), v), uniques.end());
 				}
 			}
-			
+			for (const auto& v : uniques)
+			{
+				list.push_back(v);
+			}
+			for (auto it = list.begin(); it != list.end(); it++)
+			{
+				map[*it].second = it;
+			}
 		}
 
 		int showFirstUnique() const
 		{
-			if (uniques.size() > 0)
-			return uniques.front();
+			if (list.size() > 0)
+			return list.front();
 			else return -1;
 
 		}
@@ -1897,20 +1893,20 @@ namespace day28
 			auto it = map.find(value);
 			if (it == map.end()) // not in the queue
 			{
-				map[value] = 1;
-				uniques.push_back(value);
+				list.push_back(value);
+				map[value] = { 1,std::prev(list.end()) };
 			}
 			else // already in the queue
 			{
-				if (it->second == 1) // was unique, no longer with this addition
+				if (it->second.first == 1) // was unique, no longer with this addition
 				{
-					uniques.erase(std::remove(uniques.begin(),uniques.end(),value),uniques.end());
+					list.erase(it->second.second);
 				}
-				map[value]++;
+				map[value].first++;
+				map[value].second = list.end();
 			}
 		}
 	};
-
 	/**
 	 * Your FirstUnique object will be instantiated and called as such:
 	 * FirstUnique* obj = new FirstUnique(nums);
@@ -1919,16 +1915,18 @@ namespace day28
 	 */
 	void RunExample()
 	{
-		std::vector<int> vec = { 2,3,5 };
+		std::vector<int> vec = { 7,7,7,7,7,7 };
 		FirstUnique* firstUnique = new FirstUnique(vec);
 		firstUnique->showFirstUnique(); // return 2
-		firstUnique->add(5);            // the queue is now [2,3,5,5]
+		firstUnique->add(7);            // the queue is now [2,3,5,5]
 		firstUnique->showFirstUnique(); // return 2
-		firstUnique->add(2);            // the queue is now [2,3,5,5,2]
+		firstUnique->add(3);            // the queue is now [2,3,5,5,2]
 		firstUnique->showFirstUnique(); // return 3
 		firstUnique->add(3);            // the queue is now [2,3,5,5,2,3]
 		firstUnique->showFirstUnique(); // return -1
-		firstUnique->add(1);
+		firstUnique->add(7);
+		firstUnique->showFirstUnique(); // return 1
+		firstUnique->add(17);
 		firstUnique->showFirstUnique(); // return 1
 	}
 
