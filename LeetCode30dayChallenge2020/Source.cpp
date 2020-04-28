@@ -1849,6 +1849,12 @@ namespace day27DP
 }
 namespace day28
 {
+	/**
+	 * Your FirstUnique object will be instantiated and called as such:
+	 * FirstUnique* obj = new FirstUnique(nums);
+	 * int param_1 = obj->showFirstUnique();
+	 * obj->add(value);
+	 */
 	class FirstUnique {
 	private:
 		std::unordered_map<int, std::pair<size_t,std::list<int>::iterator>> map;
@@ -1907,27 +1913,51 @@ namespace day28
 			}
 		}
 	};
-	/**
-	 * Your FirstUnique object will be instantiated and called as such:
-	 * FirstUnique* obj = new FirstUnique(nums);
-	 * int param_1 = obj->showFirstUnique();
-	 * obj->add(value);
-	 */
+	class FirstUnique2 
+	{
+	private:
+		std::unordered_map<int, int> map;
+		std::queue<int> queue;
+
+	public:
+		FirstUnique2(std::vector<int>& nums)
+		{
+			for (const int& v : nums)
+			{
+				map[v]++;
+				queue.push(v);
+			}
+		}
+		int showFirstUnique() 
+		{
+			while (!queue.empty() && map[queue.front()] > 1)
+			{
+				queue.pop();
+			}
+			if (queue.empty()) return -1;
+			else return queue.front();
+		}
+		void add(int value)
+		{
+			if (++map[value] == 1)
+			{
+				queue.push(value);
+			}
+		}
+	};
+
 	void RunExample()
 	{
-		std::vector<int> vec = { 7,7,7,7,7,7 };
-		FirstUnique* firstUnique = new FirstUnique(vec);
+		std::vector<int> vec = { 2,3,5 };
+		FirstUnique2* firstUnique = new FirstUnique2(vec);
 		firstUnique->showFirstUnique(); // return 2
-		firstUnique->add(7);            // the queue is now [2,3,5,5]
+		firstUnique->add(5);            // the queue is now [2,3,5,5]
 		firstUnique->showFirstUnique(); // return 2
-		firstUnique->add(3);            // the queue is now [2,3,5,5,2]
+		firstUnique->add(2);            // the queue is now [2,3,5,5,2]
 		firstUnique->showFirstUnique(); // return 3
 		firstUnique->add(3);            // the queue is now [2,3,5,5,2,3]
 		firstUnique->showFirstUnique(); // return -1
-		firstUnique->add(7);
-		firstUnique->showFirstUnique(); // return 1
-		firstUnique->add(17);
-		firstUnique->showFirstUnique(); // return 1
+		
 	}
 
 }
