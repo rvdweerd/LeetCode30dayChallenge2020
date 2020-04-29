@@ -1893,7 +1893,6 @@ namespace day28
 			else return -1;
 
 		}
-
 		void add(int value) 
 		{
 			auto it = map.find(value);
@@ -1945,7 +1944,6 @@ namespace day28
 			}
 		}
 	};
-
 	void RunExample()
 	{
 		std::vector<int> vec = { 2,3,5 };
@@ -1956,15 +1954,73 @@ namespace day28
 		firstUnique->add(2);            // the queue is now [2,3,5,5,2]
 		firstUnique->showFirstUnique(); // return 3
 		firstUnique->add(3);            // the queue is now [2,3,5,5,2,3]
-		firstUnique->showFirstUnique(); // return -1
-		
+		firstUnique->showFirstUnique(); // return -1	
 	}
-
 }
 
+namespace day29
+{
+	struct TreeNode {
+      int val;
+      TreeNode *left;
+      TreeNode *right;
+      TreeNode() : val(0), left(nullptr), right(nullptr) {}
+      TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+      TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	};
+ 
+	class Solution {
+		int max = -1000000000;
+	public:
+		int maxPathSum(TreeNode* root) 
+		{
+			int top = maxTree(root);
+			return std::max(max, top);
+		}
+		int maxTree(TreeNode* root)
+		{
+			if (root == nullptr) return 0;
+			int maxleft = maxTree(root->left);
+			int maxright = maxTree(root->right);
+			/*if (!(root->left == nullptr && root->right == nullptr))
+			{
+				if (root->right == nullptr)
+				{
+					max = std::max({ max,maxleft });
+					return root->val + maxleft ;
+				}
+				else if (root->left == nullptr)
+				{
+					max = std::max({ max,maxright });
+					return root->val + maxright;
+				}
+				else
+				{
+					max = std::max({ max,maxright,maxleft });
+					return root->val + maxleft + maxright;
+				}
+			}*/
+			if (root->left == nullptr && root->right != nullptr) max = std::max({ max,maxright });
+			if (root->left != nullptr && root->right == nullptr) max = std::max({ max,maxleft });
+			if (root->left != nullptr && root->right != nullptr) max = std::max({ max,maxright,maxleft });
+			return std::max(root->val,root->val + maxleft + maxright);
+		}
+	};
+
+	void RunExample()
+	{
+		TreeNode* root = new TreeNode(2);
+		root->left = new TreeNode(-1);
+		//root->right = new TreeNode(20, new TreeNode(15), new TreeNode(7));
+
+		int m = Solution().maxPathSum(root);
+
+
+	}
+}
 int main()
 {
-	day28::RunExample();
+	day29::RunExample();
 	//Rod::rod();
 	std::cin.get();
 	return 0;
