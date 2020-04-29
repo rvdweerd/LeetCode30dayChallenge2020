@@ -1120,14 +1120,14 @@ namespace day21
 		{
 			return M[x][y];
 		}
-		std::vector<int> dimensions()
+		std::vector<size_t> dimensions()
 		{
 			return { n,m };
 		}
 	private:
 		std::vector<std::vector<int>> M;
-		int n=0;
-		int m=0;
+		size_t n=0;
+		size_t m=0;
 	};
 	class Solution
 	{
@@ -1139,7 +1139,7 @@ namespace day21
 			//  ->  (nxm) matrix means m width, n height (contrary to lin.alg. convention)
 			//  ->  m[x][y] means element on row x (vertical), position y (horizontal)
 			// ->   So, my pointer ptr is defined as pair<x,y>
-			const std::vector<int> dimension = binaryMatrix.dimensions();
+			const std::vector<size_t> dimension = binaryMatrix.dimensions();
 			const int n = dimension[0];
 			const int m = dimension[1];
 			std::cout << "n=" << n << std::endl;	std::cout << "m=" << m << std::endl;
@@ -1171,7 +1171,7 @@ namespace day21
 			//  ->  m[x][y] means element on row x (vertical), position y (horizontal)
 			// ->   So, my pointer ptr is defined as pair<x,y>
 			
-			const std::vector<int> dimension = binaryMatrix.dimensions();
+			const std::vector<size_t> dimension = binaryMatrix.dimensions();
 			const int n = dimension[0];
 			const int m = dimension[1];
 			std::vector<int> markers(n, (int)1e9);
@@ -1957,7 +1957,6 @@ namespace day28
 		firstUnique->showFirstUnique(); // return -1	
 	}
 }
-
 namespace day29
 {
 	struct TreeNode {
@@ -1968,54 +1967,32 @@ namespace day29
       TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
       TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 	};
- 
 	class Solution {
-		int max = -1000000000;
+		//int max = std::numeric_limits<int>::min();
 	public:
 		int maxPathSum(TreeNode* root) 
 		{
-			int top = maxTree(root);
-			return std::max(max, top);
+			int max = INT_MIN;
+			MSS(root,max);
+			return max;
 		}
-		int maxTree(TreeNode* root)
+		int MSS(TreeNode* node, int& max) // max segment sum
 		{
-			if (root == nullptr) return 0;
-			int maxleft = maxTree(root->left);
-			int maxright = maxTree(root->right);
-			/*if (!(root->left == nullptr && root->right == nullptr))
-			{
-				if (root->right == nullptr)
-				{
-					max = std::max({ max,maxleft });
-					return root->val + maxleft ;
-				}
-				else if (root->left == nullptr)
-				{
-					max = std::max({ max,maxright });
-					return root->val + maxright;
-				}
-				else
-				{
-					max = std::max({ max,maxright,maxleft });
-					return root->val + maxleft + maxright;
-				}
-			}*/
-			if (root->left == nullptr && root->right != nullptr) max = std::max({ max,maxright });
-			if (root->left != nullptr && root->right == nullptr) max = std::max({ max,maxleft });
-			if (root->left != nullptr && root->right != nullptr) max = std::max({ max,maxright,maxleft });
-			return std::max(root->val,root->val + maxleft + maxright);
+			if (!node) return 0;
+			const int maxleft = std::max(MSS(node->left,max),0);
+			const int maxright = std::max(MSS(node->right,max),0);
+			max = std::max(max,node->val + maxleft + maxright);
+			return node->val + std::max(maxleft,maxright);
 		}
 	};
-
 	void RunExample()
 	{
-		TreeNode* root = new TreeNode(2);
+		TreeNode* root = new TreeNode(-1);
 		root->left = new TreeNode(-1);
-		//root->right = new TreeNode(20, new TreeNode(15), new TreeNode(7));
-
+		root->right = new TreeNode(2, new TreeNode(-1,nullptr,new TreeNode(3)), new TreeNode(1));
+		//root->left = new TreeNode(-1);
+		//TreeNode* root = new TreeNode(1, new TreeNode(2), new TreeNode(3
 		int m = Solution().maxPathSum(root);
-
-
 	}
 }
 int main()
