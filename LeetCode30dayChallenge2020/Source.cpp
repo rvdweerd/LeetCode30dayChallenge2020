@@ -1995,10 +1995,77 @@ namespace day29
 		int m = Solution().maxPathSum(root);
 	}
 }
+namespace day30
+{
+	struct TreeNode {
+		int val;
+		TreeNode* left;
+		TreeNode* right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+	};
+	
+	class Solution {
+	public:
+		bool isValidSequence(TreeNode* root, std::vector<int>& arr) 
+		{
+			//size_t index = 0;
+			return isValidSubSeq(root,arr,0);
+		}
+		bool isValidSubSeq(TreeNode* node, std::vector<int>& arr, size_t index)
+		{
+			if (!node) return false;
+			if (node->val == arr[index])
+			{
+				if (index == arr.size() - 1)
+				{
+					if (node->left == nullptr && node->right == nullptr)
+					{
+						return true;
+					}
+					else return false;
+				}
+				else
+				{
+					return (isValidSubSeq(node->left,arr,index+1) || isValidSubSeq(node->right, arr, index + 1));
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+	};
+	void RunExample()
+	{
+		Solution s;
+		TreeNode* root = new TreeNode(0, new TreeNode(1), new TreeNode(0));
+		root->left->left = new TreeNode(0, nullptr, new TreeNode(1));
+		root->left->right = new TreeNode(1, new TreeNode(0), new TreeNode(0));
+		root->right->left = new TreeNode(0, nullptr, nullptr);
+		std::vector<int> arr1 = { 0, 1, 0, 1};
+		bool test1 = s.isValidSequence(root, arr1); // true
+		std::vector<int> arr2 = { 0, 0, 1 };
+		bool test2 = s.isValidSequence(root, arr2); // false
+		std::vector<int> arr3 = { 0, 1, 1 };
+		bool test3 = s.isValidSequence(root, arr3); // false
+		std::vector<int> arr4 = { 0, 1, 1, 0 };
+		bool test4 = s.isValidSequence(root, arr4); // true
+	}
+	void RunExample2()
+	{
+		TreeNode* root = new TreeNode(1);
+		std::vector<int> arr1 = { 0 };
+		bool test1 = Solution().isValidSequence(root, arr1); // true
+
+	}
+}
+
 int main()
 {
-	day29::RunExample();
-	//Rod::rod();
+	day30::RunExample();
 	std::cin.get();
 	return 0;
 }
