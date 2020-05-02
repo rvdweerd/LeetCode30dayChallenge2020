@@ -2062,10 +2062,52 @@ namespace day30
 
 	}
 }
-
+namespace May_day2
+{
+	class Solution {
+	public:
+		int numJewelsInStones(std::string J, std::string S)
+		{
+			std::unordered_set<char> set;
+			for (char c : J)
+			{
+				set.insert(c);
+			}
+			int count = 0;
+			for (char c : S)
+			{
+				if (set.find(c)!=set.end())
+					count++;
+			}
+			return count;
+		}
+		
+		
+		int numJewelsInStones2(std::string J, std::string S) 
+		{
+			long long map = 0;
+			for (char c : J)
+			{
+				map |= (long long)1 << (c-'A'+1);
+			}
+			int count = 0;
+			for (char c : S)
+			{
+				count += ( (map & (long long)1<<(c-'A'+1) )> 0);
+			}
+			return count;
+		}
+	};
+	void RunExample()
+	{
+		std::string J = "aA";
+		std::string S = "aAAbbbb";
+		int ans = Solution().numJewelsInStones(J, S);
+	}
+}
 int main()
 {
-	day30::RunExample();
+	May_day2::RunExample();
 	std::cin.get();
 	return 0;
 }
