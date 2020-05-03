@@ -2105,9 +2105,32 @@ namespace May_day2
 		int ans = Solution().numJewelsInStones(J, S);
 	}
 }
+namespace May_day3
+{
+	class Solution {
+	public:
+		bool canConstruct(std::string ransomNote, std::string magazine)
+		{
+			int count[256] = { 0 };
+			for (auto c : magazine) count[c]++;
+			for (auto c : ransomNote)
+			{
+				if (--count[c] < 0) return false;
+			}
+			return true;
+		}
+	};
+	void RunExample()
+	{
+		std::string note = "aa";
+		std::string magazine = "aAAbbbb";
+		int ans = Solution().canConstruct(note, magazine);
+	}
+}
+
 int main()
 {
-	May_day2::RunExample();
+	May_day3::RunExample();
 	std::cin.get();
 	return 0;
 }
