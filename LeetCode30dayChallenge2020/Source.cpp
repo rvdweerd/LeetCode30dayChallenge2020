@@ -2127,10 +2127,49 @@ namespace May_day3
 		int ans = Solution().canConstruct(note, magazine);
 	}
 }
+namespace May_day4
+{
+	class Solution 
+	{
+		unsigned int HighestBit(unsigned int num)
+		{
+			unsigned int count = 0;
+			while (num != 0)
+			{
+				count++;
+				num >>= 1;
+			}
+			return count;
+		}
+	public:
+		unsigned int findComplement(unsigned int num)
+		{
+			unsigned mask = 1;
+			while (mask < num)
+			{
+				mask <<= 1;
+				mask++;
+			}
+			return (num ^ mask);
+		}
+		unsigned int findComplement2(unsigned int num) 
+		{
+			unsigned int digits = HighestBit(num);
+			unsigned int inv = ~num;
+			inv <<= (32-digits); 
+			inv >>= (32-digits);
+			return inv;
+		}
+	};
+	void RunExample()
+	{
+		unsigned int ans = Solution().findComplement(5);
+	}
+}
 
 int main()
 {
-	May_day3::RunExample();
+	May_day4::RunExample();
 	std::cin.get();
 	return 0;
 }
