@@ -140,6 +140,12 @@
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="30DC_Apr2020.h" />
+    <ClInclude Include="30DC_May2020.h" />
+    <ClInclude Include="GraphClass.h" />
+    <ClInclude Include="Problems.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
