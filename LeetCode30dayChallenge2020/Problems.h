@@ -14,7 +14,66 @@ namespace LC685 // Redundant connections
 {
 	class Solution {
 	public:
-		std::vector<int> findRedundantDirectedConnection(std::vector<std::vector<int>>& edges) 
+		std::vector<int> findRedundantDirectedConnection(std::vector<std::vector<int>>& edges)
+		{
+			// Build graph
+			Graph<int> graph(edges);
+			std::set<std::vector<int>> removableEdges;
+
+			// Case A: Is there a circuit? 
+			//std::set<Graph<int>::Node*> circularNodes;
+			//for (auto p : graph.nodemap) // p = pairs of { node_name , Node*}
+			//{
+			//	if (graph.IsCircularNode(p.second))
+			//	{
+			//		circularNodes.insert(p.second);
+			//	}
+			//}
+			std::set<Graph<int>::Node*> circularNodes = graph.GetCircularNodes();
+			for (auto n : circularNodes)
+			{
+				for (auto e : n->edges_out)
+				{
+					if (circularNodes.find(e->end) != circularNodes.end()) // if ourward edge points to another cirulcar node
+					{
+						if (e->end->InDegree() > 1 || !graph.HasRoot())
+						{
+							removableEdges.insert({ e->start->name,e->end->name });
+						}
+					}
+				}
+			}
+			// Case B: No circuit, but is there a node with InDegree > 1? THEN: any incoming edges of this node can be removed
+			if (removableEdges.size() == 0) // Move to Case B
+			{
+				for (auto p : graph.nodemap) // p = pairs of { node_name , Node*}
+				{
+					if (p.second->InDegree() > 1)
+					{
+						for (auto e : p.second->edges_in) // e = all incoming edges
+						{
+							removableEdges.insert({ e->start->name,e->end->name });
+						}
+					}
+				}
+			}
+			// Result processing
+			if (removableEdges.size() == 0) return {};
+			else if (removableEdges.size() == 1) return  *removableEdges.begin();
+			else // find last occurence of a removable edge in the input 2D array of edges (our function parameter)
+			{
+				for (size_t i = edges.size() - 1; i >= 0; --i)
+				{
+					if (removableEdges.find(edges[i]) != removableEdges.end())
+					{
+						return edges[i];
+					}
+				}
+
+			}
+			return {};
+		}
+		std::vector<int> findRedundantDirectedConnection_expensive(std::vector<std::vector<int>>& edges) 
 		{
 			// Build graph
 			Graph<int> graph(edges);
@@ -70,9 +129,6 @@ namespace LC685 // Redundant connections
 				}
 
 			}
-			
-			
-			
 			return {};
 		}
 	};
