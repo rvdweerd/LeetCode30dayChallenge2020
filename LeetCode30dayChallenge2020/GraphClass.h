@@ -52,19 +52,8 @@ public:
 	};
 	std::map<T, Node*> nodemap;
 	std::set<Edge*> edgelist;
-	bool hasRoot = false;
 private:
-	void CheckRoot()
-	{
-		for (auto p : nodemap)
-		{
-			if (p.second->InDegree() == 0)
-			{
-				hasRoot = true;
-				break;
-			}
-		}
-	}
+	bool hasRoot = false;
 public:
 	Graph() = default;
 	Graph(std::vector<std::vector<T>> edges)
@@ -204,5 +193,17 @@ public:
 		// delete source node
 		nodemap.erase(source->name);
 		delete source; source = nullptr;
+	}
+private:
+	void CheckRoot()
+	{
+		for (auto p : nodemap)
+		{
+			if (p.second->InDegree() == 0)
+			{
+				hasRoot = true;
+				break;
+			}
+		}
 	}
 };

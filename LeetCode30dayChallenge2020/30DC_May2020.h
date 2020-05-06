@@ -173,3 +173,28 @@ namespace May_day5
 		int ans = Solution().firstUniqChar(str);
 	}
 }
+namespace May_day6
+{
+	class Solution {
+	public:
+		int majorityElement(std:: vector<int>& nums) 
+		{
+			size_t mid = nums.size() / 2;
+			std::unordered_map<int, size_t> map;
+			for (size_t i = 0; i < nums.size(); i++)
+			{
+				if (map[nums[i]]++ == mid) return nums[i];
+			}
+			return -1;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> nums1 = { 2,2,1,1,1,2,2 };
+		int ans1 = Solution().majorityElement(nums1);
+		std::vector<int> nums2 = { 3,2,3 };
+		int ans2 = Solution().majorityElement(nums2);
+		std::vector<int> nums3 = { 2 };
+		int ans3 = Solution().majorityElement(nums3);
+	}
+}
