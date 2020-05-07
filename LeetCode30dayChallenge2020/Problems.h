@@ -143,6 +143,15 @@ namespace LC685 // Redundant connections
 		auto ans3 = Solution().findRedundantDirectedConnection(edges3);
 		std::vector<std::vector<int>> edges4 = { {5,2},{2,3},{3,4},{4,5},{5,1} }; //  ans: [4,5]
 		auto ans4 = Solution().findRedundantDirectedConnection(edges4);
+		Graph<std::string> graph(
+			{
+				{"B","C"},{"A","B"},{"C","A"},{"B","D"} ,
+				{"D","E"},{"E","F"},{"F","D"},{"G","F"},
+				{"G","H"},{"H","I"},{"I","J"},{"J","G"},
+				{"J","K"},
+			}
+		);
+		auto vec = graph.StronglyConnectedComponents();
 
 	}
 }

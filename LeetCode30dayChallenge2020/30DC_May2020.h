@@ -198,3 +198,51 @@ namespace May_day6
 		int ans3 = Solution().majorityElement(nums3);
 	}
 }
+namespace May_day7
+{
+ struct TreeNode 
+	{
+	int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode() : val(0), left(nullptr), right(nullptr) {}
+    TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	};
+
+	class Solution 
+	{
+	public:
+		std::pair<int, int> pair1 = { 0,-1 };
+		std::pair<int, int> pair2 = { 0,-1 };
+		bool isCousins(TreeNode* root, int x, int y)
+		{
+			TestNodes(root, x, y, 0);
+			if (pair1.second == -1 || pair2.second == -1) return false;
+			if (pair1.first != pair2.first && pair1.second == pair2.second) return true;
+			return false;
+		}
+		void TestNodes(TreeNode* n, int& val1, int& val2, int depth)
+		{
+			if (n == nullptr) return;
+			if (n->left != nullptr)
+			{
+				if (n->left->val == val1) pair1 = { n->val,depth };
+				if (n->left->val == val2) pair2 = { n->val,depth };
+			}
+			if (n->right != nullptr)
+			{
+				if (n->right->val == val1) pair1 = { n->val,depth };
+				if (n->right->val == val2) pair2 = { n->val,depth };
+			}
+			TestNodes(n->left, val1, val2, depth + 1);
+			TestNodes(n->right, val1, val2, depth + 1);
+		}
+
+	};
+	void RunExample()
+	{
+		TreeNode* tree = new TreeNode(1,new TreeNode(2,nullptr,new TreeNode(4)),new TreeNode(3,nullptr, new TreeNode(5)));
+		bool ans = Solution().isCousins(tree,5,4);
+	}
+}

@@ -17,18 +17,8 @@
 
 int main()
 {
-	//Apr20_day30::RunExample();
-	//May_day6::RunExample();
-	LC685::RunExample();
-	Graph<std::string> graph(
-		{
-			{"B","C"},{"A","B"},{"C","A"},{"B","D"} ,
-			{"D","E"},{"E","F"},{"F","D"},{"G","F"},
-			{"G","H"},{"H","I"},{"I","J"},{"J","G"},
-			{"J","K"},
-		}
-	);
-	graph.StronglyConnectedComponents();
+	May_day7::RunExample();
+	
 
 	std::cin.get();
 	return 0;
