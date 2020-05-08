@@ -246,3 +246,31 @@ namespace May_day7
 		bool ans = Solution().isCousins(tree,5,4);
 	}
 }
+namespace May_day8
+{
+	class Solution
+	{
+	public:
+		bool checkStraightLine(std::vector<std::vector<int>>& coordinates)
+		{
+			if (coordinates.size() <= 2) return true;
+			const int basevec0 = coordinates[1][0] - coordinates[0][0];
+			const int basevec1 = coordinates[1][1] - coordinates[0][1];
+			// v1 - v0
+			for (size_t i = 2; i < coordinates.size(); i++)
+			{
+				if ((basevec0 * (coordinates[i][1] - coordinates[0][1]) - basevec1 * (coordinates[i][0] - coordinates[0][0])  ) != 0) 
+					// check if crossproduct = 0 (then basevec and checkvec have the same direction)
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec = { {1,1},{2,2},{3,4},{4,5},{5,6},{7,7} };
+		bool test = Solution().checkStraightLine(vec);
+	}
+}
