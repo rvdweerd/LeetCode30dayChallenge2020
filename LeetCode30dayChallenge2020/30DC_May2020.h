@@ -274,3 +274,37 @@ namespace May_day8
 		bool test = Solution().checkStraightLine(vec);
 	}
 }
+namespace May_day9
+{
+	class Solution {
+	public:
+		bool isPerfectSquare(int num) 
+		{
+			long long numL = (long long)num;
+			if (num <= 1) return true;
+			long long int lo = 0;
+			long long int hi = 1;
+			while (hi * hi < numL)
+			{
+				lo = hi;
+				hi = hi + lo/2+1;
+			}
+			while (lo <= hi)
+			{
+				long long int mid = lo + (hi - lo) / 2;
+				long long int sq = mid * mid;
+				if (sq == numL) return true;
+				if (sq < numL) lo = mid + 1;
+				else hi = mid - 1;
+			}
+			return false;
+		}
+
+	};
+	void RunExample()
+	{
+		bool ans = Solution().isPerfectSquare(2147483647);
+		ans = Solution().isPerfectSquare(16);
+		ans = Solution().isPerfectSquare(15);
+	}
+}
