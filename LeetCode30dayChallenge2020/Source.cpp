@@ -17,7 +17,7 @@
 
 int main()
 {
-	May_day9::RunExample();
+	May_day10::RunExample();
 	
 
 	std::cin.get();

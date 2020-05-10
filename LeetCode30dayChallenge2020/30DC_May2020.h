@@ -308,3 +308,74 @@ namespace May_day9
 		ans = Solution().isPerfectSquare(15);
 	}
 }
+namespace May_day10
+{
+	class Solution {
+	public:
+		int findJudge0(int N, std::vector<std::vector<int>>& trust) 
+		{
+			std::unordered_map<int, size_t> map_candidates;
+			std::unordered_set<int> map_disqualified;
+			if ((int)trust.size() < N - 1) return -1;
+			map_candidates.insert({ 1,0 });
+			for (auto v : trust)
+			{
+				// Trusting person is disqualified to be judge
+				// -> Add to discualified set
+				map_disqualified.insert(v[0]);
+				// -> Remove from candidate list
+				auto it_c0 = map_candidates.find(v[0]);
+				if (it_c0 != map_candidates.end()) map_candidates.erase(it_c0);
+				
+				// Trusted person is a candidate, if not disqualified earlier
+				auto it_d1 = map_disqualified.find(v[1]);
+				if (it_d1 == map_disqualified.end())
+				{
+					map_candidates[v[1]]++;
+				}
+			}
+			for (auto c : map_candidates)
+			{
+				if (c.second == N - 1) return c.first;
+			}
+			return -1;
+		}
+		int findJudge(int N, std::vector<std::vector<int>>& trust)
+		{
+			std::unordered_map<int, std::pair<size_t,size_t>> map_candidates;
+			if ((int)trust.size() < N - 1) return -1;
+			map_candidates.insert({ 1,  {0,0} });
+			for (auto v : trust)
+			{
+				map_candidates[v[0]].first++;
+				map_candidates[v[1]].second++;
+			}
+			for (auto c : map_candidates)
+			{
+				if (c.second.first == 0 && c.second.second == N - 1) return c.first;
+			}
+			return -1;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec = { {1, 3}, {1, 4}, {2, 3}, {2, 4}, {4, 3} };
+		int ans = Solution().findJudge(4,vec); // 3
+		vec = { {1,2},{2,3} };
+		ans = Solution().findJudge(3, vec); // -1
+		vec = { {1,3},{2,3},{3,1} };
+		ans = Solution().findJudge(3, vec); // -1
+		vec = { {1,3},{2,3} };
+		ans = Solution().findJudge(3, vec); // 3
+		vec = { {1,2} };
+		ans = Solution().findJudge(2, vec); // 2
+		vec = { {1,2} };
+		ans = Solution().findJudge(0, vec); // -1
+		vec = { {1,2} };
+		ans = Solution().findJudge(1, vec); // -1
+		vec = {  };
+		ans = Solution().findJudge(1, vec); // 1
+
+
+	}
+}
