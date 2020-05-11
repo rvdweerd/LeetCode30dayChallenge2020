@@ -10,6 +10,136 @@
 #include <queue>
 #include "GraphClass.h"
 
+namespace LC37 // Sudoko solver
+{
+	class Solution {
+	private:
+		struct Pos
+		{
+			size_t i;
+			size_t row;
+			size_t col;
+			char ch;
+		};
+		std::unordered_map<size_t, std::set<char>> cache;
+		void FillCache(std::vector<std::vector<char>>& board)
+		{
+			for (size_t i = 0; i < 81; i++)
+			{
+				size_t row = i / 9; size_t col = i % 9;
+				if (board[row][col] == '.')
+				{
+					std::set<char> reducedSet = { '1','2','3' ,'4' ,'5' ,'6' ,'7' ,'8' ,'9' };
+					// check row & col
+					for (size_t i = 0; i < 9; i++)
+					{
+						const char ch_r = board[row][i];
+						const char ch_c = board[i][col];
+						if (ch_r != '.') reducedSet.erase(ch_r);
+						if (ch_c != '.') reducedSet.erase(ch_c);
+					}
+					// check quadrant
+					size_t Q_row = row / 3;
+					size_t Q_col = col / 3;
+					for (size_t i = 0; i < 3; i++)
+					{
+						for (size_t j = 0; j < 3; j++)
+						{
+							const char ch = board[Q_row * 3 + i][Q_col * 3 + j];
+							if (ch != '.') reducedSet.erase(ch);
+						}
+					}
+					cache[i] = reducedSet;
+				}
+			}
+		}
+		std::set<char> GetOptions(size_t row, size_t col, size_t i, std::vector<std::vector<char>>& board)
+		{
+			std::set<char> reducedSet = cache.find(i)->second;
+			// check row & col
+			for (size_t i = 0; i < 9; i++)
+			{
+				const char ch_r = board[row][i] ;
+				const char ch_c = board[i][col] ;
+				if (ch_r != '.') reducedSet.erase(ch_r);
+				if (ch_c != '.') reducedSet.erase(ch_c);
+			}
+			// check quadrant
+			size_t Q_row = row / 3;
+			size_t Q_col = col / 3;
+			for (size_t i = 0; i < 3; i++)
+			{
+				for (size_t j = 0; j < 3; j++)
+				{
+					const char ch = board[Q_row * 3 + i][Q_col * 3 + j];
+					if (ch != '.') reducedSet.erase(ch);
+				}
+			}
+			return reducedSet;
+		}
+	public:
+		void solveSudoku(std::vector<std::vector<char>>& board) 
+		{
+			std::stack<Pos> stack;
+			FillCache(board);
+			size_t i = 0;
+			while (i < 81)
+			{
+				size_t row = i / 9;
+				size_t col = i % 9;
+				if (board[row][col] == '.')
+				{
+					std::set<char> options = GetOptions(row, col, i,board);
+					if (options.size() == 0)
+					{
+						Pos prevPos = stack.top(); stack.pop();
+						while (prevPos.ch == '.')
+						{
+							board[prevPos.row][prevPos.col] = '.'; // backtrack
+							prevPos = stack.top(); stack.pop();
+						}
+						board[prevPos.row][prevPos.col] = prevPos.ch;
+						i = prevPos.i+1;
+					}
+					else
+					{
+						stack.push({ i, row, col, '.' });
+						for (auto c : options)
+						{
+							stack.push({ i, row, col, c });
+						}
+						Pos prevPos = stack.top(); stack.pop();
+						board[prevPos.row][prevPos.col] = prevPos.ch;
+						i++;
+					}
+				}
+				else
+				{
+					++i;
+				}
+			}
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> board =
+		{
+			{'5','3','.',	'.','7','.',	'.','.','.'},
+			{'6','.','.',	'1','9','5',	'.','.','.'},
+			{'.','9','8',	'.','.','.',	'.','6','.'},
+
+			{'8','.','.',	'.','6','.',	'.','.','3'},
+			{'4','.','.',	'8','.','3',	'.','.','1'},
+			{'7','.','.',	'.','2','.',	'.','.','6'},
+
+			{'.','6','.',	'.','.','.',	'2','8','.'},
+			{'.','.','.',	'4','1','9',	'.','.','5'},
+			{'.','.','.',	'.','8','.',	'.','7','9'}
+		};
+		Solution().solveSudoku(board);
+	}
+}
+
 namespace LC685 // Redundant connections
 {
 	class Solution {
