@@ -379,3 +379,92 @@ namespace May_day10
 
 	}
 }
+namespace May_day11
+{
+	class Solution {
+	private:
+		struct Point
+		{
+			int row=0;
+			int col=0;
+		};
+		
+	public:
+		std::vector<std::vector<int>> floodFill_cpy(std::vector<std::vector<int>>& image, int sr, int sc, int newColor) 
+		{
+			std::vector<std::vector<int>> floodedImage = image;
+			if (image[sr][sc] == newColor) return image;
+			std::queue<Point> queue;
+			int oldColor = image[sr][sc];
+			queue.push({ sr,sc });
+			while (!queue.empty())
+			{
+				Point currentPos = queue.front(); queue.pop();
+				floodedImage[currentPos.row][currentPos.col] = newColor;
+				if (currentPos.row > 0 && floodedImage[currentPos.row - 1][currentPos.col] == oldColor) // Check NORTH
+				{
+					queue.push({ currentPos.row - 1, currentPos.col }); 
+					floodedImage[currentPos.row-1][currentPos.col] = newColor;
+				}
+				if (currentPos.row < int(image.size() - 1) && floodedImage[currentPos.row + 1][currentPos.col] == oldColor) // Check SOUTH
+				{
+					queue.push({ currentPos.row + 1,currentPos.col }); 
+					floodedImage[currentPos.row + 1][currentPos.col] = newColor;
+				}
+				if (currentPos.col < int(image[0].size() - 1) && floodedImage[currentPos.row][currentPos.col + 1] == oldColor)
+				{
+					queue.push({ currentPos.row, currentPos.col +1}); // East
+					floodedImage[currentPos.row ][currentPos.col+1] = newColor;
+				}
+				if (currentPos.col > 0 && floodedImage[currentPos.row][currentPos.col - 1] == oldColor)
+				{
+					queue.push({ currentPos.row, currentPos.col - 1 }); // West
+					floodedImage[currentPos.row ][currentPos.col-1] = newColor;
+				}
+			}
+			return floodedImage;
+		}
+		std::vector<std::vector<int>> floodFill(std::vector<std::vector<int>>& image, int sr, int sc, int newColor)
+		{
+			//std::vector<std::vector<int>> floodedImage = image;
+			if (image[sr][sc] == newColor) return image;
+			std::queue<Point> queue;
+			int oldColor = image[sr][sc];
+			queue.push({ sr,sc });
+			while (!queue.empty())
+			{
+				Point currentPos = queue.front(); queue.pop();
+				image[currentPos.row][currentPos.col] = newColor;
+				if (currentPos.row > 0 && image[currentPos.row - 1][currentPos.col] == oldColor) // Check NORTH
+				{
+					queue.push({ currentPos.row - 1, currentPos.col });
+					image[currentPos.row - 1][currentPos.col] = newColor;
+				}
+				if (currentPos.row < int(image.size() - 1) && image[currentPos.row + 1][currentPos.col] == oldColor) // Check SOUTH
+				{
+					queue.push({ currentPos.row + 1,currentPos.col });
+					image[currentPos.row + 1][currentPos.col] = newColor;
+				}
+				if (currentPos.col < int(image[0].size() - 1) && image[currentPos.row][currentPos.col + 1] == oldColor)
+				{
+					queue.push({ currentPos.row, currentPos.col + 1 }); // East
+					image[currentPos.row][currentPos.col + 1] = newColor;
+				}
+				if (currentPos.col > 0 && image[currentPos.row][currentPos.col - 1] == oldColor)
+				{
+					queue.push({ currentPos.row, currentPos.col - 1 }); // West
+					image[currentPos.row][currentPos.col - 1] = newColor;
+				}
+			}
+			return image;
+		}
+
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> image = { {1, 1, 1}, {1, 1, 0}, {1, 0, 1} };
+		std::vector<std::vector<int>> flooded = Solution().floodFill(image, 1, 1, 2);
+		image = { {0, 0, 0}, {0, 1, 0}};
+		flooded = Solution().floodFill(image, 1, 1, 2);
+	}
+}
