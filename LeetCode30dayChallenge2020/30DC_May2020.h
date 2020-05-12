@@ -468,3 +468,51 @@ namespace May_day11
 		flooded = Solution().floodFill(image, 1, 1, 2);
 	}
 }
+namespace May_day12
+{
+	class Solution {
+	public:
+		int singleNonDuplicate(std::vector<int>& nums) 
+		{
+			if (nums.size() == 1) return nums[0];
+			size_t lo = 0;
+			size_t hi = nums.size()-1;
+			while (lo <= hi)
+			{
+				if (((hi - lo) / 2) % 2 == 0) //even number of pairs in range
+				{
+					const size_t mid = lo + (hi - lo) / 2;
+					if (nums[mid] > nums[mid - 1] && nums[mid] < nums[mid + 1]) return nums[mid];
+					if (nums[mid - 1] == nums[mid])
+					{
+						hi = mid;
+					}
+					else
+					{
+						lo = mid;
+					}
+				}
+				else // uneven number of pairs in range
+				{
+					if (nums[hi] != nums[hi - 1]) return nums[hi];
+					if (nums[lo] != nums[lo + 1]) return nums[lo];
+					const size_t mid = lo + (hi - lo) / 2;
+					if (nums[mid] == nums[mid + 1])
+					{
+						hi = mid - 1;
+					}
+					else
+					{
+						lo = mid + 1;
+					}
+				}
+			}
+			return -1;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> vec = { 3,3,7,7,10,11,11 };
+		int ans = Solution().singleNonDuplicate(vec);
+	}
+}
