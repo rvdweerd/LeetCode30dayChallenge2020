@@ -139,7 +139,7 @@ namespace LC37 // Sudoko solver
 		Solution().solveSudoku(board);
 	}
 }
-namespace LC587
+namespace LC587 // Erect the Fence
 {
 	struct Vec2
 	{
@@ -179,90 +179,81 @@ namespace LC587
 		{
 			stack.push(points[0]);
 			stack.push(points[1]);
+			Vec2 p0(points[0]);
+			Vec2 p1(points[1]);
+
 			for (size_t i = 2; i<points.size();i++)
 			{
-				Vec2 p1(stack.top()); stack.pop;
-				Vec2 p0(stack.top()); stack.pop;
-				Vec2 v1 = p1 - p0;
 				Vec2 p2 = points[i];
+				Vec2 v1 = p1 - p0;
 				Vec2 v2 = p2 - p0;
-				if (v1 % v2 > 0)
-				{
 
-				}
-				else
+				while (v1 % v2 > 0)
 				{
-
+					stack.pop(); stack.pop();
+					p1 = p0; 
+					if (stack.empty())
+					{
+						stack.push({ p0.x,p0.y });
+						break;
+					}
+					p0 = stack.top();
+					stack.push({p1.x,p1.y});
+					v1 = p1 - p0;
+					v2 = p2 - p0;
 				}
-				//Vec2 v1(*p, *(std::next(p))); 
-				//int v1_x = (*(std::next(p)))[0] - (*p)[0];
-				//int v1_y = (*(std::next(p)))[1] - (*p)[1];
-				//Vec2 v2(*(std::next(p)), *(std::next(p,2)));
-				//Vec2 v3(*p, *(std::next(p, 2)));
-				//int v3_x = (*(std::next(p,2)))[0] - (*p)[0];
-				//int v3_y = (*(std::next(p,2)))[1] - (*p)[1];
-
-
-				//v1.Print(); v2.Print(); std::cout << std::endl;
-				if (((*(std::next(p)))[0] - (*p)[0]) * ((*(std::next(p, 2)))[1] - (*p)[1]) - ((*(std::next(p)))[1] - (*p)[1]) * ((*(std::next(p, 2)))[0] - (*p)[0]) > 0)
-				//if (v1 % v3 > 0)
-				{
-					points.erase(std::next(p));
-					e = std::prev(points.end(), 2);
-					//p = points.begin();
-					if (p!=points.begin()) --p;
-				}
-				else
-				{
-					++p;
-				}
+				stack.push(points[i]);
+				p0 = p1;
+				p1 = points[i];
 			}
-			return std::move(points);
 		}
-		void SweepLower(std::vector<std::vector<int>>& points)
+		void SweepLower(std::vector<std::vector<int>>& points, std::stack<std::vector<int>>& stack)
 		{
-			for (auto p = std::prev(points.end()), e = std::next(points.begin(), 1); p > e; )
+			stack.push(points[points.size()-1]);
+			stack.push(points[points.size()-2]);
+			Vec2 p0(points[points.size() - 1]);
+			Vec2 p1(points[points.size() - 2]);
+
+			for (int i = points.size()-3; i >= 0; i--)
 			{
-				//Vec2 v1(*p, *(std::prev(p)));
-				//int v1_x = ((*(std::prev(p)))[0] - (*p)[0]);
-				//int v1_y = ((*(std::prev(p)))[1] - (*p)[1]);
-				//Vec2 v3(*p, *(std::prev(p, 2)));
-				//int v3_x = ((*(std::prev(p, 2)))[0] - (*p)[0]);
-				//int v3_y = ((*(std::prev(p, 2)))[1] - (*p)[1]);
-				//if (v1 % v3 > 0)
-				if (((*(std::prev(p)))[0] - (*p)[0]) * ((*(std::prev(p, 2)))[1] - (*p)[1]) - ((*(std::prev(p)))[1] - (*p)[1])* ((*(std::prev(p, 2)))[0] - (*p)[0]) > 0)
+				Vec2 p2 = points[i];
+				Vec2 v1 = p1 - p0;
+				Vec2 v2 = p2 - p0;
+
+				while (v1 % v2 > 0)
 				{
-					p=points.erase(std::prev(p));
-					e = std::next(points.begin(), 1);
-					//p = std::prev(points.end());
-					//if (p != std::prev(points.end()) && p!= points.end()) ++p;
-					if (p != std::prev(points.end()) ) ++p;
+					stack.pop(); stack.pop();
+					p1 = p0;
+					if (stack.empty())
+					{
+						stack.push({ p0.x,p0.y });
+						break;
+					}
+					p0 = stack.top();
+					stack.push({ p1.x,p1.y });
+					v1 = p1 - p0;
+					v2 = p2 - p0;
 				}
-				else
-				{
-					--p;
-				}
+				stack.push(points[i]);
+				p0 = p1;
+				p1 = points[i];
 			}
-			//return std::move(points);
 		}
-
-
 	public:
 		std::vector<std::vector<int>> outerTrees(std::vector<std::vector<int>>& points) 
 		{
 			if (points.size() <= 3) return points;
 			std::sort(points.begin(), points.end(), [](std::vector<int> v1, std::vector<int> v2) {return (v1 < v2); });
-			auto upperPoints = SweepUpper(points);
-			// PRINT
-			//std::cout << "Upper: "; for (auto p : upperPoints) Vec2(p).Print(); std::cout << std::endl;
-			// ENDPRINT
-			//std::sort(points.begin(), points.end(), [](std::vector<int> v1, std::vector<int> v2) {return (v1 > v2); });
-			SweepLower(points);
-			// PRINT
-			//std::cout << "Lower: "; for (auto p : points) Vec2(p).Print(); std::cout << std::endl;
-			// ENDPRINT
+			std::stack<std::vector<int>> stack;
+			SweepUpper(points,stack);
+			SweepLower(points, stack);
+
 			std::set<std::vector<int>> set;
-			for (auto v : upperPoints) set.insert(v); for (auto v : points) set.insert(v);
+			while (!stack.empty())
+			{
+				set.insert(stack.top());
+				stack.pop();
+			}
 			std::vector<std::vector<int>> result(set.begin(), set.end());
 			return result;
 		}
