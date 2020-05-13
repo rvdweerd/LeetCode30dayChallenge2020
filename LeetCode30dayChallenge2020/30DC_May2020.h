@@ -516,3 +516,51 @@ namespace May_day12
 		int ans = Solution().singleNonDuplicate(vec);
 	}
 }
+namespace May_day13
+{
+	class Solution {
+	public:
+		std::string oneRun(std::string num)
+		{
+			std::string result;
+			for (size_t i = 0; i < num.size() - 1; i++)
+			{
+				char c1 = num[i];
+				char c2 = num[i + 1];
+				if (c2 >= c1)
+				{
+					result += c1;
+				}
+				else
+				{
+					if (i == 0)
+						while (num[i+1] == '0') i++;
+					result += num.substr(i + 1);
+					break;
+				}
+			}
+			if (result.size() == 0) return "0";
+			else return result;
+		}
+
+		std::string removeKdigits(std::string num, int k) 
+		{
+			for (size_t i = 0; i < k; ++i) num = oneRun(num);
+			return num;
+		}
+	};
+	void RunExample()
+	{
+		//std::string num = "1432219";
+		
+		std::string reduced;
+		reduced = Solution().removeKdigits("1432219", 3);
+		reduced = Solution().removeKdigits("10", 1);
+		reduced = Solution().removeKdigits("10", 2);
+		reduced = Solution().removeKdigits("531", 1);
+		reduced = Solution().removeKdigits("315", 1);
+		reduced = Solution().removeKdigits("112", 1);
+
+		
+	}
+}
