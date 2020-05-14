@@ -518,6 +518,7 @@ namespace May_day12
 }
 namespace May_day13
 {
+	
 	class Solution {
 	public:
 		std::string oneRun(std::string num)
@@ -584,7 +585,19 @@ namespace May_day14
 			:
 			root(new Node)
 		{}
-
+		~Trie()
+		{
+			DeleteNode(root);
+		}
+		void DeleteNode(Node* node)
+		{
+			for (Node* n : node->letters)
+			{
+				if (n && n!=root) DeleteNode(n);
+			}
+			delete node;
+			node = nullptr;
+		}
 		/** Inserts a word into the trie. */
 		void insert(std::string word) 
 		{
@@ -640,12 +653,18 @@ namespace May_day14
 
 	void RunExample()
 	{
-		Trie* trie = new Trie();
-		trie->insert("apple");
-		trie->search("apple");   // returns true
-		trie->search("app");     // returns false
-		trie->startsWith("app"); // returns true
-		trie->insert("app");
-		trie->search("app");     // returns true
+		{
+			//Trie* trie = new Trie();
+			Trie trie;
+			//trie->insert("apple");
+			//trie->search("apple");   // returns true
+			//trie->search("app");     // returns false
+			//trie->startsWith("app"); // returns true
+			//trie->insert("app");
+			//trie->search("app");     // returns true
+
+			trie.insert("abs");
+		}
+		
 	}
 }
