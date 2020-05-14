@@ -564,3 +564,88 @@ namespace May_day13
 		
 	}
 }
+namespace May_day14
+{
+	class Trie {
+	private:
+		
+		struct Node
+		{
+			Node()
+				:
+				letters(27, nullptr)
+			{}
+			std::vector<Node*> letters;
+		};
+		Node* root;
+	public:
+		/** Initialize your data structure here. */
+		Trie()
+			:
+			root(new Node)
+		{}
+
+		/** Inserts a word into the trie. */
+		void insert(std::string word) 
+		{
+			Node* ptr = root;
+			for (auto c : word)
+			{
+				if (ptr->letters[c - 'a'])
+				{
+					ptr = ptr->letters[c - 'a'];
+				}
+				else
+				{
+					ptr->letters[c - 'a'] = new Node();
+					ptr = ptr->letters[c - 'a'];
+				}
+			}
+			ptr->letters[26] = root;
+		}
+
+		/** Returns if the word is in the trie. */
+		bool search(std::string word) 
+		{
+			Node* ptr = root;
+			for (auto c : word)
+			{
+				if (ptr->letters[c - 'a']) ptr = ptr->letters[c - 'a'];
+				else return false;
+			}
+			if (ptr->letters[26]) return true;
+			else return false;
+		}
+
+		/** Returns if there is any word in the trie that starts with the given prefix. */
+		bool startsWith(std::string prefix) 
+		{
+			Node* ptr = root;
+			for (auto c : prefix)
+			{
+				if (ptr->letters[c - 'a']) ptr = ptr->letters[c - 'a'];
+				else return false;
+			}
+			return true;
+		}
+	};
+
+	/**
+	 * Your Trie object will be instantiated and called as such:
+	 * Trie* obj = new Trie();
+	 * obj->insert(word);
+	 * bool param_2 = obj->search(word);
+	 * bool param_3 = obj->startsWith(prefix);
+	 */
+
+	void RunExample()
+	{
+		Trie* trie = new Trie();
+		trie->insert("apple");
+		trie->search("apple");   // returns true
+		trie->search("app");     // returns false
+		trie->startsWith("app"); // returns true
+		trie->insert("app");
+		trie->search("app");     // returns true
+	}
+}

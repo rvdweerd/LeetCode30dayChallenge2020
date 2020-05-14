@@ -17,8 +17,8 @@
 
 int main()
 {
-	//May_day13::RunExample();
-	LC36::RunExample();
+	May_day14::RunExample();
+	//LC36::RunExample();
 
 	std::cin.get();
 	return 0;
