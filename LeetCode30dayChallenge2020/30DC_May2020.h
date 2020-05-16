@@ -379,7 +379,7 @@ namespace May_day10
 
 	}
 }
-namespace May_day11
+namespace May_day11 // LC733 Flood Fill
 {
 	class Solution {
 	private:
@@ -468,7 +468,7 @@ namespace May_day11
 		flooded = Solution().floodFill(image, 1, 1, 2);
 	}
 }
-namespace May_day12
+namespace May_day12 // LC540 Single Element in a Sorted Array
 {
 	class Solution {
 	public:
@@ -516,7 +516,7 @@ namespace May_day12
 		int ans = Solution().singleNonDuplicate(vec);
 	}
 }
-namespace May_day13
+namespace May_day13 // LC402 Remove K Digits
 {
 	
 	class Solution {
@@ -565,7 +565,7 @@ namespace May_day13
 		
 	}
 }
-namespace May_day14
+namespace May_day14 // LC208 Implement a Trie (prefix Tree)
 {
 	class Trie {
 	private:
@@ -669,7 +669,7 @@ namespace May_day14
 		}
 	}
 }
-namespace May_day15
+namespace May_day15 // LC918 Maximum Sum Circular Subarray
 {
 	class Solution {
 	public:
@@ -749,5 +749,52 @@ namespace May_day15
 		ans2 = Solution().maxSubArray(vec1); //3
 		vec1 = { -2, 1 };
 		ans2 = Solution().maxSubArray(vec1); //1
+	}
+}
+namespace May_day16 // LC328 Odd Even Linked List
+{
+	/**
+	* Definition for singly-linked list.
+	**/
+	struct ListNode {
+		int val;
+		ListNode *next;
+		ListNode() : val(0), next(nullptr) {}
+		ListNode(int x) : val(x), next(nullptr) {}
+		ListNode(int x, ListNode *next) : val(x), next(next) {}
+	};
+	class Solution {
+	public:
+		ListNode* oddEvenList(ListNode* head) 
+		{
+			if (!head || head->next == nullptr || head->next->next == nullptr) return head;
+			//ListNode* newLeftHead = head;
+			ListNode* newRightHead = head->next;
+			ListNode* pLeftRunner = head;
+			ListNode* pRightRunner = head->next;
+			while (pRightRunner->next)
+			{
+				pLeftRunner->next = pRightRunner->next;
+				pLeftRunner = pLeftRunner->next;
+
+				if (pLeftRunner->next)
+				{
+					pRightRunner->next = pLeftRunner->next;
+					pRightRunner = pRightRunner->next;
+				}
+				else
+				{
+					pRightRunner->next = nullptr;
+					break;
+				}
+			}
+			pLeftRunner->next = newRightHead;
+			return head;// newLeftHead;
+		}
+	};
+	void RunExample()
+	{
+		ListNode* list = new ListNode(2, new ListNode(1, new ListNode(3, new ListNode(5, new ListNode(6, new ListNode(4, new ListNode(7)))))));
+		ListNode* reordered_list = Solution().oddEvenList(list);
 	}
 }
