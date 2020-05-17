@@ -10,7 +10,7 @@
 #include <queue>
 #include "GraphClass.h"
 
-namespace LC36
+namespace LC36 //  Is Valid Sudoko
 {
 	class Solution {
 	public:
@@ -69,6 +69,78 @@ namespace LC36
 			{'.','.','.',	'.','8','.',	'.','7','9'}
 		};
 		Solution().isValidSudoku(board);
+	}
+}
+namespace LC42 // Trapping Rain Water
+{
+	class Solution {
+	public:
+		int trap(std::vector<int>& height) // DP, O(N), requires 2 runs and evaluation run
+		{
+			std::vector<int> highestL;  highestL.resize(height.size()); 
+			std::vector<int> highestR;  highestR.resize(height.size()); 
+			int highMark = 0;
+			for (size_t i = 1; i < height.size(); i++)
+			{
+				highestL[i] = std::max(highMark, height[i-1]);
+				highMark = highestL[i];
+			}
+			highMark = 0;
+			for (int i = height.size()-2; i>=0; i--)
+			{
+				highestR[(size_t)i] = std::max(highMark, height[(size_t)i + 1]);
+				highMark = highestR[(size_t)i];
+			}
+			int total = 0;
+			for (size_t i = 1; i < height.size(); i++)
+			{
+				int lowMark = std::min(highestL[i], highestR[i]);
+				if (height[i] < lowMark) total += lowMark - height[i];
+			}
+			return total;
+		}
+		int trap_Maps(std::vector<int>& height) // O(N * n)?
+		{
+			std::map<int, int>  resevoir;
+			int  total=0;
+			int highPoint = 0;
+			for (auto v : height)
+			{
+				for (size_t i = 1; i <= (size_t)v; i++)
+				{
+					for (auto& p : resevoir)
+					{
+						if (p.first <= v)
+						{
+							total += p.second;
+							p.second = 0;
+						}
+					}
+					if (resevoir.find(i) == resevoir.end()) resevoir[i] = 0;
+				}
+				for (size_t i = v+1; i <= (size_t)highPoint; i++)
+				{
+					resevoir[i]++;
+				}
+				highPoint = std::max(highPoint, v);
+			}
+			return total;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> vec;
+		int ans;
+		vec = { 0,1,0,2,1,0,1,3,2,1,2,1 };
+		ans	= Solution().trap(vec); // 6
+		vec = { 5,0,5,0,1,0,5 };
+		ans = Solution().trap(vec);  //19
+		vec = { 0,1,0,2,0,3,4,2,3,1,5,0,2,1,6,2,2,0 };
+		ans = Solution().trap(vec); //21
+		vec = {  };
+		ans = Solution().trap(vec); //0
+		vec = { 0,10,0,0};
+		ans = Solution().trap(vec); //0
 	}
 }
 namespace LC37 // Sudoko solver

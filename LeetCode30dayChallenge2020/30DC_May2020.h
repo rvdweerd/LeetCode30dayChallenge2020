@@ -546,7 +546,7 @@ namespace May_day13 // LC402 Remove K Digits
 
 		std::string removeKdigits(std::string num, int k) 
 		{
-			for (size_t i = 0; i < k; ++i) num = oneRun(num);
+			for (size_t i = 0; i < (size_t)k; ++i) num = oneRun(num);
 			return num;
 		}
 	};
@@ -796,5 +796,65 @@ namespace May_day16 // LC328 Odd Even Linked List
 	{
 		ListNode* list = new ListNode(2, new ListNode(1, new ListNode(3, new ListNode(5, new ListNode(6, new ListNode(4, new ListNode(7)))))));
 		ListNode* reordered_list = Solution().oddEvenList(list);
+	}
+}
+namespace May_day17 // LC438  Find all anagrams in a string
+{
+	class Solution {
+	public:
+		std::vector<int> findAnagrams(std::string s, std::string p) 
+		{
+			// Initialize
+			std::vector<int> returnvec;
+			std::unordered_map<char, size_t> letterBox;
+			for (auto c : p) letterBox[c]++;
+			std::queue<char> queue;
+			
+			// Visit all letters in the search string
+			for (size_t i = 0; i < s.size(); i++)
+			{
+				auto it = letterBox.find(s[i]);
+				if (it != letterBox.end()) // picket letter is in originals
+				{
+					if (it->second > 0)  // picket letter is still available in letterbox
+					{
+						queue.push(s[i]);
+						letterBox[s[i]]--;
+						if (queue.size() == p.size()) // we have a match
+						{
+							returnvec.push_back(i-p.size()+1);
+							letterBox[queue.front()]++; 
+							queue.pop();
+						}
+					}
+					else // ran out of picket letter in letterbox, unwind queue until we this letter is found & put back in the queue
+					{
+						while (queue.front() != s[i])
+						{
+							letterBox[queue.front()]++;
+							queue.pop();
+						}
+						queue.pop(); queue.push(s[i]);
+					}
+				}
+				else  // picket letter not in originals, fully unwind queue & move on
+				{
+					while (!queue.empty()) 
+					{
+						letterBox[queue.front()]++; 
+						queue.pop();
+					}
+				}
+			}
+			return returnvec;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> ans;
+		ans = Solution().findAnagrams("cbaebabacd", "abc"); // [0,6]
+		ans = Solution().findAnagrams("abab", "ab"); //[0,1,2]
+		ans = Solution().findAnagrams("abaacbabc", "abc"); // [3,4,6]
+
 	}
 }
