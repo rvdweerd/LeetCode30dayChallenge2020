@@ -9,7 +9,6 @@
 #include <stack>
 #include <queue>
 
-
 namespace May_day2
 {
 	class Solution {
@@ -856,5 +855,111 @@ namespace May_day17 // LC438  Find all anagrams in a string
 		ans = Solution().findAnagrams("abab", "ab"); //[0,1,2]
 		ans = Solution().findAnagrams("abaacbabc", "abc"); // [3,4,6]
 
+	}
+}
+namespace May_day18 // LC567  Permutation in a string
+{
+	class Solution {
+	public:
+		bool checkInclusion(std::string s1, std::string s2) // int array for character frequencies (12ms)
+		{
+			if (s1.size() > s2.size()) return false;
+			int signature[26] = { 0 };
+			int freq0[26] = { 0 };
+			int delta[26] = { 0 };
+			for (size_t i = 0; i < s1.size(); i++)
+			{
+				signature[s1[i] - 'a']++;
+				freq0[s2[i] - 'a']++;
+			}
+			int  deficit=0;
+			int excess=0;
+			for (size_t i = 0; i < 26; i++)
+			{
+				int d = freq0[i] - signature[i];
+				delta[i] += d;
+				if (d > 0) excess+=d;
+				if (d < 0)  deficit-=d;
+			}
+			if (deficit == 0 && excess == 0) return true;
+			for (size_t i = 0, j = i + s1.size(); j < s2.size(); i++, j++)
+			{
+				char c_out = s2[i];
+				char c_in = s2[j];
+				if (delta[c_out - 'a']-- > 0) excess--; else deficit++;
+				if (delta[c_in - 'a']++ < 0) deficit--; else excess++;
+				if (deficit == 0 && excess == 0) return true;
+			}
+			return false;
+		}
+		bool checkInclusion0(std::string p, std::string s) // Map+queue based solution (28ms)(Code reused from LC438)
+		{
+			// Initialize
+			std::unordered_map<char, size_t> letterBox;
+			for (auto c : p) letterBox[c]++;
+			std::queue<char> queue;
+
+			// Visit all letters in the search string
+			for (size_t i = 0; i < s.size(); i++)
+			{
+				auto it = letterBox.find(s[i]);
+				if (it != letterBox.end()) // picket letter is in originals
+				{
+					if (it->second > 0)  // picket letter is still available in letterbox
+					{
+						queue.push(s[i]);
+						letterBox[s[i]]--;
+						if (queue.size() == p.size()) // we have a match
+						{
+							return true;
+						}
+					}
+					else // ran out of picket letter in letterbox, unwind queue until we this letter is found & put back in the queue
+					{
+						while (queue.front() != s[i])
+						{
+							letterBox[queue.front()]++;
+							queue.pop();
+						}
+						queue.pop(); queue.push(s[i]);
+					}
+				}
+				else  // picket letter not in originals, fully unwind queue & move on
+				{
+					while (!queue.empty())
+					{
+						letterBox[queue.front()]++;
+						queue.pop();
+					}
+				}
+			}
+			return false;
+		}
+		bool checkInclusion1(std::string s1, std::string s2) // Checking all permutations, brute force solution (TLE)
+		{
+			if (s1.size() > s2.size()) return false;
+			std::unordered_set<std::string> set;
+			std::sort(s1.begin(), s1.end());
+			do
+			{
+				set.insert(s1);
+			} while (std::next_permutation(s1.begin(), s1.end()));
+			for (size_t i = 0; i <= s2.size() - s1.size(); i++)
+			{
+				std::string check = s2.substr(i, s1.size());
+				if (set.find(s2.substr(i,s1.size())) != set.end()) return true;
+			}
+			return false;
+		}
+	};
+	void RunExample()
+	{
+		bool   res;
+		res = Solution().checkInclusion("abc", "bbbca"); // true
+		res = Solution().checkInclusion("a", "ab"); // true
+		res = Solution().checkInclusion("trinitrophenylmethylnitramine", "dinitrophenylhydrazinetrinitrophenylmethylnitramine");
+		res = Solution().checkInclusion("adc", "dcda"); // true
+		res = Solution().checkInclusion("ab", "eidbaooo"); //  true
+		res = Solution().checkInclusion("ab", "eidboaoo"); // false
 	}
 }
