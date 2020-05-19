@@ -963,3 +963,58 @@ namespace May_day18 // LC567  Permutation in a string
 		res = Solution().checkInclusion("ab", "eidboaoo"); // false
 	}
 }
+namespace May_day19
+{
+	class StockSpanner {
+	public:
+		std::vector<std::pair<int,size_t>> history;
+		StockSpanner() {
+
+		}
+		size_t SeekTrace(std::vector<std::pair<int, size_t>>& history, size_t i, int price)
+		{
+			if (history[i].first <= price)
+			{
+				i = i + history[i].second-1 + SeekTrace(history, i - history[i].second, price);
+			}
+			return i;
+		}
+		int next(int price)
+		{
+			if (history.size() == 0)
+			{
+				history.emplace_back(price, 1);
+				return 1;
+			}
+			size_t n = 1;
+			if (price < history.back().first)
+			{
+				history.emplace_back(price, 1);
+			}
+			else
+			{
+				size_t i = history.size() - 1;
+				n = SeekTrace(history, i,price) - i+1;
+				history.emplace_back(price, n);
+			}
+			return n;
+		}
+	};
+	/**
+	 * Your StockSpanner object will be instantiated and called as such:
+	 * StockSpanner* obj = new StockSpanner();
+	 * int param_1 = obj->next(price);
+	 */
+	void RunExample()
+	{
+		auto S = StockSpanner();
+		std::cout << S.next(1) <<", ";
+		std::cout << S.next(1) << ", ";
+		std::cout << S.next(1) << ", ";
+		std::cout << S.next(2) << ", ";
+		std::cout << S.next(1) << ", ";
+		std::cout << S.next(4) << ", ";
+		std::cout << S.next(6) << ", ";
+		
+	}
+}
