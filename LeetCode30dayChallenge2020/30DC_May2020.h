@@ -963,41 +963,90 @@ namespace May_day18 // LC567  Permutation in a string
 		res = Solution().checkInclusion("ab", "eidboaoo"); // false
 	}
 }
-namespace May_day19
+namespace May_day19 // LC901 Online Stock Plan
 {
-	class StockSpanner {
-	public:
-		std::vector<std::pair<int,size_t>> history;
-		StockSpanner() {
-
-		}
-		size_t SeekTrace(std::vector<std::pair<int, size_t>>& history, size_t i, int price)
+	class StockSpanner { // Stack based
+		struct Node
 		{
-			if (history[i].first <= price)
+			Node(int p, size_t s)
+				:
+				price(p),
+				span(s)
 			{
-				i = i + history[i].second-1 + SeekTrace(history, i - history[i].second, price);
 			}
-			return i;
+			int price;
+			size_t span;
+		};
+		std::stack<Node> stack;
+	public:
+		void Clear()
+		{
+			while (!stack.empty()) stack.pop();
+			stack.push({ INT_MAX, 0 });
+		}
+		StockSpanner()
+		{
+			stack.push({ INT_MAX, 0 }); 
 		}
 		int next(int price)
 		{
-			if (history.size() == 0)
+			size_t count = 1;
+			while (price >= stack.top().price)
+			{
+				count+=stack.top().span;
+				stack.pop();
+			}
+			stack.push({ price,count });
+			return count;
+		}
+	};
+	class StockSpanner1 { // Vector based
+		struct Node
+		{
+			Node(int p,size_t s)
+				:
+				price(p),
+				span(s)
+			{
+			}
+			int price;
+			size_t span;
+		};
+		std::vector<Node> history;
+	public:
+		void Clear()
+		{
+			history.clear();
+			history.reserve(1000);
+			history.emplace_back(INT_MAX, 0);
+		}
+		StockSpanner1() 
+		{
+			history.reserve(1000);
+			history.emplace_back(INT_MAX, 0);
+		}
+		size_t SeekTrace(size_t i, int price)
+		{
+			size_t count = 0;
+			if (history[i].price <= price)
+			{
+				count += history[i].span + SeekTrace(i - history[i].span, price);
+			}
+			return count;
+		}
+		int next(int price)
+		{
+			if (price < history.back().price || history.size() == 1)
 			{
 				history.emplace_back(price, 1);
 				return 1;
 			}
-			size_t n = 1;
-			if (price < history.back().first)
-			{
-				history.emplace_back(price, 1);
-			}
 			else
 			{
-				size_t i = history.size() - 1;
-				n = SeekTrace(history, i,price) - i+1;
+				size_t n = 1+SeekTrace(history.size() - 1, price);
 				history.emplace_back(price, n);
+				return n;
 			}
-			return n;
 		}
 	};
 	/**
@@ -1005,16 +1054,16 @@ namespace May_day19
 	 * StockSpanner* obj = new StockSpanner();
 	 * int param_1 = obj->next(price);
 	 */
+	void Run(const std::vector<int>& testvec, StockSpanner& S)
+	{
+		for (int n : testvec) std::cout << S.next(n) << ", "; std::cout << std::endl;
+		S.Clear();
+	}
 	void RunExample()
 	{
 		auto S = StockSpanner();
-		std::cout << S.next(1) <<", ";
-		std::cout << S.next(1) << ", ";
-		std::cout << S.next(1) << ", ";
-		std::cout << S.next(2) << ", ";
-		std::cout << S.next(1) << ", ";
-		std::cout << S.next(4) << ", ";
-		std::cout << S.next(6) << ", ";
-		
+		std::vector<int> testvec;
+		testvec = { 100,80,60,70,60,75,85 }; Run(testvec, S);
+		testvec = { 1,1,1,2,1,4,6 }; Run(testvec,S);				
 	}
 }
