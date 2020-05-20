@@ -1067,3 +1067,60 @@ namespace May_day19 // LC901 Online Stock Plan
 		testvec = { 1,1,1,2,1,4,6 }; Run(testvec,S);				
 	}
 }
+namespace May_day20
+{
+	/**
+	* Definition for a binary tree node.*/
+	struct TreeNode 
+	{
+		int val;
+		TreeNode *left;
+		TreeNode *right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+	    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	};
+	class Solution {
+	public:
+		void VisitChildren(TreeNode* node,int& count,int& ans)
+		{
+			std::cout << "PRE-ORDER : "<<node->val<<", " << count << ", "<<ans<<"\n---------\n"; // PRE-ORDER
+			if (count < 0) return; 
+			if (node->left)
+			{
+				VisitChildren(node->left,count,ans);
+			}
+			count--;
+			std::cout << "IN-ORDER  : "<< node->val<<", "<<count<< ", " << ans << "\n---------\n"; // IN-ORDER
+			if (count == 0) {
+				ans = node->val; count--;
+			}
+			if (count < 0) return;
+			if (node->right) 
+			{
+
+				VisitChildren(node->right,count,ans);
+			};
+			std::cout << "POST-ORDER: " << node->val << ", " << count << ", " << ans << "\n---------\n"; // IN-ORDER
+			if (count < 0) return;
+		}
+		int kthSmallest(TreeNode* root, int k) 
+		{
+			int ans = 0;
+			VisitChildren(root,k,ans);
+			return ans;
+		}
+	};
+	void RunExample()
+	{
+		TreeNode* root = new TreeNode(5, new TreeNode(3),new TreeNode(6));
+		root->left->left = new TreeNode(2, new TreeNode(1), nullptr);
+		root->left->right = new TreeNode(4);
+		root->right = new TreeNode(6);
+		//TreeNode* root = new TreeNode(5);
+		int ans;
+		
+		ans = Solution().kthSmallest(root, 6);
+		int k = 0;
+	}
+}
