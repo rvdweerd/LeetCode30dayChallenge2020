@@ -937,3 +937,33 @@ namespace LC1263 // Box Pusher
 		}
 	}
 }
+namespace LC1344 // Angle between hands of a clock
+{
+	class Solution {
+	public:
+		double angleClock(int hour, int minutes)
+		{
+			double phi_m = minutes / 60.0 * 360.0;
+			double phi_h = (hour%12 + minutes / 60.0) / 12.0 * 360.0;
+			double diff = std::abs(phi_m - phi_h);
+			if (diff > 180.0) return 360.0-diff;
+			else return diff;
+			//return std::abs(phi_m - phi_h);
+			//return std::abs(std::fmod(phi_m - phi_h+180.0 ,180.0f));
+
+		}
+	};
+	void RunExample()
+	{
+		double ans;
+		ans = Solution().angleClock(1, 57);  //76.5
+		ans = Solution().angleClock(12, 30);  //165
+		ans = Solution().angleClock(3, 30); //75
+		ans = Solution().angleClock(8, 7); // 158.5
+		ans = Solution().angleClock(3, 15);
+		ans = Solution().angleClock(4, 50);
+		ans = Solution().angleClock(12, 0);
+		ans = Solution().angleClock(7, 45);
+
+	}
+}

@@ -49,8 +49,8 @@ size_t allocated=0;
 
 int main()
 {
-	May_day20::RunExample();
-	//LC::RunExample();
+	May_day21::RunExample();
+	//LC1344::RunExample();
 
 	std::cin.get();
 	return 0;

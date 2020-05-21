@@ -1067,7 +1067,7 @@ namespace May_day19 // LC901 Online Stock Plan
 		testvec = { 1,1,1,2,1,4,6 }; Run(testvec,S);				
 	}
 }
-namespace May_day20
+namespace May_day20 // LC230 Kth Smallest Element in a BST  
 {
 	/**
 	* Definition for a binary tree node.*/
@@ -1122,5 +1122,55 @@ namespace May_day20
 		
 		ans = Solution().kthSmallest(root, 6);
 		int k = 0;
+	}
+}
+namespace May_day21 // LC1277 Count Square Submatrices with All Ones
+{
+	class Solution {
+	public:
+		int countSquares(std::vector<std::vector<int>>& matrix) 
+		{
+			int count = 0;
+			for (size_t row = 0; row < matrix.size(); row++)
+			{
+				for (size_t col = 0; col < matrix[0].size(); col++)
+				{
+					if (row != 0 && col != 0 && matrix[row][col] > 0)
+					{
+						const int L = matrix[row][col - 1];
+						const int U = matrix[row-1][col];
+						const int D = matrix[row - 1][col - 1];
+						const int minLUD = std::min(L, std::min(U, D));
+						matrix[row][col] += minLUD;
+
+					}
+					count += matrix[row][col];
+				}
+			}
+			return count;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> matrix;
+		int ans;
+		matrix =
+		{	{0,1,1,1},
+			{1,1,1,1},
+			{0,1,1,1}
+		};
+		ans = Solution().countSquares(matrix);
+		
+		matrix =
+		{	{1,0,1},
+			{1,1,0},
+			{1,1,0}
+		};
+		ans = Solution().countSquares(matrix);
+
+		matrix =
+		{ {1}
+		};
+		ans = Solution().countSquares(matrix);
 	}
 }
