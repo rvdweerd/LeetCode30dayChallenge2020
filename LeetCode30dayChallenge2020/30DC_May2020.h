@@ -963,41 +963,90 @@ namespace May_day18 // LC567  Permutation in a string
 		res = Solution().checkInclusion("ab", "eidboaoo"); // false
 	}
 }
-namespace May_day19
+namespace May_day19 // LC901 Online Stock Plan
 {
-	class StockSpanner {
-	public:
-		std::vector<std::pair<int,size_t>> history;
-		StockSpanner() {
-
-		}
-		size_t SeekTrace(std::vector<std::pair<int, size_t>>& history, size_t i, int price)
+	class StockSpanner { // Stack based
+		struct Node
 		{
-			if (history[i].first <= price)
+			Node(int p, size_t s)
+				:
+				price(p),
+				span(s)
 			{
-				i = i + history[i].second-1 + SeekTrace(history, i - history[i].second, price);
 			}
-			return i;
+			int price;
+			size_t span;
+		};
+		std::stack<Node> stack;
+	public:
+		void Clear()
+		{
+			while (!stack.empty()) stack.pop();
+			stack.push({ INT_MAX, 0 });
+		}
+		StockSpanner()
+		{
+			stack.push({ INT_MAX, 0 }); 
 		}
 		int next(int price)
 		{
-			if (history.size() == 0)
+			size_t count = 1;
+			while (price >= stack.top().price)
+			{
+				count+=stack.top().span;
+				stack.pop();
+			}
+			stack.push({ price,count });
+			return count;
+		}
+	};
+	class StockSpanner1 { // Vector based
+		struct Node
+		{
+			Node(int p,size_t s)
+				:
+				price(p),
+				span(s)
+			{
+			}
+			int price;
+			size_t span;
+		};
+		std::vector<Node> history;
+	public:
+		void Clear()
+		{
+			history.clear();
+			history.reserve(1000);
+			history.emplace_back(INT_MAX, 0);
+		}
+		StockSpanner1() 
+		{
+			history.reserve(1000);
+			history.emplace_back(INT_MAX, 0);
+		}
+		size_t SeekTrace(size_t i, int price)
+		{
+			size_t count = 0;
+			if (history[i].price <= price)
+			{
+				count += history[i].span + SeekTrace(i - history[i].span, price);
+			}
+			return count;
+		}
+		int next(int price)
+		{
+			if (price < history.back().price || history.size() == 1)
 			{
 				history.emplace_back(price, 1);
 				return 1;
 			}
-			size_t n = 1;
-			if (price < history.back().first)
-			{
-				history.emplace_back(price, 1);
-			}
 			else
 			{
-				size_t i = history.size() - 1;
-				n = SeekTrace(history, i,price) - i+1;
+				size_t n = 1+SeekTrace(history.size() - 1, price);
 				history.emplace_back(price, n);
+				return n;
 			}
-			return n;
 		}
 	};
 	/**
@@ -1005,17 +1054,124 @@ namespace May_day19
 	 * StockSpanner* obj = new StockSpanner();
 	 * int param_1 = obj->next(price);
 	 */
+	void Run(const std::vector<int>& testvec, StockSpanner& S)
+	{
+		for (int n : testvec) std::cout << S.next(n) << ", "; std::cout << std::endl;
+		S.Clear();
+	}
 	void RunExample()
 	{
 		auto S = StockSpanner();
-		std::cout << S.next(1) <<", ";
-		std::cout << S.next(1) << ", ";
-		std::cout << S.next(1) << ", ";
-		std::cout << S.next(2) << ", ";
-		std::cout << S.next(1) << ", ";
-		std::cout << S.next(4) << ", ";
-		std::cout << S.next(6) << ", ";
+		std::vector<int> testvec;
+		testvec = { 100,80,60,70,60,75,85 }; Run(testvec, S);
+		testvec = { 1,1,1,2,1,4,6 }; Run(testvec,S);				
+	}
+}
+namespace May_day20 // LC230 Kth Smallest Element in a BST  
+{
+	/**
+	* Definition for a binary tree node.*/
+	struct TreeNode 
+	{
+		int val;
+		TreeNode *left;
+		TreeNode *right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+	    TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	};
+	class Solution {
+	public:
+		void VisitChildren(TreeNode* node,int& count,int& ans)
+		{
+			std::cout << "PRE-ORDER : "<<node->val<<", " << count << ", "<<ans<<"\n---------\n"; // PRE-ORDER
+			if (count < 0) return; 
+			if (node->left)
+			{
+				VisitChildren(node->left,count,ans);
+			}
+			count--;
+			std::cout << "IN-ORDER  : "<< node->val<<", "<<count<< ", " << ans << "\n---------\n"; // IN-ORDER
+			if (count == 0) {
+				ans = node->val; count--;
+			}
+			if (count < 0) return;
+			if (node->right) 
+			{
+
+				VisitChildren(node->right,count,ans);
+			};
+			std::cout << "POST-ORDER: " << node->val << ", " << count << ", " << ans << "\n---------\n"; // IN-ORDER
+			if (count < 0) return;
+		}
+		int kthSmallest(TreeNode* root, int k) 
+		{
+			int ans = 0;
+			VisitChildren(root,k,ans);
+			return ans;
+		}
+	};
+	void RunExample()
+	{
+		TreeNode* root = new TreeNode(5, new TreeNode(3),new TreeNode(6));
+		root->left->left = new TreeNode(2, new TreeNode(1), nullptr);
+		root->left->right = new TreeNode(4);
+		root->right = new TreeNode(6);
+		//TreeNode* root = new TreeNode(5);
+		int ans;
 		
+		ans = Solution().kthSmallest(root, 6);
+		int k = 0;
+	}
+}
+namespace May_day21 // LC1277 Count Square Submatrices with All Ones
+{
+	class Solution {
+	public:
+		int countSquares(std::vector<std::vector<int>>& matrix) 
+		{
+			int count = 0;
+			for (size_t row = 0; row < matrix.size(); row++)
+			{
+				for (size_t col = 0; col < matrix[0].size(); col++)
+				{
+					if (row != 0 && col != 0 && matrix[row][col] > 0)
+					{
+						const int L = matrix[row][col - 1];
+						const int U = matrix[row-1][col];
+						const int D = matrix[row - 1][col - 1];
+						const int minLUD = std::min(L, std::min(U, D));
+						matrix[row][col] += minLUD;
+
+					}
+					count += matrix[row][col];
+				}
+			}
+			return count;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> matrix;
+		int ans;
+		matrix =
+		{	{0,1,1,1},
+			{1,1,1,1},
+			{0,1,1,1}
+		};
+		ans = Solution().countSquares(matrix);
+		
+		matrix =
+		{	{1,0,1},
+			{1,1,0},
+			{1,1,0}
+		};
+		ans = Solution().countSquares(matrix);
+
+		matrix =
+		{ {1}
+		};
+		ans = Solution().countSquares(matrix);
 	}
 }
 namespace May_day22  // LC Sort characters by frequency
