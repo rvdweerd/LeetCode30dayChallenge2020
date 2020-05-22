@@ -1174,12 +1174,35 @@ namespace May_day21 // LC1277 Count Square Submatrices with All Ones
 		ans = Solution().countSquares(matrix);
 	}
 }
-namespace May_day22  // LC Sort characters by frequency
+namespace May_day22  // LC451 Sort characters by frequency
 {
+	static int fastio = []() {
+		#define endl '\n'
+		std::ios::sync_with_stdio(false);
+		std::cin.tie(NULL);
+		std::cout.tie(0);
+		return 0;
+	}();
 	class Solution
 	{
 	public:
 		std::string frequencySort(std::string s)
+		{
+			std::vector<std::pair<int, char>> freq('z' + 1, { 0,0 });
+			for (char c : s)
+			{
+				freq[c] = { freq[c].first + 1,c };
+			}
+			std::sort(freq.rbegin(), freq.rend());
+			std::string str_out;
+			for (auto p : freq)
+			{
+				str_out.append(p.first, p.second);
+			}
+			return str_out;
+		}
+
+		std::string frequencySort_map(std::string s)
 		{
 			std::unordered_map<char, size_t> map;
 			for (char c : s)
