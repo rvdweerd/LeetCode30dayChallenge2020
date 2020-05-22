@@ -1018,3 +1018,34 @@ namespace May_day19
 		
 	}
 }
+namespace May_day22  // LC Sort characters by frequency
+{
+	class Solution
+	{
+	public:
+		std::string frequencySort(std::string s)
+		{
+			std::unordered_map<char, size_t> map;
+			for (char c : s)
+			{
+				map[c]++;
+			}
+			std::multimap<size_t, char> mm;
+			for (auto p : map)
+			{
+				mm.insert({ p.second,p.first });
+			}
+			std::string str_out;
+			for (auto it = mm.rbegin(); it != mm.rend(); ++it)
+			{
+				str_out.append(it->first, it->second);
+			}
+			return str_out;
+		}
+	};
+	void RunExample()
+	{
+		std::string str = "abaacc";
+		std::string out = Solution().frequencySort(str);
+	}
+}
