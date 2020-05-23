@@ -109,7 +109,7 @@ public:
 			{
 				std::cout << e->end->name << "[" << e->cost << "], ";
 			}
-			std::cout << std::endl;
+			//std::cout << std::endl;
 		}
 	}
 	std::vector<std::vector<Node*>> StronglyConnectedComponents() // Kosaraju's algorithm

@@ -394,7 +394,6 @@ namespace LC587 // Erect the Fence
 			return result;
 		}
 	};
-
 	void RunExample()
 	{
 		std::vector<std::vector<int>> vec = { {0,0}, {1,1}, {2,2}, {2,1}, {3,10}, {4,0} ,{3,0} };
@@ -402,9 +401,9 @@ namespace LC587 // Erect the Fence
 		//std::vector<std::vector<int>> vec = { {1, 1}, {2, 2}, {2, 0}, {2, 4}, {3, 3}, {4, 2} };
 		//std::vector<std::vector<int>> vec = { {0, 2}, {1, 1}, {2, 2}, {2, 4}, {4, 2}, {3, 3} };
 		//std::vector<std::vector<int>> vec = { {2,2}, {3,2}, {10,2} };
-		std::cout << "Input:  "; for (auto p : vec) Vec2(p).Print(); std::cout << std::endl;
+		std::cout << "Input:  "; for (auto p : vec) Vec2(p).Print(); //std::cout << std::endl;
 		auto ans = Solution().outerTrees(vec);
-		std::cout << "Output: "; for (auto p : ans) Vec2(p).Print(); std::cout << std::endl;
+		std::cout << "Output: "; for (auto p : ans) Vec2(p).Print(); //std::cout << std::endl;
 	}
 }
 namespace LC685 // Redundant connections
@@ -552,6 +551,52 @@ namespace LC685 // Redundant connections
 
 	}
 }
+namespace LC765 // Couples holding hands
+{
+	int minSwapsCouples(std::vector<int>& row)
+	{
+		std::map<int, size_t> map;
+		for (size_t i=0; i<row.size();i++)
+		{
+			map[row[i]] = i;
+		}
+		int count = 0;
+		//size_t i = 0;
+		for (size_t i = 0; i < row.size()-1; i+=2)
+		{
+			if (row[i]/2 != row[i+1] / 2)
+			{
+				int spouse = row[i] % 2 == 0 ? row[i] + 1 : row[i] - 1;
+				auto j = map.find(spouse)->second;
+				int temp = row[i+1];
+				row[i+1] = row[j];
+				row[j] = temp;
+				map[spouse] = i+1;
+				map[temp] = j;
+				count++;
+			}
+		}
+		return count;
+	}
+	void RunExample()
+	{
+		std::vector<int> row;
+		int ans;
+		row = { 4,1,5,3,2,0 }; //2
+		ans = minSwapsCouples(row);
+		row = { 5,3,4,2,1,0 }; //1
+		ans = minSwapsCouples(row);
+		row = { 5, 4, 2, 6, 3, 1, 0, 7 };
+		ans = minSwapsCouples(row); //2
+		row = { 0,2,4,6,7,1,3,5};
+		ans = minSwapsCouples(row); //3
+		row = { 3,2,0,1 };
+		ans = minSwapsCouples(row); //0
+		row = { 1,4,0,5,8,7,6,3,2,9 };
+		ans = minSwapsCouples(row); //3
+	}
+}
+
 namespace LC1263 // Box Pusher
 {
 	using ULL = unsigned long long;
