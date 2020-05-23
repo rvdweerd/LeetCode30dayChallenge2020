@@ -1228,3 +1228,35 @@ namespace May_day22  // LC451 Sort characters by frequency
 		std::string out = Solution().frequencySort(str);
 	}
 }
+namespace May_day23  // LC986 Interval list intersections
+{
+	//using vec = std::vector<std::vector<int>>;
+	//typedef std::vector<std::vector<int>> vec;
+	class Solution
+	{
+	public:
+		std::vector<std::vector<int>> intervalIntersection(std::vector<std::vector<int>>& A, std::vector<std::vector<int>>& B) 
+		{
+			std::vector<std::vector<int>> vec_out;
+			for (size_t iA = 0, iB = 0; iA<A.size() && iB<B.size() ;)
+			{
+				int start = std::max(A[iA][0], B[iB][0]);
+				int end = std::min(A[iA][1], B[iB][1]);
+				if (end >= start)
+				{
+					vec_out.push_back({ start,end });
+				}
+				if (end == A[iA][1]) iA++;
+				else iB++;
+			}
+			return vec_out;
+		}
+	};
+	void RunExample()
+	{
+		typedef std::vector<std::vector<int>> vec;
+		vec A = { {0, 2}, {5, 10}, {13, 23}, {24, 25} };
+		vec B = { {1, 5}, {8, 12}, {15, 24}, {25, 26} };
+		vec C = Solution().intervalIntersection(A, B);
+	}
+}
