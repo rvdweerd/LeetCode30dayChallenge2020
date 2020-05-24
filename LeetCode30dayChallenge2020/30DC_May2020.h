@@ -1275,7 +1275,35 @@ namespace May_day24 // LC1008 Construct Binary Search Tree from Preorder Travers
 	class Solution {
 	private:
 	public:
-		TreeNode* bstFromPreorder(std::vector<int>& preorder) 
+		std::stack<TreeNode*> stack;
+		TreeNode* bstFromPreorder(std::vector<int>& preorder)
+		{
+			TreeNode* root = new TreeNode(preorder[0]);
+			stack.push(root);
+			TreeNode* ptr = root;
+			for (size_t i = 1; i < preorder.size(); i++)
+			{
+				if (preorder[i] < stack.top()->val)
+				{
+					ptr->left = new TreeNode(preorder[i]);
+					ptr = ptr->left;
+					stack.push(ptr);
+				}
+				else
+				{
+					while (!stack.empty() && preorder[i] < stack.top()->val)
+					{
+						stack.pop();
+					}
+					ptr = stack.top(); stack.pop();
+					ptr->right = new TreeNode(preorder[i]);
+					ptr = ptr->right;
+					stack.push(ptr);
+				}
+			}
+			return root;
+		}
+		TreeNode* bstFromPreorder_ForLoop(std::vector<int>& preorder) 
 		{
 			TreeNode* root = new TreeNode(preorder[0]);
 			for (size_t i = 1; i < preorder.size(); i++)
