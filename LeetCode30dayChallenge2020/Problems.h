@@ -406,6 +406,100 @@ namespace LC587 // Erect the Fence
 		std::cout << "Output: "; for (auto p : ans) Vec2(p).Print(); //std::cout << std::endl;
 	}
 }
+namespace LC655 // Print Binary Tree
+{
+	/**
+	* Definition for a binary tree node.*/
+	struct TreeNode {
+		int val;
+		TreeNode* left;
+		TreeNode* right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+	};
+	class Solution {
+	private:
+		struct Entry
+		{
+			int val;
+			size_t d;
+			std::vector<int> pos;
+		};
+		int l = 0, r = 0;
+		size_t d = 0, maxDepth = 0;
+		std::vector<Entry> entries;
+		std::vector<int> path;
+	private:
+		void GetNodePositions(TreeNode* root)
+		{
+			if (root)
+			{
+				std::cout << root->val << ", d=" << d << ", l=" << l << ", r=" << r << "\n";
+				entries.push_back({ root->val,d,path });
+				d++; l++; path.push_back(-1);
+				GetNodePositions(root->left);
+				l--; r++; path.pop_back(); path.push_back(1);
+				GetNodePositions(root->right);
+				r--; d--; path.pop_back();
+			}
+			else
+			{
+				maxDepth = std::max(maxDepth, d - 1);
+			}
+		}
+		std::vector<size_t> MakePaddingVector(size_t depth)
+		{
+			std::vector<size_t> vec_out;
+			size_t max = 1;
+			if (maxDepth > 1) max = (size_t)std::pow(2, maxDepth - 1);
+			for (size_t i = 0; i < maxDepth; i++)
+			{
+				vec_out.push_back(max);
+				max /= 2;
+			}
+			return vec_out;
+		}
+	public:
+		std::vector<std::vector<std::string>> printTree(TreeNode* root)
+		{
+			GetNodePositions(root);
+			std::vector<std::vector<std::string>> bstStringArray(maxDepth + 1, std::vector<std::string>((int)std::pow(2, maxDepth + 1) - 1, ""));
+			std::vector<size_t> padding = MakePaddingVector(maxDepth);
+			size_t midPoint = bstStringArray[0].size() / 2;
+			for (auto e : entries)
+			{
+				size_t row = e.d;
+				size_t col = midPoint;
+				for (size_t i = 0; i < e.pos.size(); i++)
+				{
+					col += e.pos[i] * padding[i];
+				}
+				bstStringArray[row][col] = std::to_string(e.val);
+			}
+			return bstStringArray;
+		}
+	};
+
+	void RunExample()
+	{
+		TreeNode* root = new TreeNode(32, nullptr, new TreeNode(30));
+		root->right->left = new TreeNode(10, nullptr, new TreeNode(15));
+		root->right->left->right->right = new TreeNode(45);
+		auto ans = Solution().printTree(root);
+
+		for (auto e : ans)
+		{
+			for (auto s : e)
+			{
+				if (s == "") std::cout << "  ";
+				std::cout << s << ",";
+			}
+			std::cout << "\n";
+		}
+
+	}
+}
 namespace LC685 // Redundant connections
 {
 	class Solution {
