@@ -9,7 +9,40 @@
 #include <stack>
 #include <queue>
 #include <string>
+namespace May_day1 // LC278 First Bad Version
+{
+	// The API isBadVersion is defined for you.
+	bool isBadVersion(int version)
+	{
+		return true; // don't have the implementation
+	}
+	class Solution {
+		//std::unordered_map<int,bool> map;
+	public:
+		int firstBadVersion(int n) {
+			int lo = 1;
+			int hi = n;
+			while (lo <= hi)
+			{
+				const int m = lo + (hi - lo) / 2;
+				if (isBadVersion(m)) // pivot on the left
+				{
 
+					if (m == 1) return m;
+					if (!isBadVersion(m - 1)) return m;
+					hi = m - 1;
+				}
+				else // pivot on the right
+				{
+					if (m >= n - 1) return n;
+					if (isBadVersion(m + 1)) return  m + 1;
+					lo = m + 1;
+				}
+			}
+			return 0;
+		}
+	};
+}
 namespace May_day2
 {
 	class Solution {
