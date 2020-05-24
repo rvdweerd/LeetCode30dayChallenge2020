@@ -1260,3 +1260,57 @@ namespace May_day23  // LC986 Interval list intersections
 		vec C = Solution().intervalIntersection(A, B);
 	}
 }
+namespace May_day24 // LC1008 Construct Binary Search Tree from Preorder Traversal
+{
+	/**
+	* Definition for a binary tree node.*/
+	struct TreeNode {
+		int val;
+		TreeNode *left;
+		TreeNode *right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	};
+	class Solution {
+	private:
+	public:
+		TreeNode* bstFromPreorder(std::vector<int>& preorder) 
+		{
+			TreeNode* root = new TreeNode(preorder[0]);
+			for (size_t i = 1; i < preorder.size(); i++)
+			{
+				int val = preorder[i];
+				TreeNode* runner = root;
+				while (val < runner->val && runner->left || val > runner->val && runner->right)
+				{
+					if (val < runner->val) runner = runner->left;
+					else runner = runner->right;
+				}
+				if (val < runner->val) runner->left = new TreeNode(val);
+				else runner->right = new TreeNode(val);
+			}
+			return root;
+		}
+		void Print(TreeNode* n)
+		{
+			if (n)
+			{ 
+				std::cout << n->val << ", (addr:"<<n<<"),\n ";
+				Print(n->left);
+				Print(n->right);
+			}
+		}
+	};
+
+	void RunExample()
+	{
+		std::vector<int> vec;
+		vec = {8,5,1,7,10,12};
+		TreeNode* root = Solution().bstFromPreorder(vec);
+		//TreeNode* root = new TreeNode(8);
+		//root->left = new TreeNode(5, new TreeNode(1), new TreeNode(7));
+		//root->right = new TreeNode(10, nullptr, new TreeNode(12));
+		//Solution().Print(root);
+	}
+}
