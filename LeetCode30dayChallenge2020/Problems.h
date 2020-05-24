@@ -596,7 +596,45 @@ namespace LC765 // Couples holding hands
 		ans = minSwapsCouples(row); //3
 	}
 }
+namespace LC846 // Hand of Straights
+{
+	class Solution {
+	public:
+		bool isNStraightHand(std::vector<int>& hand, int W) 
+		{
+			std::map<int, size_t> map;
+			for (int v : hand) map[v]++;
+			for (auto p : map)
+			{
+				if (p.second < 0) return false;
+				while (p.second > 0)
+				{
+					for (int i = p.first; i < p.first + W; i++)
+					{
+						auto it = map.find(i);
+						if (it == map.end() || it->second <=0) return false;
+						it->second--;
+					}
+					p.second--;
+				}
+			}
+			return true;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> hand;
+		bool ans;
+		hand = { 1,2,3,6,2,3,4,7,8 };
+		ans = Solution().isNStraightHand(hand,3);//true
+		hand = { 1,2,3,4,5 };
+		ans = Solution().isNStraightHand(hand, 4);//false
+		hand = { 1,2,3,1,2,3 };
+		ans = Solution().isNStraightHand(hand, 3); //true
 
+
+	}
+}
 namespace LC1263 // Box Pusher
 {
 	using ULL = unsigned long long;
