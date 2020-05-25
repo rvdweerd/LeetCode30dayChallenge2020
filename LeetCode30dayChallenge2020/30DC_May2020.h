@@ -1432,18 +1432,19 @@ namespace May_day24 // LC1008 Construct Binary Search Tree from Preorder Travers
 
 	}
 }
-namespace May_day25
+namespace May_day25 // LC1035 Uncrossed Lines
 {
 	class Solution
 	{
 	public:
-		int maxUncrossedLines(std::vector<int>& A, std::vector<int>& B)
+		int maxUncrossedLines_FAULTY(std::vector<int>& A, std::vector<int>& B)
 		{
+			// Horrific rabbit hole before the DP insight. Does not guarantee optimum
 			std::map<int, std::vector<int>> entriesB;
-			for (int i = 0; i < B.size(); i++) entriesB[B[i]].push_back(i);
+			for (int i = 0; i < (int)B.size(); i++) entriesB[B[i]].push_back(i);
 
 			std::multimap<int, std::pair<int, int>> map;
-			for (int i = 0; i < A.size(); i++)
+			for (int i = 0; i < (int)A.size(); i++)
 			{
 				auto it = entriesB.find(A[i]);
 				if (it != entriesB.end())
@@ -1454,15 +1455,10 @@ namespace May_day25
 					}
 				}
 			}
-			//std::vector<std::pair<int, std::multimap<int, std::pair<int, int>>::iterator>> processQueue;
 			std::multimap<int, std::multimap<int, std::pair<int, int>>::iterator> processQueue;
 			for (auto it = map.begin(); it != map.end(); ++it)
 			{
 				int count = 0;
-				//for (auto p_inner : map)
-				//{
-				//	if (p_inner.second.first > p.second.first && p_inner.first > p.first) count++;
-				//}
 				for (auto it_inner = map.begin(); it_inner != map.end(); ++it_inner)
 				{
 					if (it_inner->second.first > it->second.first && it_inner->first > it->first)
@@ -1471,18 +1467,18 @@ namespace May_day25
 					}
 				}
 				it->second.second = count;
-				//processQueue.push_back({ it->second.second,it });
 				processQueue.insert({ it->second.second,it });
 			}
 			int count = 0;
 			int maxCount = 0;
 			int matchB = -1;
 			int iMin = -1;
-			//for (auto e : processQueue)
 			for (size_t i = 0; i < processQueue.size(); i++)
 			{
 				for (auto it = std::next(processQueue.rbegin(),i); it != processQueue.rend(); it++)
 				{
+					auto k = it->second->first;
+					auto l = it->second->second.first;
 					if (it->second->second.first > matchB && it->second->first > iMin)
 					{
 						count++;
@@ -1491,9 +1487,35 @@ namespace May_day25
 					}
 				}
 				maxCount = std::max(count, maxCount);
+				count = 0; matchB = -1; iMin = -1;
 				std::cout << "maxcount: "<<maxCount << "\n";
 			}
 			return maxCount;
+		}
+		int maxUncrossedLines(std::vector<int>& A, std::vector<int>& B)
+		{
+			//  DP approach
+			std::vector<std::vector<int>> DP(B.size() + 1, std::vector<int>(A.size() + 1, 0));
+			for (int i = (int)A.size() - 1; i >= 0; i--)
+			{
+				for (int j = (int)B.size() - 1; j >= 0; j--)
+				{
+					DP[j][i] = std::max(DP[j + 1][i], DP[j][i + 1]);
+					if (A[i] == B[j] && (DP[j][i + 1] == DP[j + 1][i]) && DP[j][i+1]  == DP[j+1][i+1] )
+					{
+						DP[j][i]++;
+					}
+				}
+			}
+			/*for (auto vec : DP)
+			{
+				for (auto v : vec)
+				{
+					std::cout << v << ",";
+				}
+				std::cout << "\n";
+			}*/
+			return DP[0][0];
 		}
 	};
 	void RunExample()
@@ -1501,29 +1523,37 @@ namespace May_day25
 		std::vector<int> A, B;
 		int ans;
 
-		//A = { 1,4,3,2 };
-		//B = { 1,2,4,3 };
-		//ans = Solution().maxUncrossedLines(A, B); //3
+		A = { 1,4,3,2 };
+		B = { 1,2,4,3 };
+		ans = Solution().maxUncrossedLines(A, B); //3
 
-		//A = { 1,3,2,4 };
-		//B = { 2,3,1,3 };
-		//ans = Solution().maxUncrossedLines(A, B); //2
+		A = { 1,3,2,4 };
+		B = { 2,3,1,3 };
+		ans = Solution().maxUncrossedLines(A, B); //2
 
-		//A = { 5,1,5 };
-		//B = { 1,5,1 };
-		//ans = Solution().maxUncrossedLines(A, B); //2
+		A = { 5,1,5 };
+		B = { 1,5,1 };
+		ans = Solution().maxUncrossedLines(A, B); //2
 
-		//A = { 1,3,7,1,7,5 };
-		//B = { 1,9,2,5,1 };
-		//ans = Solution().maxUncrossedLines(A, B); //2
+		A = { 1,3,7,1,7,5 };
+		B = { 1,9,2,5,1 };
+		ans = Solution().maxUncrossedLines(A, B); //2
 
-		//A = { 1,2,1,3 };
-		//B = { 1,2,1,3 };
-		//ans = Solution().maxUncrossedLines(A, B); //4
+		A = { 1,2,1,3 };
+		B = { 1,2,1,3 };
+		ans = Solution().maxUncrossedLines(A, B); //4
 
 		A = { 4, 1, 2, 5, 1, 5, 3, 4, 1, 5 };
 		B = {3, 1, 1, 3, 2, 5, 2, 4, 1, 3, 2, 2, 5, 5, 3, 5, 5, 1, 2, 1};
 		ans = Solution().maxUncrossedLines(A, B); //7
+
+		A = { 3, 2, 5, 3, 2, 3, 1, 2, 2, 5, 2, 5, 4, 4, 5 };
+		B = { 3, 2, 3, 3, 5, 5, 1, 3, 3, 1, 5, 2, 5, 5, 3, 2, 4, 2, 1, 2 };
+		ans = Solution().maxUncrossedLines(A, B); //10
+
+		A = { 5,3,3,5,5,3,5,3,5,5 };
+		B = { 2,5,5,1,4,5,3,3,2,2,3,2,3,3,1 };
+		ans = Solution().maxUncrossedLines(A, B); //5
 
 	}
 }
