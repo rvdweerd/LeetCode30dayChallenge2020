@@ -8,7 +8,41 @@
 #include <unordered_map>
 #include <stack>
 #include <queue>
+#include <string>
+namespace May_day1 // LC278 First Bad Version
+{
+	// The API isBadVersion is defined for you.
+	bool isBadVersion(int version)
+	{
+		return true; // don't have the implementation
+	}
+	class Solution {
+		//std::unordered_map<int,bool> map;
+	public:
+		int firstBadVersion(int n) {
+			int lo = 1;
+			int hi = n;
+			while (lo <= hi)
+			{
+				const int m = lo + (hi - lo) / 2;
+				if (isBadVersion(m)) // pivot on the left
+				{
 
+					if (m == 1) return m;
+					if (!isBadVersion(m - 1)) return m;
+					hi = m - 1;
+				}
+				else // pivot on the right
+				{
+					if (m >= n - 1) return n;
+					if (isBadVersion(m + 1)) return  m + 1;
+					lo = m + 1;
+				}
+			}
+			return 0;
+		}
+	};
+}
 namespace May_day2
 {
 	class Solution {
@@ -1273,7 +1307,6 @@ namespace May_day24 // LC1008 Construct Binary Search Tree from Preorder Travers
 		TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 	};
 	class Solution {
-	private:
 	public:
 		std::stack<TreeNode*> stack;
 		TreeNode* bstFromPreorder(std::vector<int>& preorder)
@@ -1291,11 +1324,11 @@ namespace May_day24 // LC1008 Construct Binary Search Tree from Preorder Travers
 				}
 				else
 				{
-					while (!stack.empty() && preorder[i] < stack.top()->val)
+					while (!stack.empty() && preorder[i] > stack.top()->val)
 					{
+						ptr = stack.top();
 						stack.pop();
 					}
-					ptr = stack.top(); stack.pop();
 					ptr->right = new TreeNode(preorder[i]);
 					ptr = ptr->right;
 					stack.push(ptr);
@@ -1320,26 +1353,83 @@ namespace May_day24 // LC1008 Construct Binary Search Tree from Preorder Travers
 			}
 			return root;
 		}
-		void Print(TreeNode* n)
+	private:
+		struct Entry
 		{
-			if (n)
-			{ 
-				std::cout << n->val << ", (addr:"<<n<<"),\n ";
-				Print(n->left);
-				Print(n->right);
+			int val;
+			size_t d;
+			std::vector<int> pos;
+		};
+		int l = 0, r = 0;
+		size_t d = 0;
+		size_t maxDepth = 0;
+		std::vector<Entry> entries;
+		std::vector<int> path;
+		void GetNodePositions(TreeNode* root)
+		{
+			if (root)
+			{
+				std::cout << root->val << ", d=" << d << ", l=" << l << ", r=" << r << "\n";
+				entries.push_back({ root->val,d,path });
+				d++; l++; path.push_back(-1);
+				GetNodePositions(root->left);
+				l--; r++; path.pop_back(); path.push_back(1);
+				GetNodePositions(root->right);
+				r--; d--; path.pop_back();
 			}
+			else
+			{
+				maxDepth = std::max(maxDepth, d-1);
+			}
+		}
+		std::vector<size_t> MakePaddingVector(size_t depth)
+		{
+			std::vector<size_t> vec_out;
+			size_t max = 1;
+			if (maxDepth > 1) max = (size_t)std::pow(2, maxDepth - 1);
+			for (size_t i = 0; i < maxDepth; i++)
+			{
+				vec_out.push_back(max);
+				max /= 2;
+			}
+			return vec_out;
+		}
+	public:
+		std::vector<std::vector<std::string>> printTree(TreeNode* root)
+		{
+			GetNodePositions(root);
+			std::vector<std::vector<std::string>> bstStringArray(maxDepth+1,std::vector<std::string>((int)std::pow(2,maxDepth+1)-1,""));
+			std::vector<size_t> padding = MakePaddingVector(maxDepth); 
+			size_t midPoint = bstStringArray[0].size() / 2;
+			for (auto e : entries)
+			{
+				size_t row = e.d;
+				size_t col = midPoint;
+				for (size_t i = 0; i < e.pos.size(); i++)
+				{
+					col += e.pos[i] * padding[i];
+				}
+				bstStringArray[row][col] = std::to_string(e.val);
+			}
+			return bstStringArray;
 		}
 	};
 
 	void RunExample()
 	{
-		std::vector<int> vec;
-		vec = {8,5,1,7,10,12};
-		TreeNode* root = Solution().bstFromPreorder(vec);
-		//TreeNode* root = new TreeNode(8);
-		//root->left = new TreeNode(5, new TreeNode(1), new TreeNode(7));
-		//root->right = new TreeNode(10, nullptr, new TreeNode(12));
-		//Solution().Print(root);
+		//std::vector<int> vec;
+		//vec = {8,5,1,7,10,12};
+		//TreeNode* root = Solution().bstFromPreorder(vec);
+		//auto ans = Solution().printTree(root);
+		
+		/*TreeNode* root = new TreeNode(3, nullptr, new TreeNode(30));
+		root->right->left = new TreeNode(10, nullptr, new TreeNode(15));
+		root->right->left->right->right = new TreeNode(45);
+		auto ans = Solution().printTree(root);*/
+
+		TreeNode* root = new TreeNode(1);
+		auto ans = Solution().printTree(root);
+
 	}
 }
 namespace May_day25
