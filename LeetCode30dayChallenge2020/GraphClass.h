@@ -109,7 +109,7 @@ public:
 			{
 				std::cout << e->end->name << "[" << e->cost << "], ";
 			}
-			//std::cout << std::endl;
+			std::cout << std::endl;
 		}
 	}
 	std::vector<std::vector<Node*>> StronglyConnectedComponents() // Kosaraju's algorithm
@@ -259,6 +259,36 @@ public:  // to be made private later
 			}
 		}
 		return false;
+	}
+	bool IsDisjoint(Node* node, std::unordered_set<int>& set) const
+	{
+		while (!set.empty())
+		{
+			node = nodemap.find(*set.begin())->second;
+			std::queue<std::pair<Node*, bool>> queue;
+			std::unordered_map<Node*, bool> visited;
+			queue.push({ node,true });
+			while (!queue.empty())
+			{
+				auto current = queue.front(); queue.pop();
+				for (auto e : current.first->edges_out)
+				{
+					auto it = visited.find(e->end);
+					if (it != visited.end())
+					{
+						if (current.second == it->second) return false;
+					}
+					else
+					{
+						queue.push({ e->end,!current.second });
+					}
+				}
+				visited.insert({ current.first, current.second });
+				set.erase(current.first->name);
+
+			}
+		}
+		return true;
 	}
 	void WrapCircularNodeInto(Node* source, Node* target)
 	{
