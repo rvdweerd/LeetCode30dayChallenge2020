@@ -1616,3 +1616,56 @@ namespace May_day27 // LC Possible BiPartition
 		ans = Solution().possibleBipartition(200, dislikes);
 	}
 }
+namespace May_day28
+{
+	class Solution {
+	public:
+		std::vector<int> countBits(int num) 
+		{
+			if (num == 0) return { 0 };
+			std::vector<int> vec;
+			vec.reserve(num + 1);
+			vec.push_back(0); vec.push_back(1);
+			if (num == 1) return vec;
+			int p1 = 1;
+			int len = 1;
+
+			for (int i = 2; i < num+1; i++)
+			{
+				int c = 0;
+				for (int j = 0; j < len && i+j<num+1; j++)
+				{
+					vec.push_back(vec[p1 + j]);
+					c++;
+				}
+				for (int j = 0; j < len && i+c < num+1; j++)
+				{
+					vec.push_back(vec[p1 + j]+1);
+					c++;
+				}
+				len *= 2;
+				p1 *= 2;
+				i += c-1;
+			}
+			return vec;
+		}
+	};
+	void PrintVec(const std::vector<int>& vec)
+	{
+		for (auto v : vec)
+		{
+			std::cout << v << ", ";
+		}
+		std::cout << "\n";
+	}
+	void RunExample()
+	{
+		int n;
+		std::vector<int> vec;
+		n = 0; vec = Solution().countBits(n); std::cout << "n=" << n << ", vec: "; PrintVec(vec);
+		n = 1; vec = Solution().countBits(n); std::cout << "n=" << n << ", vec: "; PrintVec(vec);
+		n = 5; vec = Solution().countBits(n); std::cout << "n=" << n << ", vec: "; PrintVec(vec);
+		n = 15; vec = Solution().countBits(n); std::cout << "n=" << n << ", vec: "; PrintVec(vec);
+		n = 25; vec = Solution().countBits(n); std::cout << "n=" << n << ", vec: "; PrintVec(vec);
+	}
+}
