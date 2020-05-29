@@ -49,7 +49,7 @@ size_t allocated=0;
 
 int main()
 {
-	May_day28::RunExample();
+	May_day29::RunExample();
 	//LC846::RunExample();
 
 	std::cin.get();

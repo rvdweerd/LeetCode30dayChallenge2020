@@ -1669,3 +1669,110 @@ namespace May_day28
 		n = 25; vec = Solution().countBits(n); std::cout << "n=" << n << ", vec: "; PrintVec(vec);
 	}
 }
+namespace May_day29 // LC207 Course Schedule
+{
+	class Solution {
+		bool hasStronglyConnectedComponentsWithMultipleEntries(std::unordered_map<int, std::vector<int>>& incoming, 
+			std::unordered_map<int, std::vector<int>>& outgoing, std::set<int>& nodes)
+		{
+			// Apply Kosaraju to check for strongly connected components
+			std::stack<int> finishTimes;
+			std::set<int> visited;
+			// fill by finish time in DFS
+			for (int v : nodes)
+			{
+				if (visited.find(v) == visited.end())
+				{
+					std::stack<int> dfsStack;
+					std::stack<int> backLog;
+					dfsStack.push(v);
+					while (!dfsStack.empty())
+					{
+						int n = dfsStack.top(); dfsStack.pop();
+						if (visited.find(n) == visited.end())
+						{
+							visited.insert(n);
+							bool hasUnvisitedNeighbors = false;
+							for (int neighbor : outgoing[n])
+							{
+								if (visited.find(neighbor) == visited.end())
+								{
+									hasUnvisitedNeighbors = true;
+									dfsStack.push(neighbor);
+								}
+							}
+							if (!hasUnvisitedNeighbors)
+							{
+								finishTimes.push(n);
+							}
+							else
+							{
+								backLog.push(n);
+							}
+						}
+					}
+					while (!backLog.empty())
+					{
+						finishTimes.push(backLog.top()); backLog.pop();
+					}
+				}
+			}
+			visited.clear();
+			while (!finishTimes.empty())
+			{
+				int v = finishTimes.top(); finishTimes.pop();
+				visited.insert(v);
+				{
+					for (auto neighbor : incoming[v])
+					{
+						if (visited.find(neighbor) == visited.end())
+						{
+							return false;
+						}
+					}
+
+				}
+			}
+			return true;
+		}
+	public:
+		bool canFinish_flawed(int numCourses, std::vector<std::vector<int>>& prerequisites)
+		{
+			if (prerequisites.size() <= 1 || numCourses <=1) return true;
+			std::unordered_map<int, std::vector<int>> outgoing;
+			std::unordered_map<int, std::vector<int>> incoming;
+			std::set<int> nodes;
+			// Build graph
+			for (auto vec : prerequisites)
+			{
+				if (vec[0] < numCourses && vec[1] < numCourses)
+				{
+					outgoing[vec[1]].push_back(vec[0]);
+					incoming[vec[0]].push_back(vec[1]);
+					nodes.insert(vec[0]);
+					nodes.insert(vec[1]);
+				}
+			}
+			return hasStronglyConnectedComponentsWithMultipleEntries(incoming, outgoing, nodes);
+		}
+		bool canFinish(int numCourses, std::vector<std::vector<int>>& prerequisites)
+		{
+			Graph<int> graphT(prerequisites);
+			Graph<int> graph = graphT.GetInverse();
+			auto g = graph.StronglyConnectedComponents();
+			for (auto v : g)
+			{
+				if (v.size() > 1) return false;
+			}
+			return true;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> prereq;
+		bool ans;
+
+		prereq = { {0,3},{3,1},{1,0},{2,1},{2,3} };	
+		ans = Solution().canFinish(4,prereq);
+	}
+}
