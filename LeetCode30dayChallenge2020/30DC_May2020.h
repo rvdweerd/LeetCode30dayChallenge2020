@@ -1776,3 +1776,39 @@ namespace May_day29 // LC207 Course Schedule
 		ans = Solution().canFinish(4,prereq);
 	}
 }
+namespace May_day30 // LC973 Closest Points to Origin
+{
+	class Solution {
+	public:
+		std::vector<std::vector<int>> kClosest_1(std::vector<std::vector<int>>& points, int K) // sorts the entire set
+		{
+			std::sort(points.begin(), points.end(), [](std::vector<int>& vec1, std::vector<int>& vec2) 
+				{
+					return (vec1[0] * vec1[0] + vec1[1] * vec1[1]) < (vec2[0] * vec2[0] + vec2[1] * vec2[1]);
+				});
+			return std::vector<std::vector<int>>(points.begin(), points.begin()+K);
+		}
+		std::vector<std::vector<int>> kClosest(std::vector<std::vector<int>>& points, int K)  // only rearranges K elements (more work is not necessary)
+		{
+			std::nth_element(points.begin(), points.begin() + K, points.end(), [](std::vector<int>& vec1, std::vector<int>& vec2) // C++20?
+				{
+					return (vec1[0] * vec1[0] + vec1[1] * vec1[1]) < (vec2[0] * vec2[0] + vec2[1] * vec2[1]);
+				});
+			//return std::vector<std::vector<int>>(points.begin(), points.begin() + K);
+			points.resize(K);
+			return std::move(points);
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> points;
+		std::vector<std::vector<int>> ans;
+
+		points = { {3,3},{5,-1},{-2,4} };
+		ans = Solution().kClosest(points, 2);
+
+		points = { {0,0}};
+		ans = Solution().kClosest(points, 1);
+
+	}
+}
