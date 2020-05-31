@@ -10,6 +10,7 @@
 #include <queue>
 #include <string>
 #include "GraphClass.h"
+#include <algorithm>
 
 namespace May_day1 // LC278 First Bad Version
 {
@@ -1809,6 +1810,143 @@ namespace May_day30 // LC973 Closest Points to Origin
 
 		points = { {0,0}};
 		ans = Solution().kClosest(points, 1);
+
+	}
+}
+namespace May_day31
+{
+	class Solution {
+	public:
+		int calls = 0;
+		std::unordered_map<long long, int> cache;
+		int Step_map(std::string word1, std::string word2, size_t p1, size_t p2)
+		{
+			long long key = (long long)p1 << 32 | p2;
+			auto it = cache.find(key);
+			if (it != cache.end()) return it->second;
+			//calls++;
+			if ((size_t)p1 == word1.size())
+			{
+				return word2.size() - p2;
+			}
+			else if ((size_t)p2 == word2.size())
+			{
+				return word1.size() - p1;
+			}
+			else
+			{
+				if (word1[p1] == word2[p2])
+				{
+					return cache[key] = Step_map(word1, word2, p1 + 1u, p2 + 1u); // move right, without increasing count
+				}
+				else
+				{
+					int minimum = 1 +	std::min(Step_map(word1, word2, p1 + 1u, p2 + 1u),	// replace
+										std::min(Step_map(word1, word2, p1, p2 + 1u),		// insert
+												 Step_map(word1, word2, p1 + 1u, p2))		// delete
+										);
+					return cache[key] = minimum;
+				}
+			}
+		}
+		int Step(std::string word1, std::string word2, size_t p1, size_t p2, std::vector<std::vector<int>>& dp)
+		{
+			if (dp[p1][p2] != -1) return dp[p1][p2];
+			//calls++;
+			if (p1 == word1.size())
+			{
+				return dp[p1][p2] = word2.size() - p2;
+			}
+			else if (p2 == word2.size())
+			{
+				return dp[p1][p2] = word1.size() - p1;
+			}
+			else
+			{
+				if (word1[p1] == word2[p2])
+				{
+					return dp[p1][p2] = Step(word1, word2, p1 + 1u, p2 + 1u,dp); // move right, without increasing count
+				}
+				else
+				{
+					return dp[p1][p2] = 1 + std::min(Step(word1, word2, p1 + 1u, p2 + 1u, dp),	// replace
+											std::min(Step(word1, word2, p1, p2 + 1u, dp),		// insert
+													 Step(word1, word2, p1 + 1u, p2, dp))		// delete
+					);
+				}
+			}
+		}
+
+		int minDistance(std::string word1, std::string word2) 
+		{
+			//std::cout << "\nFrom  " << word1 << " to --> " << word2;
+			std::vector<std::vector<int>> dp(word1.size()+1, std::vector<int>(word2.size()+1, -1));
+			int min = Step(word1, word2, 0,0,dp);
+			/*std::cout << "\nMinSteps:" << min << ", recursive calls: " << calls<<", cache size: "<<cache.size()<<"\n";
+			for (auto vec : dp)
+			{
+				for (auto v : vec)
+				{
+					std::cout << v << ",";
+				}
+				std::cout << "\n";
+			}*/
+			return min;
+		}
+	};
+	void  RunExample()
+	{
+		std::string str1;
+		std::string str2;
+		int ans;
+
+		str1 = "plasma";
+		str2 = "altruism";
+		ans = Solution().minDistance(str1, str2); //6
+
+		str1 = "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdef";
+		str2 = "bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefg";
+		ans = Solution().minDistance(str1, str2); //2
+
+		str1 = "trinitrophenylmethylnitramine";
+		str2 = "dinitrophenylhydrazine";
+		ans = Solution().minDistance(str1, str2); //10
+
+		str1 = "sea";
+		str2 = "eat";
+		ans = Solution().minDistance(str1, str2); //2
+
+		str1 = "pneumonoultramicroscopicsilicovolcanoconiosis";
+		str2 = "ultramicroscopically";
+		ans = Solution().minDistance(str1, str2); //27?
+
+		str1 = "bag";
+		str2 = "bbag";
+		ans = Solution().minDistance(str1, str2); //1
+
+		str1 = "blat";
+		str2 = "balt";
+		ans = Solution().minDistance(str1, str2); //2
+
+		str1 = "bal";
+		str2 = "bola";
+		ans = Solution().minDistance(str1, str2); //2
+
+		str1 = "horse";
+		str2 = "ros";
+		ans = Solution().minDistance(str1, str2); //3
+
+		str1 = "ros";
+		str2 = "horse";
+		ans = Solution().minDistance(str1, str2); //3
+
+		str1 = "intention";
+		str2 = "execution";
+		ans = Solution().minDistance(str1, str2); //5
+
+		str2 = "intention";
+		str1 = "execution";
+		ans = Solution().minDistance(str1, str2); //5
 
 	}
 }
