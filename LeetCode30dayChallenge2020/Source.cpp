@@ -12,6 +12,7 @@
 #include <queue>
 #include "30DC_Apr2020.h"
 #include "30DC_May2020.h"
+#include "30DC_Jun2020.h"
 #include "Problems.h"
 #include "GraphClass.h" 
 
@@ -49,7 +50,7 @@ size_t allocated=0;
 
 int main()
 {
-	May_day31::RunExample();
+	Jun_day1::RunExample();
 	//LC846::RunExample();
 
 	std::cin.get();

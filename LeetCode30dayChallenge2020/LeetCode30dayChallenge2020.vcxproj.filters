@@ -32,5 +32,8 @@
     <ClInclude Include="GraphClass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="30DC_Jun2020.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
