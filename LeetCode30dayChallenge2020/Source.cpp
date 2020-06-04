@@ -50,8 +50,9 @@ size_t allocated=0;
 
 int main()
 {
-	Jun_day1::RunExample();
-	//LC846::RunExample();
+	//Jun_day1::RunExample();
+	Knapsack::RunExample();
+	//Karatsuba::RunExample();
 
 	std::cin.get();
 	return 0;

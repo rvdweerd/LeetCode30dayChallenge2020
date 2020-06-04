@@ -12,6 +12,8 @@
 #include <queue>
 #include "GraphClass.h"
 #include <limits>
+#include <algorithm>
+#include <numeric>
 
 namespace LC36 //  Is Valid Sudoko
 {
@@ -273,6 +275,72 @@ namespace LC37 // Sudoko solver
 			{'.','.','.',	'.','8','.',	'.','7','9'}
 		};
 		Solution().solveSudoku(board);
+	}
+}
+namespace LC416 // Partition equal subset sum
+{
+	class Solution 
+	{
+	private:
+		int maxRemain;
+		const int maxElementValue = 100;
+		const int maxArraySize = 200;
+		bool CanEliminateRemainder(const std::vector<int>& nums, int index, int remainder, std::vector<std::vector<bool>>& cache,std::string path="")
+		{
+			//static std::unordered_set<long long> cache;
+			//std::cout << "Call with [i=" << index << ", remainder=" << remainder << "], path: "<<path<<"\n";
+			//if (cache.find( (index << 32) | remainder) != cache.end())
+			if (remainder < 0 || remainder > maxRemain) return false;
+			if (cache[index][remainder] == false)
+			{
+				return false;
+			}
+			if (remainder==0)
+			{
+				//std::cout << "\nWinning path: " << path<<"\n\n";
+				return true;
+			}
+
+			if ((size_t)index < nums.size() - 1 )
+			{
+				if (remainder >= nums[(size_t)index])
+				{
+					if (CanEliminateRemainder(nums, index + 1, remainder - nums[(size_t)index], cache, path + '1')) return true;
+					cache[index + 1][remainder - nums[(size_t)index]] = false;
+				}
+				if (CanEliminateRemainder(nums, index + 1, remainder, cache, path+'0')) return true;
+				cache[index + 1][remainder] = false;
+			}
+			return false;
+		}
+	public:
+		bool canPartition(const std::vector<int>& nums) 
+		{
+			int total = std::accumulate(nums.begin(), nums.end(), 0);
+			if (total % 2 == 1) return false;
+			std::vector<std::vector<bool>> cache(nums.size(), std::vector<bool>(maxElementValue * nums.size() / 2 + 1, true));
+			maxRemain = nums.size() / 2 * maxElementValue;
+			return CanEliminateRemainder(nums, 0, total / 2,cache);
+		}
+	};
+	
+
+	void RunExample()
+	{
+		std::vector<int> vec;
+		bool ans;
+
+		vec = { 1,5,11,5 };
+		ans = Solution().canPartition(vec); // true
+
+		vec = { 100,100,100,100,100,100,100,100 };
+		ans = Solution().canPartition(vec); // true
+
+		vec = { 3,3,3,4,5 };
+		ans = Solution().canPartition(vec);  // true
+
+		vec = { 28, 63, 95, 30, 39, 16, 36, 44, 37, 100, 61, 73, 32, 71, 100, 2, 37, 60, 23, 71, 53, 70, 69, 82, 97, 43, 16, 33, 29, 5, 97, 32, 29, 78, 93, 59, 37, 88, 89, 79, 75, 9, 74, 32, 81, 12, 34, 13, 16, 15, 16, 40, 90, 70, 17, 78, 54, 81, 18, 92, 75, 74, 59, 18, 66, 62, 55, 19, 2, 67, 30, 25, 64, 84, 25, 76, 98, 59, 74, 87, 5, 93, 97, 68, 20, 58, 55, 73, 74, 97, 49, 71, 42, 26, 8, 87, 99, 1, 16, 79 };
+		ans = Solution().canPartition(vec); //true
 	}
 }
 namespace LC587 // Erect the Fence
@@ -690,6 +758,36 @@ namespace LC765 // Couples holding hands
 		ans = minSwapsCouples(row); //3
 	}
 }
+namespace LC797 // All paths from source to target
+{
+	class Solution {
+	public:
+		std::vector<std::vector<int>> allPaths;
+		void Step(std::vector<std::vector<int>>& graph, int i, std::vector<int> path)
+		{
+			path.push_back(i);
+			for (auto v : graph[i])
+			{
+				Step(graph, v, path);
+			}
+			if (i == graph.size() - 1) allPaths.push_back(path);
+		}
+		std::vector<std::vector<int>> allPathsSourceTarget(std::vector<std::vector<int>>& graph) 
+		{
+			Step(graph, 0, {});
+			return allPaths;
+		}
+	};
+
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec;
+		std::vector<std::vector<int>> ans;
+
+		vec = { {1, 2} ,{3},{3},{} };
+		ans = Solution().allPathsSourceTarget(vec);
+	}
+}
 namespace LC846 // Hand of Straights
 {
 	class Solution {
@@ -726,6 +824,68 @@ namespace LC846 // Hand of Straights
 		hand = { 1,2,3,1,2,3 };
 		ans = Solution().isNStraightHand(hand, 3); //true
 
+
+	}
+}
+namespace LC912
+{
+	class Solution {
+	public:
+		std::vector<int> MergeSort(std::vector<int> arr)
+		{
+			std::vector<int> out(arr.size());
+			if (arr.size() == 1) return arr;
+			else
+			{
+				int m = arr.size() / 2;
+				std::vector<int> sorted_left = MergeSort(std::vector<int>(arr.begin(), arr.begin() + m));
+				std::vector<int> sorted_right = MergeSort(std::vector<int>(arr.begin() + m, arr.end()));
+				for (size_t i = 0, j = 0; i < sorted_left.size() || j < sorted_right.size();)
+				{
+					if (i >= sorted_left.size())
+					{
+						out[i+j] = (sorted_right[j]);
+						j++;
+					}
+					else if (j >= sorted_right.size())
+					{
+						out[i+j] = (sorted_left[i]);
+						i++;
+					}
+					else if (sorted_left[i] > sorted_right[j])
+					{
+						out[i + j] = sorted_right[j];
+						j++;
+					}
+					else
+					{
+						out[i + j] = sorted_left[i];
+						i++;
+					}
+				}
+
+			}
+			return out;
+		}
+		std::vector<int> sortArray(std::vector<int>& nums) 
+		{
+			return MergeSort(nums);
+		}
+	};
+	void RunExample()
+	{
+		//std::vector<int> vec = { 5,4,1,7,2,6,8,3 };
+		std::vector<int> vec;
+		std::vector<int> merged;
+		
+		vec = { 2,-2,2,-2,-1 };
+		merged = Solution().sortArray(vec);
+
+		vec = { 3,2,1 }; 
+		merged = Solution().sortArray(vec);
+
+		vec = { 0 };
+		merged = Solution().sortArray(vec);
 
 	}
 }
@@ -1141,6 +1301,153 @@ namespace LC1344 // Angle between hands of a clock
 		ans = Solution().angleClock(4, 50);
 		ans = Solution().angleClock(12, 0);
 		ans = Solution().angleClock(7, 45);
+
+	}
+}
+namespace Karatsuba
+{
+	class Solution
+	{
+	private:
+		int nDigits(int n)
+		{
+			if (n < 10) return 1;
+			else return 1 + nDigits(n / 10);
+		}
+	public:
+		int KaratsubaMultiplication(int x, int y)
+		{
+			int n = nDigits(x);
+			assert(n == nDigits(y));
+			if (n == 1) return (x * y);
+			std::string strX = std::to_string(x);
+			std::string strA = strX.substr(0,n / 2);
+			std::string strB = strX.substr(n/2);
+			int a = std::stoi(strA);
+			int b = std::stoi(strB);
+
+			std::string strY = std::to_string(y);
+			std::string strC = strY.substr(0, n / 2);
+			std::string strD = strY.substr(n / 2);
+			int c = std::stoi(strC);
+			int d = std::stoi(strD);
+
+			std::string strPn = "1" + std::string( n,'0' );
+			int Pn = std::stoi(strPn);
+			std::string strPn_2 = "1" + std::string( n / 2, '0');
+			int Pn_2 = std::stoi(strPn_2);
+
+			return (Pn * KaratsubaMultiplication(a, c) + Pn_2 * (KaratsubaMultiplication(a, d) + KaratsubaMultiplication(b, c)) + KaratsubaMultiplication(b, d));
+		}
+	};
+	void RunExample()
+	{
+		int x = 5678;
+		int y = 1234;
+		int z = Solution().KaratsubaMultiplication(x, y);
+	}
+}
+namespace Knapsack
+{
+	class Solution
+	{
+	public:
+		int Pack(std::vector<std::vector<int>>& inventory, int index, int capacity, int value, std::string path)
+		{
+			if (index == inventory.size())
+			{
+				std::cout << "Value: " << value << ", Path: " << path <<"\n";
+				return value;
+			}
+			if (capacity-inventory[index][0] >= 0)
+			{
+				return std::max(
+					Pack(inventory, index + 1, capacity - inventory[index][0], value + inventory[index][1], path + '1'),
+					Pack(inventory, index + 1, capacity , value , path + '0')
+				);
+			}
+			return Pack(inventory, index + 1, capacity, value, path + '0');
+
+		}
+		int maxValueRecursive(std::vector<std::vector<int>>& inventory, int S)
+		{
+			std::cout << "\nRecursive outcomes (max values) and paths:\n";
+			return Pack(inventory, 0, S, 0,"");
+		}
+		int maxValueDP(std::vector<std::vector<int>>& inventory, int S)
+		{
+			// Create DP table, initialized with 0s
+			std::vector<std::vector<int>> DP(inventory.size(), std::vector<int>(S + 1, 0));
+			// Iterate through table and fill with local maxima
+			for (int i = 0; i < inventory.size(); i++) // DP table axis 1: number of items to choose from
+			{
+				for (int j = 1; j <= S ; j++) // DP table axis 2: max allowable weight
+				{
+					if (j >= inventory[i][0]) // current item can fit, see if adding it would lead to better outcome
+					{
+						if (i == 0) DP[i][j] = inventory[i][1];
+						else DP[i][j] = std::max(DP[i-1][j] , inventory[i][1] + DP[i-1][j-inventory[i][0]]);
+					}
+					else // current item does not fit, move on without it
+					{
+						if (i == 0) DP[i][j] = 0; 
+						else DP[i][j] = DP[i - 1][j];
+					}
+				}
+			}
+			// Loop back through the DP table to build the list of items in the optimal knapsack
+			std::vector<int> itemsIncluded;
+			int j = S;
+			for (int i = inventory.size() - 1; i > 0; i--)
+			{
+				if (DP[i - 1][j] < DP[i][j])
+				{
+					itemsIncluded.push_back(i);
+					j = j - inventory[i][0];
+				}
+			}
+			if (itemsIncluded.size()==0) itemsIncluded.push_back(0);
+			else
+			{
+				int i = itemsIncluded.back();
+				if (j-inventory[i][0] >=0 && DP[0][j-inventory[i][0]] > 0) itemsIncluded.push_back(0);
+			}
+			// Present the results
+			std::cout << "\nInventory:\n";
+			int i = 0;
+			for (auto v : inventory)
+			{
+				std::cout << "i=" << i++ << ", s_i=" << v[0] << ", v_i=" << v[1] << "\n";
+			}
+			std::cout << "Picking items: ";
+			for (auto v : itemsIncluded)
+			{
+				std::cout << v << ", ";
+			}
+			std::cout << "\nYield the optimal set with Value: " << DP[inventory.size() - 1][S]<<"\n" ;
+			// Return max
+			return DP[inventory.size()-1][S];
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec;
+		int ans;
+
+		// Test recursive solution
+		vec = { {2,1},{5,2},{10,5},{3,1} }; // {size,value}
+		ans = Solution().maxValueRecursive(vec, 10); // max size. ans: 5
+		
+		vec = { {1,1},{3,4},{4,5},{5,7} }; // {size,value}
+		ans = Solution().maxValueRecursive(vec, 7); // max size/ ans: 9
+
+		// Test DP solution
+		vec = { {2,1},{5,2},{10,5},{3,1} }; // {size,value}
+		ans = Solution().maxValueDP(vec, 10); // max size. ans: 5
+
+		vec = { {1,1},{3,4},{4,5},{5,7} }; // {size,value}
+		ans = Solution().maxValueDP(vec, 7); // max size/ ans: 9
+
 
 	}
 }
