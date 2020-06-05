@@ -12,6 +12,7 @@
 #include <string>
 #include "GraphClass.h"
 #include <algorithm>
+#include <random>
 
 namespace Jun_day1 // LC226 Invert Binary Tree
 {
@@ -145,5 +146,65 @@ namespace Jun_day1 // LC226 Invert Binary Tree
 		TreeNode* br = new TreeNode(7, new TreeNode(6), new TreeNode(9));
 		TreeNode* root = new TreeNode(4, bl, br); bl = nullptr; br = nullptr;
 		TreeNode* root_inv = Solution().invertTree(root);
+	}
+}
+namespace Jun_day5 // LC528 Random Pick With Weight
+{
+	class Solution {
+	private:
+		std::random_device rd;
+		std::mt19937 rng;
+		std::uniform_int_distribution<int> cDistr;
+		std::vector<int> distribution;
+	public:
+		Solution(std::vector<int>& w)
+			:
+			rng(rd()),
+			distribution(w.size())
+		{
+			//distribution.resize(w.size(),0);
+			distribution[0] = w[0];
+			for (size_t i = 1; i < w.size(); i++)
+			{
+				distribution[i] = distribution[i - 1] + w[i];
+			}
+			cDistr = std::uniform_int_distribution<int>(1, distribution.back());
+		}
+		int pickIndex() 
+		{
+			int X = cDistr(rng);
+			int l = 0;
+			int h = distribution.size()-1;
+			while (h >= l)
+			{
+				int m = l + (h - l) / 2;
+				if (distribution[m] < X)
+				{
+					l = m + 1;
+				}
+				else
+				{
+					h = m - 1;
+				}
+			}
+			return l;
+		}
+	};
+
+	/**
+	 * Your Solution object will be instantiated and called as such:
+	 * Solution* obj = new Solution(w);
+	 * int param_1 = obj->pickIndex();
+	 */
+	void RunExample()
+	{
+		std::vector<int> w = { 10,10,50,10,10,10 };
+		Solution* obj = new Solution(w);
+		int avg = 0;
+		for (size_t i = 0; i < 1e7; i++)
+		{
+			avg += obj->pickIndex();
+		}
+		float Avg = (float)avg / 1e7f;
 	}
 }
