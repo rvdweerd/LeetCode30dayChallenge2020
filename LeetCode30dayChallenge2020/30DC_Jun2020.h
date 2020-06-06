@@ -208,3 +208,81 @@ namespace Jun_day5 // LC528 Random Pick With Weight
 		float Avg = (float)avg / 1e7f;
 	}
 }
+namespace Jun_day6 // LC406 Queue reconstruction by height
+{
+	void PrintVec(std::vector<std::vector<int>> vec)
+	{
+		for (auto v : vec)
+		{
+			std::cout << "[" << v[0] << "," << v[1] << "],";
+		}
+		std::cout << "\n======================================\n";
+	}
+	class Solution {
+	public:
+		std::vector<std::vector<int>> reconstructQueue_vec(std::vector<std::vector<int>>& people) // vector as data structure is slow (many inserts)
+		{
+			if (people.size() == 0) return {};
+			std::cout << "Original    : "; PrintVec(people);
+			std::sort(people.begin(), people.end(), [](std::vector<int> p1, std::vector<int> p2) 
+				{ 
+					if (p1[0] == p2[0])
+					{
+						return p1[1] < p2[1];
+					}
+					else
+					{
+						return p1[0] > p2[0];
+					}
+				}
+			);
+			std::cout << "Initial sort: "; PrintVec(people);
+			std::vector<std::vector<int>> sorted; sorted.reserve(people.size());
+			sorted.push_back(people[0]);
+			for (size_t i = 1; i < people.size(); i++)
+			{
+				auto it = sorted.begin() + people[i][1];
+				sorted.insert(it, people[i]);
+			}
+			std::cout << "Sorted      : "; PrintVec(sorted);
+			std::cout << "===========================================\n";
+			return sorted;
+		}
+		std::vector<std::vector<int>> reconstructQueue(std::vector<std::vector<int>>& people) // linked list implementation
+		{
+			if (people.size() == 0) return {};
+			std::sort(people.begin(), people.end(), [](std::vector<int> p1, std::vector<int> p2)
+				{
+					if (p1[0] == p2[0])
+					{
+						return p1[1] < p2[1];
+					}
+					else
+					{
+						return p1[0] > p2[0];
+					}
+				}
+			);
+			std::list<std::vector<int>> list;
+			list.push_back(people[0]);
+			for (size_t i = 1; i < people.size(); i++)
+			{
+				auto it = std::next(list.begin(),people[i][1]);
+				list.insert(it, people[i]);
+			}
+			return { list.begin(),list.end() };
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec;
+		std::vector<std::vector<int>> ans;
+		
+		vec = { {7, 0}, {4, 4}, {7, 1}, {5, 0}, {6, 1}, {5, 2} };
+		ans = Solution().reconstructQueue(vec);
+
+		vec = { {9, 0}, {7, 0}, {1, 9}, {3, 0}, {2, 7}, {5, 3}, {6, 0}, {3, 4}, {6, 2}, {5, 2} };
+		ans = Solution().reconstructQueue(vec); // [[3,0],[6,0],[7,0],[5,2],[3,4],[5,3],[6,2],[2,7],[9,0],[1,9]]
+
+	}
+}
