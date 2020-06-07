@@ -53,7 +53,7 @@ int main()
 	//Jun_day6::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
-	LC84::RunExample();
+	LC85::RunExample();
 
 	std::cin.get();
 	return 0;

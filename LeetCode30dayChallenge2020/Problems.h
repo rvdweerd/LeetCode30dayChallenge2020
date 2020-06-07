@@ -324,6 +324,82 @@ namespace LC84 // Largest rectangle in histogram
 		ans = Solution().largestRectangleArea(vec);
 	}
 }
+namespace LC85 // Maximal rectangle
+{
+	class Solution {
+	private:
+		int largestRectangleArea(std::vector<int>& heights)
+		{
+			int max = 0;
+			std::stack<std::pair<int, size_t>> stack;
+			stack.push({ heights[0],0 });
+			for (size_t i = 1; i < heights.size(); i++)
+			{
+				if (stack.empty() || heights[i] > stack.top().first)
+				{
+					stack.push({ heights[i],i });
+				}
+				else
+				{
+					size_t last = i;
+					while (!stack.empty() && heights[i] < stack.top().first)
+					{
+						auto p = stack.top(); stack.pop();
+						max = std::max(max, int(p.first * (i - p.second)));
+						last = p.second;
+						//std::cout << "i="<<i<< ", Popped: {" << p.first << "," << p.second << "}, max compare: " << int(p.first * (i - p.second)) << ", new max: " << max << "\n";
+					}
+					stack.push({ heights[i],last });
+				}
+			}
+			//std::cout << "unwrapping\n";
+			while (!stack.empty())
+			{
+				auto p = stack.top(); stack.pop();
+				max = std::max(max, int(p.first * (heights.size() - p.second)));
+				//std::cout << "Popped: {" << p.first << "," << p.second << "}, max compare: " << int(p.first * (heights.size() - p.second)) << ", new max: " << max << "\n";
+			}
+			return max;
+		}
+	public:
+		int maximalRectangle(std::vector<std::vector<char>>& matrix) 
+		{
+			int max = 0;
+			//std::vector<std::vector<int>> histograms;
+			std::vector<int> h(matrix[0].size(), 0);
+			for (auto r : matrix)
+			{
+				for (size_t col = 0; col < r.size(); col++)
+				{
+					if (r[col] == '0')
+					{
+						h[col] = 0;
+					}
+					else
+					{
+						h[col]++;
+					}
+				}
+				max = std::max(max, largestRectangleArea(h));
+			}
+			return max;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> matrix;
+		int ans;
+
+		matrix =
+		{
+			{'1', '0', '1', '0', '0'},
+			{'1', '0', '1', '1', '1'},
+			{'1', '1', '1', '1', '1'},
+			{'1', '0', '0', '1', '0'}
+		};
+		ans = Solution().maximalRectangle(matrix);	
+	}
+}
 namespace LC416 // Partition equal subset sum
 {
 	class Solution 
