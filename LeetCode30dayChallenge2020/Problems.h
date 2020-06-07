@@ -277,6 +277,53 @@ namespace LC37 // Sudoko solver
 		Solution().solveSudoku(board);
 	}
 }
+namespace LC84 // Largest rectangle in histogram
+{
+	class Solution {
+	public:
+		int largestRectangleArea(std::vector<int>& heights)
+		{
+			int max = 0;
+			std::stack<std::pair<int, size_t>> stack;
+			stack.push({ heights[0],0 });
+			for (size_t i = 1; i < heights.size(); i++)
+			{
+				if (stack.empty() || heights[i] > stack.top().first)
+				{
+					stack.push({ heights[i],i });
+				}
+				else
+				{
+					size_t last = i;
+					while (!stack.empty() && heights[i] < stack.top().first)
+					{
+						auto p = stack.top(); stack.pop();
+						max = std::max(max, int(p.first * (i - p.second)));
+						last = p.second;
+						//std::cout << "i="<<i<< ", Popped: {" << p.first << "," << p.second << "}, max compare: " << int(p.first * (i - p.second)) << ", new max: " << max << "\n";
+					}
+					stack.push({ heights[i],last });
+				}
+			}
+			//std::cout << "unwrapping\n";
+			while (!stack.empty())
+			{
+				auto p = stack.top(); stack.pop();
+				max = std::max(max, int(p.first * (heights.size() - p.second)));
+				//std::cout << "Popped: {" << p.first << "," << p.second << "}, max compare: " << int(p.first * (heights.size() - p.second)) << ", new max: " << max << "\n";
+			}
+			return max;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> vec;
+		int ans;
+
+		vec = { 2,1,5,6,2,3 };
+		ans = Solution().largestRectangleArea(vec);
+	}
+}
 namespace LC416 // Partition equal subset sum
 {
 	class Solution 
