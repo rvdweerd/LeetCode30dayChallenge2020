@@ -286,3 +286,61 @@ namespace Jun_day6 // LC406 Queue reconstruction by height
 
 	}
 }
+namespace Jun_day7 // LC Coin Change 2
+{
+	class Solution {
+	private:
+	public:
+		int changeHelper(int amount, std::vector<int>& coins, size_t i, std::vector<std::vector<int>>& DP)
+		{
+			if (DP[amount][i] != -1) return DP[amount][i];
+			int n = 0;
+			if (amount == 0) return 1;
+			else if (i == 0)
+			{
+				return amount % coins[0] == 0 ? 1 : 0;
+			}
+			else
+			{
+				for (int p = 0; p <= amount; p += coins[i])
+				{
+					int increment = changeHelper(amount - p, coins, i - 1,DP);
+					//DP[amount][i] = increment;
+					n += increment;
+				}
+			}
+			DP[amount][i] = n;
+			return n;
+		}
+		int change(int amount, std::vector<int>& coins) 
+		{
+			if (amount == 0) return 1;
+			if (coins.size() == 0) return 0;
+			std::vector<std::vector<int>> DP = std::vector<std::vector<int>>(amount+1, std::vector<int>(coins.size(), -1));
+			return changeHelper(amount, coins, coins.size() - 1, DP);
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> coins;
+		int amount;
+		int ans;
+
+		coins = { 1,2,5 };
+		amount = 5;
+		ans = Solution().change(amount, coins); // 4
+
+		coins = { 2 };
+		amount = 3;
+		ans = Solution().change(amount, coins); // 0
+
+		coins = { 10 };
+		amount = 10;
+		ans = Solution().change(amount, coins); // 1
+
+		coins = { 3,5,7,8,9,10,11 };
+		amount = 1000;
+		ans = Solution().change(amount, coins); // 1
+
+	}
+}
