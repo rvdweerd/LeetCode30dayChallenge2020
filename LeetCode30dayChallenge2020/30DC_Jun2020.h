@@ -286,14 +286,14 @@ namespace Jun_day6 // LC406 Queue reconstruction by height
 
 	}
 }
-namespace Jun_day7 // LC Coin Change 2
+namespace Jun_day7 // LC518 Coin Change 2
 {
 	class Solution {
 	private:
 	public:
-		int changeHelper(int amount, std::vector<int>& coins, size_t i, std::vector<std::vector<int>>& DP)
+		int changeHelper_Recursive(int amount, std::vector<int>& coins, size_t i, std::vector<std::vector<int>>& cache)
 		{
-			if (DP[amount][i] != -1) return DP[amount][i];
+			if (cache[amount][i] != -1) return cache[amount][i];
 			int n = 0;
 			if (amount == 0) return 1;
 			else if (i == 0)
@@ -304,20 +304,39 @@ namespace Jun_day7 // LC Coin Change 2
 			{
 				for (int p = 0; p <= amount; p += coins[i])
 				{
-					int increment = changeHelper(amount - p, coins, i - 1,DP);
-					//DP[amount][i] = increment;
-					n += increment;
+					n += changeHelper_Recursive(amount - p, coins, i - 1, cache);
 				}
 			}
-			DP[amount][i] = n;
+			cache[amount][i] = n;
 			return n;
 		}
 		int change(int amount, std::vector<int>& coins) 
 		{
 			if (amount == 0) return 1;
 			if (coins.size() == 0) return 0;
-			std::vector<std::vector<int>> DP = std::vector<std::vector<int>>(amount+1, std::vector<int>(coins.size(), -1));
-			return changeHelper(amount, coins, coins.size() - 1, DP);
+			
+			// Recursive solution with memoization
+			//std::vector<std::vector<int>> cache = std::vector<std::vector<int>>(amount+1, std::vector<int>(coins.size(), -1));
+			//return changeHelper_Recursive(amount, coins, coins.size() - 1, cache);
+
+			// DP table soluton (O(n*amount))
+			std::vector<std::vector<int>> DP = std::vector<std::vector<int>>(coins.size()+1, std::vector<int>(amount+1));
+			for (size_t row = 1; row <= coins.size(); row++) DP[row][0] = 1;
+			for (size_t row = 1; row <= coins.size(); row++)
+			{
+				for (size_t col = 1; col <= amount; col++)
+				{
+					if (col >= coins[row - 1])
+					{
+						DP[row][col] = DP[row - 1][col] + DP[row][col - coins[row - 1]];
+					}
+					else
+					{
+						DP[row][col] = DP[row - 1][col];
+					}
+				}
+			}
+			return DP.back().back();
 		}
 	};
 	void RunExample()
@@ -340,7 +359,6 @@ namespace Jun_day7 // LC Coin Change 2
 
 		coins = { 3,5,7,8,9,10,11 };
 		amount = 1000;
-		ans = Solution().change(amount, coins); // 1
-
+		ans = Solution().change(amount, coins); // 1952879228
 	}
 }
