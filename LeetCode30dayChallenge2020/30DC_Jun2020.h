@@ -344,3 +344,31 @@ namespace Jun_day7 // LC Coin Change 2
 
 	}
 }
+namespace Jun_day8
+{
+	class Solution {
+	public:
+		bool isPowerOfTwo_shifts(int n)
+		{
+			if (n <= 0) return false;
+			while ( (n & 1) != 1)
+			{
+				n >>= 1;
+			}
+			return n == 1;
+		}
+		bool isPowerOfTwo(int n)
+		{
+			return (n>0 && ( (n-1) & n ) == 0 );
+		}
+	};
+	void RunExample()
+	{
+		bool ans;
+		ans = Solution().isPowerOfTwo(0); // false
+		ans = Solution().isPowerOfTwo(1);
+		ans = Solution().isPowerOfTwo(16); 
+		ans = Solution().isPowerOfTwo(218); //false
+		
+	}
+}
