@@ -390,3 +390,39 @@ namespace Jun_day8
 		
 	}
 }
+namespace Jun_day9
+{
+	class Solution {
+	public:
+		bool isSubsequence(std::string s, std::string t) 
+		{
+			if (s.size() == 0) return true;
+			if (t.size() == 0) return false;
+			for (size_t it1 = 0, it2 = 0; it2 < t.size(); it2++)
+			{
+				if (s[it1] == t[it2])
+				{
+					if (it1 == s.size() - 1) return true;
+					else it1++;
+				}
+			}
+			return false;
+		}
+	};
+	void RunExample()
+	{
+		std::string s;
+		std::string t;
+		bool ans;
+
+		s = "abc";
+		t = "ahbgdc";
+		ans = Solution().isSubsequence(s, t);
+
+		s = "axc";
+		t = "ahbgdc";
+		ans = Solution().isSubsequence(s, t);
+
+
+	}
+}
