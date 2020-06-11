@@ -426,3 +426,67 @@ namespace Jun_day9
 
 	}
 }
+namespace Jun_day11 // LC Sort Colors
+{
+	class Solution 
+	{
+	public:
+		void sortColors(std::vector<int>& nums) 
+		{
+			int LL = -1; // pointer to LastLow entry
+			int FH = nums.size(); // pointer to LastHigh entry
+			int D = 0; // director pointer, traverses the array
+			while (D < FH )
+			{
+				if (nums[D] == 2) // director observes a high entry
+				{
+					std::swap(nums[D], nums[FH - 1]);
+					FH--;
+					//while (nums[FH-1]==2) FH--;
+				}
+				else if (nums[D] == 0) // director observes a low entry
+				{
+					if (nums[LL + 1] > 0)
+					{
+						std::swap(nums[LL+1],nums[D]);
+					}
+					LL++;
+					D++;
+				}
+				else // (nums[D] == 1) no swaps, director continues
+				{
+					D++;
+				}
+			}
+
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> vec;
+		
+		vec = { 2,0,2,1,1,2 };
+		Solution().sortColors(vec);
+
+		vec = { 2,0,2,1,0,2,1,2,2,0,1,0 };
+		Solution().sortColors(vec);
+
+		vec = { 0,0,0 };
+		Solution().sortColors(vec);
+
+		vec = { 1,1,1 };
+		Solution().sortColors(vec);
+
+		vec = { 2,2,2 };
+		Solution().sortColors(vec);
+
+		vec = { };
+		Solution().sortColors(vec);
+
+		vec = { 1 };
+		Solution().sortColors(vec);
+		
+		vec = { 2 };
+		Solution().sortColors(vec);
+	}
+}
