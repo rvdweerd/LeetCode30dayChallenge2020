@@ -428,6 +428,13 @@ namespace Jun_day9
 }
 namespace Jun_day11 // LC Sort Colors
 {
+	/**
+	 * Your RandomizedSet object will be instantiated and called as such:
+	 * RandomizedSet* obj = new RandomizedSet();
+	 * bool param_1 = obj->insert(val);
+	 * bool param_2 = obj->remove(val);
+	 * int param_3 = obj->getRandom();
+	 */
 	class Solution 
 	{
 	public:
@@ -488,5 +495,84 @@ namespace Jun_day11 // LC Sort Colors
 		
 		vec = { 2 };
 		Solution().sortColors(vec);
+	}
+}
+namespace Jun_day12 // LC380 Insert Delete GetRandom
+{
+	class RandomizedSet {
+	private:
+		std::unordered_set<int> set;
+		//std::mt19937 rng;
+		//std::uniform_int_distribution<int> rdistr;
+	public:
+		/** Initialize your data structure here. */
+		RandomizedSet() 
+			//:
+			//rng(std::random_device()())
+		{
+
+		}
+
+		/** Inserts a value to the set. Returns true if the set did not already contain the specified element. */
+		bool insert(int val) 
+		{
+			if (set.find(val) == set.end())
+			{
+				set.insert(val);
+				//rdistr = std::uniform_int_distribution<int>(0, set.size()-1);
+				return true;
+			}
+			return false;
+		}
+
+		/** Removes a value from the set. Returns true if the set contained the specified element. */
+		bool remove(int val) 
+		{
+			auto it = set.find(val);
+			if (it != set.end())
+			{
+				set.erase(val);
+				//rdistr = std::uniform_int_distribution<int>(0, set.size()-1);
+				return true;
+			}
+			return false;
+		}
+
+		/** Get a random element from the set. */
+		int getRandom() 
+		{
+			if (set.size() == 0) return 0;
+			//auto it = std::next(set.begin(), rdistr(rng));
+			auto it = std::next(set.begin(), rand()%(set.size()));
+			return *it;
+		}
+	};
+
+	
+	void RunExample()
+	{
+		// Init an empty set.
+		RandomizedSet* randomSet = new RandomizedSet();
+
+		// Inserts 1 to the set. Returns true as 1 was inserted successfully.
+		randomSet->insert(1);
+
+		// Returns false as 2 does not exist in the set->
+		randomSet->remove(2);
+
+		// Inserts 2 to the set, returns true. Set now contains [1,2].
+		randomSet->insert(2);
+
+		// getRandom should return either 1 or 2 randomly.
+		randomSet->getRandom();
+
+		// Removes 1 from the set, returns true. Set now contains [2].
+		randomSet->remove(1);
+
+		// 2 was already in the set, so return false.
+		randomSet->insert(2);
+
+		// Since 2 is the only number in the set, getRandom always return 2.
+		randomSet->getRandom();
 	}
 }
