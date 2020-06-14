@@ -597,3 +597,81 @@ namespace Jun_day13 // LC368 largest divisible subset
 
 	}
 }
+namespace Jun_day14 // LC787 Cheapest Flights with K stops
+{
+	class Solution {
+	private:
+		std::unordered_map<int, std::vector<std::vector<int>>> gMap; // Graph representation in a map
+		void FillGraph(const std::vector<std::vector<int>>& flights)
+		{
+			for (auto v : flights)
+			{
+				gMap[v[0]].push_back({ v[1],v[2] });
+			}
+		}
+	public:
+		int findCheapestPrice(int n, const std::vector<std::vector<int>>& flights, int src, int dst, int K) 
+		// Dijkstra's algo
+		{
+			FillGraph(flights);
+			struct GreaterPathCost // This is the comparator for the priotity queue definition
+			{
+				bool operator()(const std::pair<std::vector<int>, int>& lhs, const std::pair<std::vector<int>, int>& rhs) const
+				{
+					return (lhs.second > rhs.second);
+				}
+			};
+			std::priority_queue <
+					std::pair<std::vector<int>, int>,
+					std::vector<std::pair<std::vector<int>, int>>,
+					GreaterPathCost
+				> pqueue;
+			std::set<int> visited;
+			pqueue.push({ {src},0 });
+			
+			while (!pqueue.empty())
+			{
+				std::pair<std::vector<int>, int> current = pqueue.top(); pqueue.pop();
+				if (current.first.back() == dst && (int)current.first.size() - 2 <= K) // Terminator condition for success
+				{
+					return current.second;
+				}
+				else
+				{
+					visited.insert(current.first.back());
+				}
+				std::vector<std::vector<int>> destinations = gMap[current.first.back()];
+				for (std::vector<int> d : destinations)
+				{
+					if (visited.find(d[0]) == visited.end() || (int)current.first.size()-1 <= K) // destination not yet visited, or stopovers left
+					{
+						current.first.push_back(d[0]); current.second += d[1]; // add new destination to path...
+						pqueue.push(current); 
+						current.first.pop_back(); current.second -= d[1]; // ...and remove it for next flight option(s)
+					}
+				}
+			}
+			return -1;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> flights;
+		int ans;
+
+		//flights = { {0,1,100},{1,2,100},{0,2,500} };
+		//ans = Solution().findCheapestPrice(3, flights, 0, 2, 1);
+
+		//flights = { {0,1,100},{1,2,10},{0,2,500},{0,3,1000},{2,3,10},{1,3,50} };
+		//ans = Solution().findCheapestPrice(3, flights, 0, 3, 0);
+
+		flights = { {0,1,1},{0,2,5},{1,2,1},{2,3,1}};
+		ans = Solution().findCheapestPrice(4, flights, 0, 3, 1); // 6
+
+		flights = { {0,1,1},{0,2,5},{1,2,1},{2,3,1},{3,4,1}	};
+		ans = Solution().findCheapestPrice(5, flights, 0, 4, 2); //7
+
+		flights = { {2,0,83},{0,2,97},{0,3,59},{2,3,32},{3,1,16},{1,3,16} };
+		ans = Solution().findCheapestPrice(4, flights, 3, 0, 3); //-1
+	}
+}
