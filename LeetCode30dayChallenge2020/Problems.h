@@ -1502,7 +1502,7 @@ namespace Knapsack
 			// Create DP table, initialized with 0s
 			std::vector<std::vector<int>> DP(inventory.size(), std::vector<int>(S + 1, 0));
 			// Iterate through table and fill with local maxima
-			for (int i = 0; i < inventory.size(); i++) // DP table axis 1: number of items to choose from
+			for (int i = 0; i < (int)inventory.size(); i++) // DP table axis 1: number of items to choose from
 			{
 				for (int j = 1; j <= S ; j++) // DP table axis 2: max allowable weight
 				{
