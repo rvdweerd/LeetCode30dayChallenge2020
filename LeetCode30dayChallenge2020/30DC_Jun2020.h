@@ -700,3 +700,127 @@ namespace Jun_day16 // LC468 Validate IP Address
 
 	}
 }
+namespace Jun_day17 // LC Surrounded Regions
+{
+	class Solution {
+	private:
+		struct Pos
+		{
+			size_t y;
+			size_t x;
+		};
+		void ProcessIfEnclosedArea(std::vector<std::vector<char>>& board, size_t row, size_t col, std::vector<std::vector<bool>>& visited)
+		{
+			bool hitsBorder = false;
+			std::stack<Pos> flipStack;
+			std::queue<Pos> queue;
+			queue.push({ row,col });
+			visited[row][col] = 1;
+			while (!queue.empty())
+			{
+				Pos curPos = queue.front(); queue.pop();
+				flipStack.push(curPos);
+				if (curPos.x == 0 || curPos.x == board[0].size() - 1 || curPos.y == 0 || curPos.y == board.size() - 1) hitsBorder = true;
+				else
+				{
+					if (visited[curPos.y + 1][curPos.x] == 0 && board[curPos.y + 1][curPos.x] == 'O')
+					{
+						queue.push({ curPos.y + 1,curPos.x });
+						visited[curPos.y + 1][curPos.x] = 1;
+					}
+					if (visited[curPos.y - 1][curPos.x] == 0 && board[curPos.y - 1][curPos.x] == 'O')
+					{
+						queue.push({ curPos.y - 1,curPos.x });
+						visited[curPos.y - 1][curPos.x] = 1;
+					}
+					if (visited[curPos.y][curPos.x + 1] == 0 && board[curPos.y][curPos.x + 1] == 'O')
+					{
+						queue.push({ curPos.y,curPos.x + 1 });
+						visited[curPos.y][curPos.x + 1] = 1;
+					}
+					if (visited[curPos.y][curPos.x - 1] == 0 && board[curPos.y][curPos.x - 1] == 'O')
+					{
+						queue.push({ curPos.y,curPos.x - 1 });
+						visited[curPos.y][curPos.x - 1] = 1;
+					}
+				}
+			}
+			if (!hitsBorder)
+			{
+				while (!flipStack.empty())
+				{
+					board[flipStack.top().y][flipStack.top().x] = 'X';
+					flipStack.pop();
+				}
+			}
+		}
+
+	public:
+		void solve(std::vector<std::vector<char>>& board) 
+		{
+			if (board.size() == 0) return;
+			size_t m = board.size();
+			size_t n = board[0].size();
+			std::vector<std::vector<bool>> visited(m,std::vector<bool>(n,0));
+			for (size_t row = 1; row < m; row++)
+			{
+				for (size_t col = 1; col < n; col++)
+				{
+					if (!visited[row][col] && board[row][col] == 'O')
+					{
+						ProcessIfEnclosedArea(board, row, col, visited);
+					}
+				}
+			}
+			return;
+		}
+	};
+	void Print(std::vector<std::vector<char>>& vec)
+	{
+		for (auto v : vec)
+		{
+			for (auto ch : v)
+			{
+				std::cout << ch<<'.';
+			}
+			std::cout << '\n';
+		}
+	}
+	void RunExample()
+	{
+		std::vector<std::vector<char>> vec;
+		vec = { 
+			{'X','X','X','X'},
+			{'O','X','X','X'},
+			{'X','X','O','O'},
+			{'X','O','X','X'},
+			{'X','X','X','X'}
+		};
+		//Solution().solve(vec);
+
+		vec = {
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'X', 'O', 'O', 'X', 'O', 'X', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'O'}, 
+			{'O', 'X', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'X'}, 
+			{'O', 'O', 'O', 'O', 'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'O', 'X', 'O', 'O'}, 
+			{'O', 'X', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'X', 'X', 'O', 'O', 'O', 'X', 'O', 'O', 'X', 'O', 'O', 'X'}, 
+			{'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O', 'O'}};
+		Print(vec); std::cout << "====================================\n";
+		Solution().solve(vec);
+		Print(vec); std::cout << "====================================\n";
+	}
+}
