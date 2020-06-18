@@ -13,6 +13,7 @@
 #include "GraphClass.h"
 #include <algorithm>
 #include <random>
+#include <regex>
 
 namespace Jun_day1 // LC226 Invert Binary Tree
 {
@@ -675,7 +676,6 @@ namespace Jun_day14 // LC787 Cheapest Flights with K stops
 		ans = Solution().findCheapestPrice(4, flights, 3, 0, 3); //-1
 	}
 }
-#include <regex>
 namespace Jun_day16 // LC468 Validate IP Address
 {
 	class Solution {
