@@ -824,3 +824,53 @@ namespace Jun_day17 // LC Surrounded Regions
 		Print(vec); std::cout << "====================================\n";
 	}
 }
+namespace Jun_day18
+{
+	class Solution 
+	{
+	public:
+		int hIndex_lin(std::vector<int> & series) 
+		{
+			int n = series.size();
+			if (!n) return 0;
+			for (int i = 0; i < n; i++) 
+			{
+				if (series[i] >= n - i) return n - i;
+			}
+			return 0;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> series;
+		int h;
+
+		series = { 0,0 };
+		h = Solution().hIndex_lin(series); //0
+
+		series = { 0,1 };
+		h = Solution().hIndex_lin(series); //1
+
+		series = { 0,1,3,5,6 };
+		h = Solution().hIndex_lin(series); //3
+		
+		series = { 1,3,3 };
+		h = Solution().hIndex_lin(series); // 2
+
+		series = { 0,1,3,3,3 };
+		h = Solution().hIndex_lin(series); // 3
+
+
+		series = { 1 }; 
+		h = Solution().hIndex_lin(series); // 1
+		
+		series = { 0 };
+		h = Solution().hIndex_lin(series); // 0
+
+		series = { 100 };
+		h = Solution().hIndex_lin(series); // 1
+
+		series = { 1,2 };
+		h = Solution().hIndex_lin(series); // 1
+	}
+}
