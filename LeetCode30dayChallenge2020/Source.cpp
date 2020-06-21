@@ -10,11 +10,11 @@
 #include <unordered_map>
 #include <stack>
 #include <queue>
-#include "30DC_Apr2020.h"
-#include "30DC_May2020.h"
+//#include "30DC_Apr2020.h"
+//#include "30DC_May2020.h"
 #include "30DC_Jun2020.h"
 #include "Problems.h"
-#include "GraphClass.h" 
+//#include "GraphClass.h" 
 
 size_t allocated=0;
 
@@ -50,11 +50,11 @@ size_t allocated=0;
 
 int main()
 {
-	Jun_day18::RunExample();
+	Jun_day21::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
 	//LC85::RunExample();
-
+	//TriangleIntersect::RunExample();
 	std::cin.get();
 	return 0;
 }

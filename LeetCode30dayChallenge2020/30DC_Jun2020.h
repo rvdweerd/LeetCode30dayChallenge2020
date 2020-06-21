@@ -874,3 +874,140 @@ namespace Jun_day18
 		h = Solution().hIndex_lin(series); // 1
 	}
 }
+namespace Jun_day19
+{
+	class Solution {
+	public:
+		const int MOD = 1e9 + 7, MOD1 = 1e9 + 9;
+		const int D = 257;
+
+		std::string Get(std::string& str, int len)
+		{
+			std::set<std::pair<int, int>> set;
+			long long int curr_1 = 0, curr_2 = 0;
+			long long int off_1 = 1, off_2 = 1;
+			for (int i = 0; i < len - 1; i++)
+			{
+				off_1 = off_1 * D % MOD;
+				off_2 = off_2 * D % MOD1;
+			}
+
+			for (int i = 0; i < len; i++)
+			{
+				curr_1 = (curr_1 * D + str[i]) % MOD;
+				curr_2 = (curr_2 * D + str[i]) % MOD1;
+			}
+			set.insert({ curr_1,curr_2 });
+			for (int i = 0, j = len; j < str.size(); i++, j++)
+			{
+				curr_1 = (D * (curr_1 - off_1 * str[i]) + str[j]) % MOD;
+				curr_2 = (D * (curr_2 - off_2 * str[i]) + str[j]) % MOD1;
+				if (curr_1 < 0)
+					curr_1 += MOD;
+				if (curr_2 < 0)
+					curr_2 += MOD1;
+				if (set.find({ curr_1,curr_2 }) != set.end())
+					return str.substr(i + 1, len);
+
+				set.insert({ curr_1,curr_2 });
+			}
+			return "";
+		}
+
+
+		std::string longestDupSubstring(std::string S) {
+			int le = 0, ri = S.size();
+
+			while (le < ri)
+			{
+				int m = le + (ri - le + 1) / 2;
+				if (Get(S, m).size() != 0)
+				{
+					le = m;
+				}
+				else
+					ri = m - 1;
+			}
+			return Get(S, le);
+		}
+	};
+}
+namespace Jun_day20
+{
+	class Solution
+	{
+	public:
+		std::string getPermutation(int n, int k) 
+		{
+			int pTab[10] = { 1 };
+			for (int i = 1; i <= 9; i++) {
+				pTab[i] = i * pTab[i - 1];
+			}
+			std::string res;
+			std::vector<char> numSet = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+			while (n > 0) {
+				int tmp = (k - 1) / pTab[n - 1];
+				res += numSet[tmp];
+				numSet.erase(numSet.begin() + tmp);
+				k = k - tmp * pTab[n - 1];
+				n--;
+			}
+			return res;
+		}
+	};
+	void RunExample()
+	{
+		std::string ans;
+		ans = Solution().getPermutation(4, 9);
+	}
+}
+namespace Jun_day21 // LC174 Dungeon Game
+{
+	class Solution 
+	{
+	public:
+		int calculateMinimumHP(std::vector<std::vector<int>>& dungeon) 
+		{
+			//if (dungeon[0].size() == 1) return std::max(1, 1 - dungeon[0][0]);
+			//std::vector<std::vector<int>> DP(dungeon.size(), std::vector<int>(dungeon[0].size(), 0));
+			size_t m = dungeon.size();
+			size_t n = dungeon[0].size();
+
+
+			dungeon.back().back() = std::max(1, 1 - dungeon.back().back());
+			for (int col = n - 2; col >= 0; --col) // Fill bottom row
+			{
+				int target = dungeon[m - 1][(size_t)col + 1];
+				dungeon[m - 1][(size_t)col] = std::max(1, target - dungeon[m - 1][(size_t)col]);
+			}
+			for (int row = m - 2; row >= 0; --row) // Fill right column
+			{
+				int target = dungeon[(size_t)row + 1][n - 1];
+				dungeon[(size_t)row][n-1] = std::max(1, target - dungeon[(size_t)row][n-1]);
+			}
+			for (int row = m - 2; row >= 0; --row) // Fill remaining Upper Left of Matrix
+			{
+				for (int col = n - 2; col >= 0; --col)
+				{
+					int target = std::min(dungeon[row+1][col],dungeon[row][col+1]);
+					dungeon[(size_t)row][(size_t)col] = std::max(1, target - dungeon[(size_t)row][(size_t)col]);
+				}
+			}
+			return dungeon[0][0];
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> dun;
+		int ans;
+
+		dun = { {-2,-3,3},{-5,-10,1},{10,30,-5} };
+		ans = Solution().calculateMinimumHP(dun);
+
+		dun = { {-2} };
+		ans = Solution().calculateMinimumHP(dun);
+
+		dun = { {-2},{-2},{-1} };
+		ans = Solution().calculateMinimumHP(dun);
+	}
+}
