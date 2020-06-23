@@ -15,7 +15,7 @@
 #include "30DC_Jun2020.h"
 #include "Problems.h"
 //#include "GraphClass.h" 
-
+#include "FTTI.h"
 size_t allocated=0;
 
 //void* operator new(size_t size)
@@ -50,7 +50,9 @@ size_t allocated=0;
 
 int main()
 {
-	Jun_day21::RunExample();
+	//FTTI::RunExample();
+
+	Jun_day23::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
 	//LC85::RunExample();

@@ -149,6 +149,7 @@
     <ClInclude Include="30DC_Jun2020.h" />
     <ClInclude Include="30DC_May2020.h" />
     <ClInclude Include="ChiliMath.h" />
+    <ClInclude Include="FTTI.h" />
     <ClInclude Include="GraphClass.h" />
     <ClInclude Include="Problems.h" />
     <ClInclude Include="Vec2.h" />
