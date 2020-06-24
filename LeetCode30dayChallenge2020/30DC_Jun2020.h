@@ -1058,3 +1058,49 @@ namespace Jun_day23// LC222 Count complete treenodes
 		int ans = Solution().countNodes(root);
 	}
 }
+namespace Jun_day24 // LC96 Unique binary search trees
+{
+	class Solution 
+	{
+	public:
+		int F(int x)
+		{
+			// DP: uses rotation of the tail & recursive calls with memoization
+			// F(i) = F(0)F(i-1) + F(1)F(i-2) + ... + F(i-1)F(0)
+			static std::map<int, int> map;
+			if (x <= 1) return 1;
+			else
+			{
+				auto it = map.find(x);
+				if (it == map.end())
+				{
+					int ans = 0;
+					for (size_t i = 0; i < x; i++)
+					{
+						ans += F(i) * F(x - 1 - i);
+					}
+					//std::cout << ".";
+					map[x] = ans;
+					return ans;
+				}
+				else
+				{
+					//std::cout << "R";
+					return it->second;
+				}
+			}
+		}
+		int numTrees(int n) 
+		{
+			if (n == 0) return 0;
+			return F(n);
+		}
+	};
+	void RunExample()
+	{
+		int ans;
+		ans = Solution().numTrees(5); //42
+		ans = Solution().numTrees(1); //1
+		ans = Solution().numTrees(0); //0
+	}
+}
