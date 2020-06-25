@@ -1104,3 +1104,45 @@ namespace Jun_day24 // LC96 Unique binary search trees
 		ans = Solution().numTrees(0); //0
 	}
 }
+namespace Jun_day25 // LC287 Find Duplicate Number
+{
+	class Solution
+	{
+	public:
+		int findDuplicate(const std::vector<int>& nums)
+		{
+			//std::cout << "===============================\n";
+			size_t p1 = 0;
+			size_t p2 = 0;
+			while (true)
+			{
+				p1 = nums[p1];
+				p2 = nums[nums[p2]];
+				//std::cout << "p1:" << p1 << ",p2:" << p2 << '\n';
+				if (p1 == p2) break;
+			}
+			p1 = 0;
+			//std::cout << "--------------------------\n";
+			while (true)
+			{
+				p1 = nums[p1];
+				p2 = nums[p2];
+				//std::cout << "p1:" << p1 << ",p2:" << p2 << '\n';
+				if (p1 == p2) break;
+			}
+			return p1;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> v;
+		int ans;
+
+		v = { 1,3,4,2,2 };
+		ans = Solution().findDuplicate(v); // 2
+		v = { 3,1,3,4,2 };
+		ans = Solution().findDuplicate(v); // 3
+		v = {2,5,9,6,9,3,8,9,7,1};
+		ans = Solution().findDuplicate(v); // 9
+	}
+}
