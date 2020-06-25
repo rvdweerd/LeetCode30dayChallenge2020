@@ -1109,7 +1109,7 @@ namespace Jun_day25 // LC287 Find Duplicate Number
 	class Solution
 	{
 	public:
-		int findDuplicate(const std::vector<int>& nums)
+		int findDuplicate_cycle(const std::vector<int>& nums)
 		{
 			//std::cout << "===============================\n";
 			size_t p1 = 0;
@@ -1131,6 +1131,26 @@ namespace Jun_day25 // LC287 Find Duplicate Number
 				if (p1 == p2) break;
 			}
 			return p1;
+		}
+		int findDuplicate_bitmask(const std::vector<int>& nums)
+		{
+			int mask = 0;
+			for (int n : nums)
+			{
+				int bit = 1 << n;
+				if (bit & mask) return n;
+				mask |= bit;
+			}
+		}
+		int findDuplicate(const std::vector<int>& nums)
+		{
+			std::unordered_set<int> set;
+			for (int n : nums)
+			{
+				auto it = set.find(n);
+				if (it == set.end()) set.insert(n);
+				else return *it;
+			}
 		}
 	};
 	void RunExample()
