@@ -114,7 +114,7 @@ void TestTriangleIntersections()
 int main()
 {
 
-	Jun_day25::RunExample();
+	Jun_day26::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
 	//LC85::RunExample();

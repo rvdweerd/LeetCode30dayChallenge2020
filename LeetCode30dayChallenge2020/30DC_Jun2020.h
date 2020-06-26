@@ -1166,3 +1166,53 @@ namespace Jun_day25 // LC287 Find Duplicate Number
 		ans = Solution().findDuplicate(v); // 9
 	}
 }
+namespace Jun_day26 // LC129 Sum root to leaf numbers
+{
+
+ //Definition for a binary tree node.
+	struct TreeNode {
+		int val;
+		TreeNode* left;
+		TreeNode* right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+	};
+ 
+	class Solution {
+	public:
+		int ans = 0;
+		void Dive(TreeNode* node, std::string str)
+		{
+			if (node == nullptr)
+			{
+				//ans += std::stoi(str);
+			}
+			else if (node->left == nullptr && node->right == nullptr)
+			{
+				str += std::to_string(node->val);
+				ans += std::stoi(str);
+			}
+			else
+			{
+				str += std::to_string(node->val);
+				Dive(node->left, str);
+				Dive(node->right, str);
+			}
+		}
+		int sumNumbers(TreeNode* root) 
+		{
+			Dive(root, "");
+			return ans;
+		}
+	};
+	void RunExample()
+	{
+		TreeNode* root = nullptr;
+		int ans;
+
+		root = new TreeNode(4, new TreeNode(2, new TreeNode(1), new TreeNode(3)), new TreeNode(9));
+		ans = Solution().sumNumbers(root);
+
+	}
+}
