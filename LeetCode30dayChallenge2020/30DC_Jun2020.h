@@ -1248,22 +1248,24 @@ namespace Jun_day27 // LC279 Perfect Squares
 		}
 		int numSquares(int n) 
 		{
-			static std::vector<int> cntPerfectSquares(10000, 0 );
+			static int filled = 1;
+			static std::vector<int> cntPerfectSquares(10000, -1 );
+			cntPerfectSquares[0]=0;
 			if (n <= 3) return n;
-			if (n < (int)cntPerfectSquares.size()) return cntPerfectSquares[n];
+			if (n >= cntPerfectSquares.size()) cntPerfectSquares.resize(n+1, -1);
+			if (cntPerfectSquares[n] != -1) return cntPerfectSquares[n];
 
-			//std::vector<int> DP(n+1,0);
 			auto p = remainderLowestSquare_sqrt(n);
-			for (int i = (int)cntPerfectSquares.size(); i <= n; i++)
+			for (int i = filled; i <= n; i++)
 			{
 				int min = INT_MAX;
 				for (int j = 1; j * j <= i; j++)
 				{
 					min = std::min(min, 1 + cntPerfectSquares[i-j*j]);
 				}
-				//DP[i] = min;
-				cntPerfectSquares.push_back(min);
+				cntPerfectSquares[i]=min;
 			}
+			filled = n;
 			return cntPerfectSquares[n];
 		}
 	};
@@ -1275,7 +1277,7 @@ namespace Jun_day27 // LC279 Perfect Squares
 		ans = obj.numSquares(13);//2
 		ans = obj.numSquares(32);//2
 		ans = obj.numSquares(22);//3
-		ans = obj.numSquares(INT_MAX-1);//
-
+		ans = obj.numSquares(10001);//2
+		ans = obj.numSquares(9999);//4
 	}
 }
