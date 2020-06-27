@@ -1216,3 +1216,61 @@ namespace Jun_day26 // LC129 Sum root to leaf numbers
 
 	}
 }
+namespace Jun_day27 // LC279 Perfect Squares
+{
+	class Solution {
+	public:
+		std::pair<int,int> remainderLowestSquare_bins(int num)
+		{
+			long long numL = (long long)num;
+			if (numL <= 1) return { num,0 };
+			long long int lo = 0;
+			long long int hi = 1;
+			while (hi * hi < numL)
+			{
+				lo = hi;
+				hi = hi + lo / 2 + 1;
+			}
+			while (lo <= hi)
+			{
+				long long int mid = lo + (hi - lo) / 2;
+				long long int sq = mid * mid;
+				if (sq == numL) return {mid, 0};
+				if (sq < numL) lo = mid + 1;
+				else hi = mid - 1;
+			}
+			return { lo - 1,num - (lo - 1) * (lo - 1) };
+		}
+		std::pair<int, int> remainderLowestSquare_sqrt(int num)
+		{
+			int root = sqrt(num);
+			return {root,num-root};
+		}
+		int numSquares(int n) 
+		{
+			if (n <= 3) return n;
+			std::vector<int> DP(n+1,0);
+			auto p = remainderLowestSquare_sqrt(n);
+			for (int i = 1; i <= n; i++)
+			{
+				int min = INT_MAX;
+				for (int j = 1; j * j <= i; j++)
+				{
+					min = std::min(min, 1 + DP[i-j*j]);
+				}
+				DP[i] = min;
+			}
+			return DP[n];
+		}
+	};
+	void RunExample()
+	{
+		int ans;
+		ans = Solution().numSquares(12);//3
+		ans = Solution().numSquares(13);//2
+		ans = Solution().numSquares(32);//2
+		ans = Solution().numSquares(22);//3
+		ans = Solution().numSquares(INT_MAX-1);//
+
+	}
+}
