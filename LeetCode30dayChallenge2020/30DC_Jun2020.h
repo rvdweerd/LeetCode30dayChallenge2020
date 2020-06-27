@@ -1248,29 +1248,34 @@ namespace Jun_day27 // LC279 Perfect Squares
 		}
 		int numSquares(int n) 
 		{
+			static std::vector<int> cntPerfectSquares(10000, 0 );
 			if (n <= 3) return n;
-			std::vector<int> DP(n+1,0);
+			if (n < (int)cntPerfectSquares.size()) return cntPerfectSquares[n];
+
+			//std::vector<int> DP(n+1,0);
 			auto p = remainderLowestSquare_sqrt(n);
-			for (int i = 1; i <= n; i++)
+			for (int i = (int)cntPerfectSquares.size(); i <= n; i++)
 			{
 				int min = INT_MAX;
 				for (int j = 1; j * j <= i; j++)
 				{
-					min = std::min(min, 1 + DP[i-j*j]);
+					min = std::min(min, 1 + cntPerfectSquares[i-j*j]);
 				}
-				DP[i] = min;
+				//DP[i] = min;
+				cntPerfectSquares.push_back(min);
 			}
-			return DP[n];
+			return cntPerfectSquares[n];
 		}
 	};
 	void RunExample()
 	{
 		int ans;
-		ans = Solution().numSquares(12);//3
-		ans = Solution().numSquares(13);//2
-		ans = Solution().numSquares(32);//2
-		ans = Solution().numSquares(22);//3
-		ans = Solution().numSquares(INT_MAX-1);//
+		Solution obj;
+		ans = obj.numSquares(12);//3
+		ans = obj.numSquares(13);//2
+		ans = obj.numSquares(32);//2
+		ans = obj.numSquares(22);//3
+		ans = obj.numSquares(INT_MAX-1);//
 
 	}
 }
