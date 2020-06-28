@@ -1281,3 +1281,127 @@ namespace Jun_day27 // LC279 Perfect Squares
 		ans = obj.numSquares(9999);//4
 	}
 }
+namespace Jun_day28_stack
+{
+	class Solution {
+	private:
+		std::unordered_map<	std::string, std::map<std::string,int> > map;
+		int numTickets = 0;
+		std::vector<std::vector<std::string>> validRoutes;
+	public:
+		std::vector<std::string> findItinerary(std::vector<std::vector<std::string>>& tickets) 
+		{
+			for (auto vec : tickets)
+			{
+				map[vec[0]][vec[1]]++;
+				numTickets++;
+			}
+			struct routeData
+			{
+				std::vector<std::string> routeVec;
+				std::unordered_map<	std::string, std::map<std::string, int>> usedTickets;
+			};
+			std::stack<routeData> stack; 
+			{
+				routeData init; init.routeVec = { "JFK" };
+				stack.push(init);
+			}
+			while (!stack.empty())
+			{
+				if (stack.size() > 100)
+				{
+					int k = 0;
+				}
+				routeData curRoute = stack.top(); stack.pop();
+				if (curRoute.routeVec.size() == numTickets + 1) return curRoute.routeVec;
+				std::string current = curRoute.routeVec.back();
+				//for (const auto& dest : map[current])
+				for (auto it = map[current].rbegin(); it!=map[current].rend();it++)
+				{
+					if (curRoute.usedTickets[current][it->first] < it->second) // flights available
+					{
+						curRoute.routeVec.push_back(it->first);
+						curRoute.usedTickets[current][it->first]++;
+						stack.push(curRoute);
+						curRoute.routeVec.pop_back();
+						curRoute.usedTickets[current][it->first]--;
+					}
+				}
+			}
+			return {};
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<std::string>> tickets;
+		std::vector<std::string> ans;
+		
+		tickets = { {"JFK" ,"B"} ,{"JFK","B"},{"B","C"},{"B","D"},{"D","JFK"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"JFK","SFO"} ,{"JFK","ATL"},{"SFO","ATL"},{"ATL","JFK"},{"ATL","SFO"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"AXA","EZE"},{"EZE","AUA"},{"ADL","JFK"},{"ADL","TIA"},{"AUA","AXA"},{"EZE","TIA"},{"EZE","TIA"},{"AXA","EZE"},{"EZE","ADL"},{"ANU","EZE"},{"TIA","EZE"},{"JFK","ADL"},{"AUA","JFK"},{"JFK","EZE"},{"EZE","ANU"},{"ADL","AUA"},{"ANU","AXA"},{"AXA","ADL"},{"AUA","JFK"},{"EZE","ADL"},{"ANU","TIA"},{"AUA","JFK"},{"TIA","JFK"},{"EZE","AUA"},{"AXA","EZE"},{"AUA","ANU"},{"ADL","AXA"},{"EZE","ADL"},{"AUA","ANU"},{"AXA","EZE"},{"TIA","AUA"},{"AXA","EZE"},{"AUA","SYD"},{"ADL","JFK"},{"EZE","AUA"},{"ADL","ANU"},{"AUA","TIA"},{"ADL","EZE"},{"TIA","JFK"},{"AXA","ANU"},{"JFK","AXA"},{"JFK","ADL"},{"ADL","EZE"},{"AXA","TIA"},{"JFK","AUA"},{"ADL","EZE"},{"JFK","ADL"},{"ADL","AXA"},{"TIA","AUA"},{"AXA","JFK"},{"ADL","AUA"},{"TIA","JFK"},{"JFK","ADL"},{"JFK","ADL"},{"ANU","AXA"},{"TIA","AXA"},{"EZE","JFK"},{"EZE","AXA"},{"ADL","TIA"},{"JFK","AUA"},{"TIA","EZE"},{"EZE","ADL"},{"JFK","ANU"},{"TIA","AUA"},{"EZE","ADL"},{"ADL","JFK"},{"ANU","AXA"},{"AUA","AXA"},{"ANU","EZE"},{"ADL","AXA"},{"ANU","AXA"},{"TIA","ADL"},{"JFK","ADL"},{"JFK","TIA"},{"AUA","ADL"},{"AUA","TIA"},{"TIA","JFK"},{"EZE","JFK"},{"AUA","ADL"},{"ADL","AUA"},{"EZE","ANU"},{"ADL","ANU"},{"AUA","AXA"},{"AXA","TIA"},{"AXA","TIA"},{"ADL","AXA"},{"EZE","AXA"},{"AXA","JFK"},{"JFK","AUA"},{"ANU","ADL"},{"AXA","TIA"},{"ANU","AUA"},{"JFK","EZE"},{"AXA","ADL"},{"TIA","EZE"},{"JFK","AXA"},{"AXA","ADL"},{"EZE","AUA"},{"AXA","ANU"},{"ADL","EZE"},{"AUA","EZE"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = {{"INN", "TIA"}, {"BIM", "BRU"}, {"VIE", "LST"}, {"OOL", "BAH"}, {"MEL", "CRL"}, {"CNS", "ADL"}, {"AUA", "OOL"}, {"HBA", "ASD"}, {"INN", "FPO"}, {"NAS", "BZE"}, {"DRW", "BRU"}, {"NAS", "BAK"}, {"ADL", "ASD"}, {"HBA", "OOL"}, {"BZE", "BAH"}, {"TBI", "FPO"}, {"CRL", "AUA"}, {"BGI", "TIA"}, {"TCB", "ELH"}, {"AUA", "AXA"}, {"MHH", "TBI"}, {"CNS", "BNE"}, {"INN", "GGT"}, {"DRW", "EZE"}, {"CRL", "SYD"}, {"BNE", "AXA"}, {"CNS", "ADL"}, {"BGI", "SYD"}, {"CNS", "VIE"}, {"GGT", "BNE"}, {"ELH", "BNE"}, {"BNE", "DAC"}, {"DRW", "CNS"}, {"PER", "CRL"}, {"ADL", "ASD"}, {"MHH", "ANU"}, {"ELH", "NAS"}, {"TIA", "ADL"}, {"DAC", "AUA"}, {"ADL", "DAC"}, {"CRL", "OOL"}, {"DAC", "NAS"}, {"BNE", "GGT"}, {"BAH", "DAC"}, {"SYD", "GGT"}, {"CRL", "ADL"}, {"TCB", "VIE"}, {"TBI", "BAK"}, {"BRU", "BNE"}, {"GGT", "ASD"}, {"MEL", "BZE"}, {"TBI", "BAK"}, {"ANU", "CNS"}, {"BIM", "MEL"}, {"ELH", "AUA"}, {"GGT", "SYD"}, {"AXA", "MHH"}, {"GGT", "ANU"}, {"CRL", "DAC"}, {"VIE", "BAH"}, {"JFK", "LST"}, {"TIA", "CRL"}, {"MHH", "DAC"}, {"OOL", "BZE"}, {"VIE", "ELH"}, {"DRW", "INN"}, {"EZE", "INN"}, {"ASD", "TBI"}, {"BAK", "BNE"}, {"BNE", "INN"}, {"BZE", "NAS"}, {"VIE", "CRL"}, {"ADL", "SYD"}, {"INN", "DRW"}, {"BRU", "BZE"}, {"BNE", "FPO"}, {"BIM", "DAC"}, {"JFK", "MEL"}, {"BAK", "BNE"}, {"BAK", "BZE"}, {"JFK", "ASD"}, {"BNE", "DRW"}, {"EZE", "ELH"}, {"ASD", "BGI"}, {"SYD", "TCB"}, {"AUA", "MHH"}, {"INN", "AUA"}, {"SYD", "OOL"}, {"ASD", "CRL"}, {"BNE", "BRU"}, {"MEL", "BGI"}, {"BIM", "CNS"}, {"BIM", "ASD"}, {"ASD", "MEL"}, {"SYD", "DAC"}, {"OOL", "VIE"}, {"ASD", "BNE"}, {"OOL", "DAC"}, {"LST", "TIA"}, {"AUA", "MEL"}, {"ASD", "DAC"}, {"ANU", "PER"}, {"DAC", "TBI"}, {"ASD", "BNE"}, {"BAK", "MEL"}, {"CBR", "OOL"}, {"BNE", "ADL"}, {"AXA", "ELH"}, {"CBR", "DRW"}, {"ADL", "LST"}, {"BAK", "INN"}, {"FPO", "SYD"}, {"DAC", "BNE"}, {"TBI", "EZE"}, {"AXA", "DAC"}, {"DAC", "EZE"}, {"NAS", "DRW"}, {"FPO", "DRW"}, {"BAH", "BNE"}, {"MEL", "BZE"}, {"LST", "CRL"}, {"EZE", "LST"}, {"TBI", "NAS"}, {"CBR", "BAK"}, {"NAS", "DAC"}, {"JFK", "ANU"}, {"TIA", "BNE"}, {"CRL", "NAS"}, {"SYD", "ELH"}, {"OOL", "BIM"}, {"AUA", "ASD"}, {"BZE", "EZE"}, {"BAK", "BRU"}, {"HBA", "BZE"}, {"BNE", "SYD"}, {"DAC", "TIA"}, {"BRU", "TCB"}, {"ANU", "OOL"}, {"ELH", "VIE"}, {"CRL", "DRW"}, {"ANU", "VIE"}, {"PER", "BIM"}, {"BIM", "JFK"}, {"DAC", "VIE"}, {"FPO", "TCB"}, {"AUA", "CNS"}, {"CRL", "FPO"}, {"BAK", "DAC"}, {"EZE", "ANU"}, {"NAS", "DRW"}, {"BZE", "HBA"}, {"BNE", "BAK"}, {"AXA", "AUA"}, {"VIE", "PER"}, {"DAC", "AUA"}, {"BIM", "MEL"}, {"DAC", "ASD"}, {"DAC", "CRL"}, {"MHH", "HBA"}, {"BRU", "EZE"}, {"GGT", "BNE"}, {"BZE", "AXA"}, {"BZE", "CRL"}, {"TBI", "CBR"}, {"CRL", "BGI"}, {"ASD", "JFK"}, {"DAC", "BIM"}, {"ELH", "BGI"}, {"MEL", "TBI"}, {"OOL", "ASD"}, {"CNS", "BZE"}, {"TIA", "ELH"}, {"ASD", "BNE"}, {"BNE", "ASD"}, {"TIA", "LST"}, {"AUA", "AXA"}, {"CRL", "DAC"}, {"BAK", "BIM"}, {"BGI", "BNE"}, {"ELH", "BZE"}, {"ANU", "GGT"}, {"ASD", "CBR"}, {"OOL", "BIM"}, {"TBI", "INN"}, {"BRU", "ELH"}, {"CRL", "TIA"}, {"PER", "ASD"}, {"TIA", "DAC"}, {"ADL", "AUA"}, {"TCB", "AUA"}, {"HBA", "BNE"}, {"BNE", "TIA"}, {"INN", "ANU"}, {"TBI", "ADL"}, {"ELH", "AXA"}, {"BGI", "ANU"}, {"TIA", "BAK"}, {"PER", "TBI"}, {"EZE", "MHH"}, {"BZE", "NAS"}, {"JFK", "BNE"}, {"BRU", "ASD"}, {"AUA", "CBR"}, {"NAS", "JFK"}, {"ELH", "BIM"}, {"BNE", "TBI"}, {"BAK", "CNS"}, {"BNE", "GGT"}, {"OOL", "PER"}, {"BNE", "BRU"}, {"MEL", "PER"}, {"BAH", "MEL"}, {"TCB", "CRL"}, {"CNS", "OOL"}, {"BZE", "VIE"}, {"ASD", "CRL"}, {"LST", "BZE"}, {"ANU", "BRU"}, {"AUA", "BRU"}, {"ASD", "BGI"}, {"AUA", "TCB"}, {"TCB", "CRL"}, {"SYD", "CRL"}, {"BRU", "HBA"}, {"DRW", "ASD"}, {"TCB", "FPO"}, {"TIA", "CRL"}, {"BZE", "CNS"}, {"ELH", "TCB"}, {"OOL", "CRL"}, {"CRL", "ELH"}, {"MEL", "ASD"}, {"ASD", "BIM"}, {"CRL", "JFK"}, {"DAC", "BNE"}, {"HBA", "JFK"}, {"NAS", "OOL"}, {"DAC", "CRL"}, {"ELH", "CNS"}, {"ASD", "ELH"}, {"DRW", "ELH"}, {"FPO", "BAK"}, {"OOL", "BAK"}, {"ELH", "OOL"}, {"ADL", "OOL"}, {"BNE", "INN"}, {"DAC", "TIA"}, {"INN", "NAS"}, {"BAH", "BNE"}, {"BAH", "JFK"}, {"AUA", "BIM"}, {"PER", "TIA"}, {"BZE", "ADL"}, {"BAK", "BNE"}, {"JFK", "PER"}, {"JFK", "AXA"}, {"GGT", "FPO"}, {"FPO", "MHH"}, {"ASD", "HBA"}, {"BNE", "INN"}, {"LST", "ANU"}, {"AXA", "BZE"}, {"JFK", "ANU"}, {"ASD", "LST"}, {"VIE", "EZE"}, {"ELH", "TBI"}, {"DAC", "TBI"}, {"DRW", "JFK"}, {"CRL", "TCB"}, {"TBI", "ASD"}, {"FPO", "AXA"}, {"NAS", "BAH"}, {"EZE", "DRW"}, {"AXA", "BAK"}, {"BIM", "JFK"}, {"JFK", "ASD"}, {"BZE", "HBA"}, {"LST", "DAC"}, {"AXA", "AUA"}, {"GGT", "TBI"}, {"CRL", "ELH"}, {"VIE", "BAH"}, {"BGI", "DAC"}, {"LST", "GGT"}, {"BNE", "GGT"}, {"CNS", "NAS"}, {"BNE", "BAK"}, {"ANU", "ELH"}, {"DRW", "AUA"}, {"ANU", "AUA"}};
+		ans = Solution().findItinerary(tickets);
+	}
+}
+namespace Jun_day28 // LC332 Reconstruct Itinerary
+{
+	class Solution {
+	private:
+		std::unordered_map<	std::string, std::map<std::string, int> > map;
+		int numTickets = 0;
+		std::vector<std::string> validRoute = {"JFK"};
+	public:
+		void dfs()
+		{
+			if (validRoute.size() == numTickets + 1) return;
+			auto current = validRoute.back();
+			for (auto it = map[current].begin(); it != map[current].end(); it++)
+			{
+				if (it->second > 0)
+				{
+					validRoute.push_back(it->first);
+					it->second--;
+					dfs();
+					if (validRoute.size() == numTickets + 1) return;
+					validRoute.pop_back();
+					it->second++;
+				}
+			}
+		}
+		std::vector<std::string> findItinerary(std::vector<std::vector<std::string>>& tickets)
+		{
+			for (const auto& vec : tickets)
+			{
+				map[vec[0]][vec[1]]++;
+				numTickets++;
+			}
+			dfs();
+			return validRoute;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<std::string>> tickets;
+		tickets.reserve(500);
+		std::vector<std::string> ans;
+
+		tickets = { {"JFK" ,"B"} ,{"JFK","B"},{"B","C"},{"B","D"},{"D","JFK"} };
+		ans = Solution().findItinerary(tickets);
+		tickets.clear();
+
+		tickets = { {"JFK","SFO"} ,{"JFK","ATL"},{"SFO","ATL"},{"ATL","JFK"},{"ATL","SFO"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"AXA","EZE"},{"EZE","AUA"},{"ADL","JFK"},{"ADL","TIA"},{"AUA","AXA"},{"EZE","TIA"},{"EZE","TIA"},{"AXA","EZE"},{"EZE","ADL"},{"ANU","EZE"},{"TIA","EZE"},{"JFK","ADL"},{"AUA","JFK"},{"JFK","EZE"},{"EZE","ANU"},{"ADL","AUA"},{"ANU","AXA"},{"AXA","ADL"},{"AUA","JFK"},{"EZE","ADL"},{"ANU","TIA"},{"AUA","JFK"},{"TIA","JFK"},{"EZE","AUA"},{"AXA","EZE"},{"AUA","ANU"},{"ADL","AXA"},{"EZE","ADL"},{"AUA","ANU"},{"AXA","EZE"},{"TIA","AUA"},{"AXA","EZE"},{"AUA","SYD"},{"ADL","JFK"},{"EZE","AUA"},{"ADL","ANU"},{"AUA","TIA"},{"ADL","EZE"},{"TIA","JFK"},{"AXA","ANU"},{"JFK","AXA"},{"JFK","ADL"},{"ADL","EZE"},{"AXA","TIA"},{"JFK","AUA"},{"ADL","EZE"},{"JFK","ADL"},{"ADL","AXA"},{"TIA","AUA"},{"AXA","JFK"},{"ADL","AUA"},{"TIA","JFK"},{"JFK","ADL"},{"JFK","ADL"},{"ANU","AXA"},{"TIA","AXA"},{"EZE","JFK"},{"EZE","AXA"},{"ADL","TIA"},{"JFK","AUA"},{"TIA","EZE"},{"EZE","ADL"},{"JFK","ANU"},{"TIA","AUA"},{"EZE","ADL"},{"ADL","JFK"},{"ANU","AXA"},{"AUA","AXA"},{"ANU","EZE"},{"ADL","AXA"},{"ANU","AXA"},{"TIA","ADL"},{"JFK","ADL"},{"JFK","TIA"},{"AUA","ADL"},{"AUA","TIA"},{"TIA","JFK"},{"EZE","JFK"},{"AUA","ADL"},{"ADL","AUA"},{"EZE","ANU"},{"ADL","ANU"},{"AUA","AXA"},{"AXA","TIA"},{"AXA","TIA"},{"ADL","AXA"},{"EZE","AXA"},{"AXA","JFK"},{"JFK","AUA"},{"ANU","ADL"},{"AXA","TIA"},{"ANU","AUA"},{"JFK","EZE"},{"AXA","ADL"},{"TIA","EZE"},{"JFK","AXA"},{"AXA","ADL"},{"EZE","AUA"},{"AXA","ANU"},{"ADL","EZE"},{"AUA","EZE"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"INN", "TIA"}, {"BIM", "BRU"}, {"VIE", "LST"}, {"OOL", "BAH"}, {"MEL", "CRL"}, {"CNS", "ADL"}, {"AUA", "OOL"}, {"HBA", "ASD"}, {"INN", "FPO"}, {"NAS", "BZE"}, {"DRW", "BRU"}, {"NAS", "BAK"}, {"ADL", "ASD"}, {"HBA", "OOL"}, {"BZE", "BAH"}, {"TBI", "FPO"}, {"CRL", "AUA"}, {"BGI", "TIA"}, {"TCB", "ELH"}, {"AUA", "AXA"}, {"MHH", "TBI"}, {"CNS", "BNE"}, {"INN", "GGT"}, {"DRW", "EZE"}, {"CRL", "SYD"}, {"BNE", "AXA"}, {"CNS", "ADL"}, {"BGI", "SYD"}, {"CNS", "VIE"}, {"GGT", "BNE"}, {"ELH", "BNE"}, {"BNE", "DAC"}, {"DRW", "CNS"}, {"PER", "CRL"}, {"ADL", "ASD"}, {"MHH", "ANU"}, {"ELH", "NAS"}, {"TIA", "ADL"}, {"DAC", "AUA"}, {"ADL", "DAC"}, {"CRL", "OOL"}, {"DAC", "NAS"}, {"BNE", "GGT"}, {"BAH", "DAC"}, {"SYD", "GGT"}, {"CRL", "ADL"}, {"TCB", "VIE"}, {"TBI", "BAK"}, {"BRU", "BNE"}, {"GGT", "ASD"}, {"MEL", "BZE"}, {"TBI", "BAK"}, {"ANU", "CNS"}, {"BIM", "MEL"}, {"ELH", "AUA"}, {"GGT", "SYD"}, {"AXA", "MHH"}, {"GGT", "ANU"}, {"CRL", "DAC"}, {"VIE", "BAH"}, {"JFK", "LST"}, {"TIA", "CRL"}, {"MHH", "DAC"}, {"OOL", "BZE"}, {"VIE", "ELH"}, {"DRW", "INN"}, {"EZE", "INN"}, {"ASD", "TBI"}, {"BAK", "BNE"}, {"BNE", "INN"}, {"BZE", "NAS"}, {"VIE", "CRL"}, {"ADL", "SYD"}, {"INN", "DRW"}, {"BRU", "BZE"}, {"BNE", "FPO"}, {"BIM", "DAC"}, {"JFK", "MEL"}, {"BAK", "BNE"}, {"BAK", "BZE"}, {"JFK", "ASD"}, {"BNE", "DRW"}, {"EZE", "ELH"}, {"ASD", "BGI"}, {"SYD", "TCB"}, {"AUA", "MHH"}, {"INN", "AUA"}, {"SYD", "OOL"}, {"ASD", "CRL"}, {"BNE", "BRU"}, {"MEL", "BGI"}, {"BIM", "CNS"}, {"BIM", "ASD"}, {"ASD", "MEL"}, {"SYD", "DAC"}, {"OOL", "VIE"}, {"ASD", "BNE"}, {"OOL", "DAC"}, {"LST", "TIA"}, {"AUA", "MEL"}, {"ASD", "DAC"}, {"ANU", "PER"}, {"DAC", "TBI"}, {"ASD", "BNE"}, {"BAK", "MEL"}, {"CBR", "OOL"}, {"BNE", "ADL"}, {"AXA", "ELH"}, {"CBR", "DRW"}, {"ADL", "LST"}, {"BAK", "INN"}, {"FPO", "SYD"}, {"DAC", "BNE"}, {"TBI", "EZE"}, {"AXA", "DAC"}, {"DAC", "EZE"}, {"NAS", "DRW"}, {"FPO", "DRW"}, {"BAH", "BNE"}, {"MEL", "BZE"}, {"LST", "CRL"}, {"EZE", "LST"}, {"TBI", "NAS"}, {"CBR", "BAK"}, {"NAS", "DAC"}, {"JFK", "ANU"}, {"TIA", "BNE"}, {"CRL", "NAS"}, {"SYD", "ELH"}, {"OOL", "BIM"}, {"AUA", "ASD"}, {"BZE", "EZE"}, {"BAK", "BRU"}, {"HBA", "BZE"}, {"BNE", "SYD"}, {"DAC", "TIA"}, {"BRU", "TCB"}, {"ANU", "OOL"}, {"ELH", "VIE"}, {"CRL", "DRW"}, {"ANU", "VIE"}, {"PER", "BIM"}, {"BIM", "JFK"}, {"DAC", "VIE"}, {"FPO", "TCB"}, {"AUA", "CNS"}, {"CRL", "FPO"}, {"BAK", "DAC"}, {"EZE", "ANU"}, {"NAS", "DRW"}, {"BZE", "HBA"}, {"BNE", "BAK"}, {"AXA", "AUA"}, {"VIE", "PER"}, {"DAC", "AUA"}, {"BIM", "MEL"}, {"DAC", "ASD"}, {"DAC", "CRL"}, {"MHH", "HBA"}, {"BRU", "EZE"}, {"GGT", "BNE"}, {"BZE", "AXA"}, {"BZE", "CRL"}, {"TBI", "CBR"}, {"CRL", "BGI"}, {"ASD", "JFK"}, {"DAC", "BIM"}, {"ELH", "BGI"}, {"MEL", "TBI"}, {"OOL", "ASD"}, {"CNS", "BZE"}, {"TIA", "ELH"}, {"ASD", "BNE"}, {"BNE", "ASD"}, {"TIA", "LST"}, {"AUA", "AXA"}, {"CRL", "DAC"}, {"BAK", "BIM"}, {"BGI", "BNE"}, {"ELH", "BZE"}, {"ANU", "GGT"}, {"ASD", "CBR"}, {"OOL", "BIM"}, {"TBI", "INN"}, {"BRU", "ELH"}, {"CRL", "TIA"}, {"PER", "ASD"}, {"TIA", "DAC"}, {"ADL", "AUA"}, {"TCB", "AUA"}, {"HBA", "BNE"}, {"BNE", "TIA"}, {"INN", "ANU"}, {"TBI", "ADL"}, {"ELH", "AXA"}, {"BGI", "ANU"}, {"TIA", "BAK"}, {"PER", "TBI"}, {"EZE", "MHH"}, {"BZE", "NAS"}, {"JFK", "BNE"}, {"BRU", "ASD"}, {"AUA", "CBR"}, {"NAS", "JFK"}, {"ELH", "BIM"}, {"BNE", "TBI"}, {"BAK", "CNS"}, {"BNE", "GGT"}, {"OOL", "PER"}, {"BNE", "BRU"}, {"MEL", "PER"}, {"BAH", "MEL"}, {"TCB", "CRL"}, {"CNS", "OOL"}, {"BZE", "VIE"}, {"ASD", "CRL"}, {"LST", "BZE"}, {"ANU", "BRU"}, {"AUA", "BRU"}, {"ASD", "BGI"}, {"AUA", "TCB"}, {"TCB", "CRL"}, {"SYD", "CRL"}, {"BRU", "HBA"}, {"DRW", "ASD"}, {"TCB", "FPO"}, {"TIA", "CRL"}, {"BZE", "CNS"}, {"ELH", "TCB"}, {"OOL", "CRL"}, {"CRL", "ELH"}, {"MEL", "ASD"}, {"ASD", "BIM"}, {"CRL", "JFK"}, {"DAC", "BNE"}, {"HBA", "JFK"}, {"NAS", "OOL"}, {"DAC", "CRL"}, {"ELH", "CNS"}, {"ASD", "ELH"}, {"DRW", "ELH"}, {"FPO", "BAK"}, {"OOL", "BAK"}, {"ELH", "OOL"}, {"ADL", "OOL"}, {"BNE", "INN"}, {"DAC", "TIA"}, {"INN", "NAS"}, {"BAH", "BNE"}, {"BAH", "JFK"}, {"AUA", "BIM"}, {"PER", "TIA"}, {"BZE", "ADL"}, {"BAK", "BNE"}, {"JFK", "PER"}, {"JFK", "AXA"}, {"GGT", "FPO"}, {"FPO", "MHH"}, {"ASD", "HBA"}, {"BNE", "INN"}, {"LST", "ANU"}, {"AXA", "BZE"}, {"JFK", "ANU"}, {"ASD", "LST"}, {"VIE", "EZE"}, {"ELH", "TBI"}, {"DAC", "TBI"}, {"DRW", "JFK"}, {"CRL", "TCB"}, {"TBI", "ASD"}, {"FPO", "AXA"}, {"NAS", "BAH"}, {"EZE", "DRW"}, {"AXA", "BAK"}, {"BIM", "JFK"}, {"JFK", "ASD"}, {"BZE", "HBA"}, {"LST", "DAC"}, {"AXA", "AUA"}, {"GGT", "TBI"}, {"CRL", "ELH"}, {"VIE", "BAH"}, {"BGI", "DAC"}, {"LST", "GGT"}, {"BNE", "GGT"}, {"CNS", "NAS"}, {"BNE", "BAK"}, {"ANU", "ELH"}, {"DRW", "AUA"}, {"ANU", "AUA"} };
+		ans = Solution().findItinerary(tickets);
+	}
+}
