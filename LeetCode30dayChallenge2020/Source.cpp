@@ -45,8 +45,8 @@ size_t allocated=0;
 //		count++;
 //	}
 //	std::cout << "Freeing " << count << " bytes\n";
-//	allocated += count;
-//	std::cout << " Total allocated: " << count << "bytes\n";
+//	allocated -= count;
+//	std::cout << " Total allocated: " << allocated << "bytes\n";
 //	std::free(ptr);
 //}
 void TestTriangleIntersections()
@@ -114,7 +114,7 @@ void TestTriangleIntersections()
 int main()
 {
 
-	Jun_day28::RunExample();
+	Jun_day30::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
 	//LC85::RunExample();

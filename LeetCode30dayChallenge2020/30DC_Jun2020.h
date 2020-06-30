@@ -1405,3 +1405,252 @@ namespace Jun_day28 // LC332 Reconstruct Itinerary
 		ans = Solution().findItinerary(tickets);
 	}
 }
+namespace Jun_day30 // LC212 Word search II
+{
+	struct Node
+	{
+		Node* next[27] = { nullptr };
+	};
+	class Trie {
+	public:
+		Node* root;
+	public:
+		/** Initialize your data structure here. */
+		Trie()
+			:
+			root(new Node)
+		{}
+		void VisitAndDelete(Node* n)
+		{
+			for (size_t i = 0; i < 26; ++i)
+			{
+				if (n->next[i])
+				{
+					VisitAndDelete(n->next[i]);
+				}
+			}
+			delete n;
+			n = nullptr;
+		}
+		~Trie()
+		{
+			VisitAndDelete(root);
+			//delete root;
+			root = nullptr;
+		}
+		/** Inserts a word into the trie. */
+		void insert(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (!pRunner->next[word[i] - 'a'])
+				{
+					pRunner->next[word[i] - 'a'] = new Node;
+				}
+				pRunner = pRunner->next[word[i] - 'a'];
+			}
+			pRunner->next[26] = root;
+		}
+		/** Returns if the word is in the trie. */
+		bool search(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (pRunner->next[word[i] - 'a'])
+				{
+					pRunner = pRunner->next[word[i] - 'a'];
+				}
+				else return false;
+			}
+			if (pRunner->next[26]) return true;
+			return false;
+		}
+		/** Returns if there is any word in the trie that starts with the given prefix. */
+		bool startsWith(std::string prefix)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < prefix.size(); ++i)
+			{
+				if (pRunner->next[prefix[i] - 'a'])
+				{
+					pRunner = pRunner->next[prefix[i] - 'a'];
+				}
+				else return false;
+			}
+			return true;
+		}
+		int test(std::string str)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				if (pRunner->next[str[i] - 'a'])
+				{
+					pRunner = pRunner->next[str[i] - 'a'];
+				}
+				else return 0; // no prefix match
+			}
+			if (pRunner->next[26]) return 2; // word match
+			return 1; // prefix match
+		}
+	};
+	class Solution {
+	private: // data members
+		Trie* trie;
+		std::unordered_set<long long> visited;
+		std::unordered_set<std::string> matchedWords;
+		std::string wrd;
+	private: // data structures
+		struct Pos
+		{
+			int row;
+			int col;
+		};
+	private: // methods
+		static constexpr long long hash(const Pos& p)
+		{
+			return ((long long)p.row << 32 | p.col);
+		}
+		void dfs(const Pos curpos,std::vector<std::vector<char>>& board, std::vector<std::string>& words)
+		{
+			long long curposHash = hash(curpos);
+			const auto it = visited.insert(curposHash);
+			if (!it.second) // position already visited
+			{
+				//wrd.pop_back();
+				return;
+			}
+			wrd += board[curpos.row][curpos.col];
+			switch (trie->test(wrd))
+			{
+			case 0: // wrd is not in Trie; backtrack
+				visited.erase(it.first);
+				wrd.pop_back();
+				return;
+				break;
+			case 2: // wrd is match in Trie; add wrd to matchedWords 
+				matchedWords.insert(wrd);
+			default: // wrd is prefix in Trie OR match in Trie; continue
+				if (curpos.row > 0) // Try NORTH
+				{
+					dfs({ curpos.row - 1,curpos.col }, board, words);
+				}
+				if (curpos.row < board.size() - 1) // Try SOUTH
+				{
+					dfs({ curpos.row + 1,curpos.col }, board, words);
+				}
+				if (curpos.col > 0) // Try WEST
+				{
+					dfs({ curpos.row,curpos.col - 1 }, board, words);
+				}
+				if (curpos.col < board[0].size() - 1) // Try EAST
+				{
+					dfs({ curpos.row,curpos.col + 1 }, board, words);
+				}
+				break;
+			}
+			wrd.pop_back();
+			visited.erase(it.first);
+			return;
+		}
+	public: // interface
+		Solution()
+			:
+			trie(new Trie())
+		{}
+		std::vector<std::string> findWords(std::vector<std::vector<char>>& board, std::vector<std::string>& words) 
+		{
+			if (words.size() == 0) return {};
+			if (board.size() == 0 || board[0].size() == 0) return {};
+			// Initialize and fill Trie
+			for (auto s : words)
+			{
+				trie->insert(s);
+			}
+			// DFS
+			for (int row = 0; row < board.size(); row++)
+			{
+				for (int col = 0; col < board[0].size(); col++)
+				{
+					Pos curpos({ row, col });
+					visited.clear();
+					wrd.clear();
+					dfs(curpos,board,words);
+				}
+			}
+			return { matchedWords.begin(),matchedWords.end() };
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> board;
+		std::vector<std::string> words;
+		std::vector<std::string> ret;
+		
+		board = {
+			{'o','a','a','n'},
+			{'e','t','a','e'},
+			{'i','h','k','r'},
+			{'i','f','l','v'}
+		};
+		words = { "oathh","oathkree","oate","oatae" };
+		ret = Solution().findWords(board, words);
+		
+		words = { "oathkr","oate","oatae" }; //PROBLEM
+		ret = Solution().findWords(board, words);
+		
+		words = { "oet","oat" }; //PROBLEM
+		ret = Solution().findWords(board, words);
+
+		board = { 
+			{'o'},
+			{'a'},
+			{'t'}
+		};
+		words = { "oat", "oa"};
+		ret = Solution().findWords(board, words);
+
+		board = {
+			{'b', 'a', 'a', 'b', 'a', 'b'}, 
+			{'a', 'b', 'a', 'a', 'a', 'a'}, 
+			{'a', 'b', 'a', 'a', 'a', 'b'}, 
+			{'a', 'b', 'a', 'b', 'b', 'a'}, 
+			{'a', 'a', 'b', 'b', 'a', 'b'}, 
+			{'a', 'a', 'b', 'b', 'b', 'a'}, 
+			{'a', 'a', 'b', 'a', 'a', 'b'}};
+		words = { 
+			"bbaabaabaaaaabaababaaaaababb", 
+			"aabbaaabaaabaabaaaaaabbaaaba", 
+			"babaababbbbbbbaabaababaabaaa", 
+			"bbbaaabaabbaaababababbbbbaaa", 
+			"babbabbbbaabbabaaaaaabbbaaab", 
+			"bbbababbbbbbbababbabbbbbabaa", 
+			"babababbababaabbbbabbbbabbba", 
+			"abbbbbbaabaaabaaababaabbabba", 
+			"aabaabababbbbbbababbbababbaa", 
+			"aabbbbabbaababaaaabababbaaba", 
+			"ababaababaaabbabbaabbaabbaba", 
+			"abaabbbaaaaababbbaaaaabbbaab", 
+			"aabbabaabaabbabababaaabbbaab", 
+			"baaabaaaabbabaaabaabababaaaa", 
+			"aaabbabaaaababbabbaabbaabbaa", 
+			"aaabaaaaabaabbabaabbbbaabaaa", 
+			"abbaabbaaaabbaababababbaabbb", 
+			"baabaababbbbaaaabaaabbababbb", 
+			"aabaababbaababbaaabaabababab", 
+			"abbaaabbaabaabaabbbbaabbbbbb", 
+			"aaababaabbaaabbbaaabbabbabab", 
+			"bbababbbabbbbabbbbabbbbbabaa", 
+			"abbbaabbbaaababbbababbababba",
+			"bbbbbbbabbbababbabaabababaab", 
+			"aaaababaabbbbabaaaaabaaaaabb", 
+			"bbaaabbbbabbaaabbaabbabbaaba", 
+			"aabaabbbbaabaabbabaabababaaa", 
+			"abbababbbaababaabbababababbb", 
+			"aabbbabbaaaababbbbabbababbbb", 
+			"babbbaabababbbbbbbbbaabbabaa" };
+		ret = Solution().findWords(board, words);
+	}
+}
