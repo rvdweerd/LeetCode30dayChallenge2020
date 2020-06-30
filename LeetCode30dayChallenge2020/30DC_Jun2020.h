@@ -1517,40 +1517,23 @@ namespace Jun_day30 // LC212 Word search II
 		{
 			long long curposHash = hash(curpos);
 			const auto it = visited.insert(curposHash);
-			if (!it.second) // position already visited
-			{
-				//wrd.pop_back();
-				return;
-			}
+			if (!it.second) return;
 			wrd += board[curpos.row][curpos.col];
-			switch (trie->test(wrd))
+			
+			int test = trie->test(wrd);
+			if (test != 0) // wrd is prefix in Trie
 			{
-			case 0: // wrd is not in Trie; backtrack
-				visited.erase(it.first);
-				wrd.pop_back();
-				return;
-				break;
-			case 2: // wrd is match in Trie; add wrd to matchedWords 
-				matchedWords.insert(wrd);
-			default: // wrd is prefix in Trie OR match in Trie; continue
-				if (curpos.row > 0) // Try NORTH
+				if (test == 2) // wrd is match in Trie; add wrd to matchedWords 
 				{
-					dfs({ curpos.row - 1,curpos.col }, board, words);
+					matchedWords.insert(wrd);
 				}
-				if (curpos.row < board.size() - 1) // Try SOUTH
-				{
-					dfs({ curpos.row + 1,curpos.col }, board, words);
-				}
-				if (curpos.col > 0) // Try WEST
-				{
-					dfs({ curpos.row,curpos.col - 1 }, board, words);
-				}
-				if (curpos.col < board[0].size() - 1) // Try EAST
-				{
-					dfs({ curpos.row,curpos.col + 1 }, board, words);
-				}
-				break;
-			}
+				// Continue DFS
+				if (curpos.row > 0)						dfs({ curpos.row - 1,curpos.col }, board, words); // Try NORTH
+				if (curpos.row < board.size() - 1)		dfs({ curpos.row + 1,curpos.col }, board, words); // Try SOUTH
+				if (curpos.col > 0)						dfs({ curpos.row,curpos.col - 1 }, board, words); // Try WEST
+				if (curpos.col < board[0].size() - 1)	dfs({ curpos.row,curpos.col + 1 }, board, words); // Try EAST
+			}																						  
+			// Back track
 			wrd.pop_back();
 			visited.erase(it.first);
 			return;
@@ -1562,21 +1545,16 @@ namespace Jun_day30 // LC212 Word search II
 		{}
 		std::vector<std::string> findWords(std::vector<std::vector<char>>& board, std::vector<std::string>& words) 
 		{
-			if (words.size() == 0) return {};
-			if (board.size() == 0 || board[0].size() == 0) return {};
 			// Initialize and fill Trie
-			for (auto s : words)
-			{
-				trie->insert(s);
-			}
+			if (words.size() == 0 || board.size() == 0 || board[0].size() == 0) return {};
+			for (auto s : words) trie->insert(s);
+			
 			// DFS
 			for (int row = 0; row < board.size(); row++)
 			{
 				for (int col = 0; col < board[0].size(); col++)
 				{
 					Pos curpos({ row, col });
-					visited.clear();
-					wrd.clear();
 					dfs(curpos,board,words);
 				}
 			}
@@ -1596,13 +1574,13 @@ namespace Jun_day30 // LC212 Word search II
 			{'i','f','l','v'}
 		};
 		words = { "oathh","oathkree","oate","oatae" };
-		ret = Solution().findWords(board, words);
+		ret = Solution().findWords(board, words); // 2
 		
-		words = { "oathkr","oate","oatae" }; //PROBLEM
-		ret = Solution().findWords(board, words);
+		words = { "oathkr","oate","oatae" }; 
+		ret = Solution().findWords(board, words); // 3
 		
-		words = { "oet","oat" }; //PROBLEM
-		ret = Solution().findWords(board, words);
+		words = { "oet","oat" }; 
+		ret = Solution().findWords(board, words); // 2
 
 		board = { 
 			{'o'},
@@ -1610,7 +1588,11 @@ namespace Jun_day30 // LC212 Word search II
 			{'t'}
 		};
 		words = { "oat", "oa"};
-		ret = Solution().findWords(board, words);
+		ret = Solution().findWords(board, words); // 2
+
+		board = { {'a'},{'a'} };
+		words = { "a" };
+		ret = Solution().findWords(board, words); // 1
 
 		board = {
 			{'b', 'a', 'a', 'b', 'a', 'b'}, 
@@ -1651,6 +1633,6 @@ namespace Jun_day30 // LC212 Word search II
 			"abbababbbaababaabbababababbb", 
 			"aabbbabbaaaababbbbabbababbbb", 
 			"babbbaabababbbbbbbbbaabbabaa" };
-		ret = Solution().findWords(board, words);
+		ret = Solution().findWords(board, words); // 3
 	}
 }
