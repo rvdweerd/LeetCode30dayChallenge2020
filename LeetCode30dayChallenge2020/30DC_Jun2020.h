@@ -13,6 +13,7 @@
 #include "GraphClass.h"
 #include <algorithm>
 #include <random>
+#include <regex>
 
 namespace Jun_day1 // LC226 Invert Binary Tree
 {
@@ -675,7 +676,6 @@ namespace Jun_day14 // LC787 Cheapest Flights with K stops
 		ans = Solution().findCheapestPrice(4, flights, 3, 0, 3); //-1
 	}
 }
-#include <regex>
 namespace Jun_day16 // LC468 Validate IP Address
 {
 	class Solution {
@@ -872,5 +872,767 @@ namespace Jun_day18
 
 		series = { 1,2 };
 		h = Solution().hIndex_lin(series); // 1
+	}
+}
+namespace Jun_day19
+{
+	class Solution {
+	public:
+		const int MOD = 1e9 + 7, MOD1 = 1e9 + 9;
+		const int D = 257;
+
+		std::string Get(std::string& str, int len)
+		{
+			std::set<std::pair<int, int>> set;
+			long long int curr_1 = 0, curr_2 = 0;
+			long long int off_1 = 1, off_2 = 1;
+			for (int i = 0; i < len - 1; i++)
+			{
+				off_1 = off_1 * D % MOD;
+				off_2 = off_2 * D % MOD1;
+			}
+
+			for (int i = 0; i < len; i++)
+			{
+				curr_1 = (curr_1 * D + str[i]) % MOD;
+				curr_2 = (curr_2 * D + str[i]) % MOD1;
+			}
+			set.insert({ curr_1,curr_2 });
+			for (int i = 0, j = len; j < str.size(); i++, j++)
+			{
+				curr_1 = (D * (curr_1 - off_1 * str[i]) + str[j]) % MOD;
+				curr_2 = (D * (curr_2 - off_2 * str[i]) + str[j]) % MOD1;
+				if (curr_1 < 0)
+					curr_1 += MOD;
+				if (curr_2 < 0)
+					curr_2 += MOD1;
+				if (set.find({ curr_1,curr_2 }) != set.end())
+					return str.substr(i + 1, len);
+
+				set.insert({ curr_1,curr_2 });
+			}
+			return "";
+		}
+
+
+		std::string longestDupSubstring(std::string S) {
+			int le = 0, ri = S.size();
+
+			while (le < ri)
+			{
+				int m = le + (ri - le + 1) / 2;
+				if (Get(S, m).size() != 0)
+				{
+					le = m;
+				}
+				else
+					ri = m - 1;
+			}
+			return Get(S, le);
+		}
+	};
+}
+namespace Jun_day20
+{
+	class Solution
+	{
+	public:
+		std::string getPermutation(int n, int k) 
+		{
+			int pTab[10] = { 1 };
+			for (int i = 1; i <= 9; i++) {
+				pTab[i] = i * pTab[i - 1];
+			}
+			std::string res;
+			std::vector<char> numSet = { '1', '2', '3', '4', '5', '6', '7', '8', '9' };
+			while (n > 0) {
+				int tmp = (k - 1) / pTab[n - 1];
+				res += numSet[tmp];
+				numSet.erase(numSet.begin() + tmp);
+				k = k - tmp * pTab[n - 1];
+				n--;
+			}
+			return res;
+		}
+	};
+	void RunExample()
+	{
+		std::string ans;
+		ans = Solution().getPermutation(4, 9);
+	}
+}
+namespace Jun_day21 // LC174 Dungeon Game
+{
+	class Solution 
+	{
+	public:
+		int calculateMinimumHP(std::vector<std::vector<int>>& dungeon) 
+		{
+			//if (dungeon[0].size() == 1) return std::max(1, 1 - dungeon[0][0]);
+			//std::vector<std::vector<int>> DP(dungeon.size(), std::vector<int>(dungeon[0].size(), 0));
+			size_t m = dungeon.size();
+			size_t n = dungeon[0].size();
+
+
+			dungeon.back().back() = std::max(1, 1 - dungeon.back().back());
+			for (int col = n - 2; col >= 0; --col) // Fill bottom row
+			{
+				int target = dungeon[m - 1][(size_t)col + 1];
+				dungeon[m - 1][(size_t)col] = std::max(1, target - dungeon[m - 1][(size_t)col]);
+			}
+			for (int row = m - 2; row >= 0; --row) // Fill right column
+			{
+				int target = dungeon[(size_t)row + 1][n - 1];
+				dungeon[(size_t)row][n-1] = std::max(1, target - dungeon[(size_t)row][n-1]);
+			}
+			for (int row = m - 2; row >= 0; --row) // Fill remaining Upper Left of Matrix
+			{
+				for (int col = n - 2; col >= 0; --col)
+				{
+					int target = std::min(dungeon[row+1][col],dungeon[row][col+1]);
+					dungeon[(size_t)row][(size_t)col] = std::max(1, target - dungeon[(size_t)row][(size_t)col]);
+				}
+			}
+			return dungeon[0][0];
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> dun;
+		int ans;
+
+		dun = { {-2,-3,3},{-5,-10,1},{10,30,-5} };
+		ans = Solution().calculateMinimumHP(dun);
+
+		dun = { {-2} };
+		ans = Solution().calculateMinimumHP(dun);
+
+		dun = { {-2},{-2},{-1} };
+		ans = Solution().calculateMinimumHP(dun);
+	}
+}
+namespace Jun_day23// LC222 Count complete treenodes
+{
+	struct TreeNode {
+		int val;
+		TreeNode* left;
+		TreeNode* right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+	};
+	class Solution {
+	public:
+		int countNodes(TreeNode* root) 
+		{
+			int leafCount = 0;
+			int nodeCount = 1;
+			std::stack<std::pair<TreeNode*, int>> stack;
+			stack.push({ root,0 });
+			while (!stack.empty())
+			{
+				auto p = stack.top(); stack.pop();
+				if (p.first->left == nullptr && p.first->right == nullptr)
+				{
+					leafCount++;
+				}
+				else if (p.first->left != nullptr && p.first->right == nullptr)
+				{
+					return leafCount + (int)std::pow(2,p.second+1);
+				}
+				else
+				{
+					nodeCount += 2;
+					stack.push({ p.first->right,p.second + 1 });
+					stack.push({ p.first->left,p.second + 1 });
+				}
+			}
+			return nodeCount;
+		}
+	};
+	void RunExample()
+	{
+		TreeNode* root = new TreeNode(1, new TreeNode(2), new TreeNode(3));
+		root->left->left = new TreeNode(4); root->left->right = new TreeNode(5);
+		root->right->left = new TreeNode(6); //root->right->right = new TreeNode(7);
+		int ans = Solution().countNodes(root);
+	}
+}
+namespace Jun_day24 // LC96 Unique binary search trees
+{
+	class Solution 
+	{
+	public:
+		int F(int x)
+		{
+			// DP: uses rotation of the tail & recursive calls with memoization
+			// F(i) = F(0)F(i-1) + F(1)F(i-2) + ... + F(i-1)F(0)
+			static std::map<int, int> map;
+			if (x <= 1) return 1;
+			else
+			{
+				auto it = map.find(x);
+				if (it == map.end())
+				{
+					int ans = 0;
+					for (size_t i = 0; i < x; i++)
+					{
+						ans += F(i) * F(x - 1 - i);
+					}
+					//std::cout << ".";
+					map[x] = ans;
+					return ans;
+				}
+				else
+				{
+					//std::cout << "R";
+					return it->second;
+				}
+			}
+		}
+		int numTrees(int n) 
+		{
+			if (n == 0) return 0;
+			return F(n);
+		}
+	};
+	void RunExample()
+	{
+		int ans;
+		ans = Solution().numTrees(5); //42
+		ans = Solution().numTrees(1); //1
+		ans = Solution().numTrees(0); //0
+	}
+}
+namespace Jun_day25 // LC287 Find Duplicate Number
+{
+	class Solution
+	{
+	public:
+		int findDuplicate_cycle(const std::vector<int>& nums)
+		{
+			//std::cout << "===============================\n";
+			size_t p1 = 0;
+			size_t p2 = 0;
+			while (true)
+			{
+				p1 = nums[p1];
+				p2 = nums[nums[p2]];
+				//std::cout << "p1:" << p1 << ",p2:" << p2 << '\n';
+				if (p1 == p2) break;
+			}
+			p1 = 0;
+			//std::cout << "--------------------------\n";
+			while (true)
+			{
+				p1 = nums[p1];
+				p2 = nums[p2];
+				//std::cout << "p1:" << p1 << ",p2:" << p2 << '\n';
+				if (p1 == p2) break;
+			}
+			return p1;
+		}
+		int findDuplicate_bitmask(const std::vector<int>& nums)
+		{
+			int mask = 0;
+			for (int n : nums)
+			{
+				int bit = 1 << n;
+				if (bit & mask) return n;
+				mask |= bit;
+			}
+		}
+		int findDuplicate(const std::vector<int>& nums)
+		{
+			std::unordered_set<int> set;
+			for (int n : nums)
+			{
+				auto it = set.find(n);
+				if (it == set.end()) set.insert(n);
+				else return *it;
+			}
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> v;
+		int ans;
+
+		v = { 1,3,4,2,2 };
+		ans = Solution().findDuplicate(v); // 2
+		v = { 3,1,3,4,2 };
+		ans = Solution().findDuplicate(v); // 3
+		v = {2,5,9,6,9,3,8,9,7,1};
+		ans = Solution().findDuplicate(v); // 9
+	}
+}
+namespace Jun_day26 // LC129 Sum root to leaf numbers
+{
+
+ //Definition for a binary tree node.
+	struct TreeNode {
+		int val;
+		TreeNode* left;
+		TreeNode* right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+	};
+ 
+	class Solution {
+	public:
+		int ans = 0;
+		void Dive(TreeNode* node, std::string str)
+		{
+			if (node == nullptr)
+			{
+				//ans += std::stoi(str);
+			}
+			else if (node->left == nullptr && node->right == nullptr)
+			{
+				str += std::to_string(node->val);
+				ans += std::stoi(str);
+			}
+			else
+			{
+				str += std::to_string(node->val);
+				Dive(node->left, str);
+				Dive(node->right, str);
+			}
+		}
+		int sumNumbers(TreeNode* root) 
+		{
+			Dive(root, "");
+			return ans;
+		}
+	};
+	void RunExample()
+	{
+		TreeNode* root = nullptr;
+		int ans;
+
+		root = new TreeNode(4, new TreeNode(2, new TreeNode(1), new TreeNode(3)), new TreeNode(9));
+		ans = Solution().sumNumbers(root);
+
+	}
+}
+namespace Jun_day27 // LC279 Perfect Squares
+{
+	class Solution {
+	public:
+		std::pair<int,int> remainderLowestSquare_bins(int num)
+		{
+			long long numL = (long long)num;
+			if (numL <= 1) return { num,0 };
+			long long int lo = 0;
+			long long int hi = 1;
+			while (hi * hi < numL)
+			{
+				lo = hi;
+				hi = hi + lo / 2 + 1;
+			}
+			while (lo <= hi)
+			{
+				long long int mid = lo + (hi - lo) / 2;
+				long long int sq = mid * mid;
+				if (sq == numL) return {mid, 0};
+				if (sq < numL) lo = mid + 1;
+				else hi = mid - 1;
+			}
+			return { lo - 1,num - (lo - 1) * (lo - 1) };
+		}
+		std::pair<int, int> remainderLowestSquare_sqrt(int num)
+		{
+			int root = sqrt(num);
+			return {root,num-root};
+		}
+		int numSquares(int n) 
+		{
+			static int filled = 1;
+			static std::vector<int> cntPerfectSquares(10000, -1 );
+			cntPerfectSquares[0]=0;
+			if (n <= 3) return n;
+			if (n >= cntPerfectSquares.size()) cntPerfectSquares.resize(n+1, -1);
+			if (cntPerfectSquares[n] != -1) return cntPerfectSquares[n];
+
+			auto p = remainderLowestSquare_sqrt(n);
+			for (int i = filled; i <= n; i++)
+			{
+				int min = INT_MAX;
+				for (int j = 1; j * j <= i; j++)
+				{
+					min = std::min(min, 1 + cntPerfectSquares[i-j*j]);
+				}
+				cntPerfectSquares[i]=min;
+			}
+			filled = n;
+			return cntPerfectSquares[n];
+		}
+	};
+	void RunExample()
+	{
+		int ans;
+		Solution obj;
+		ans = obj.numSquares(12);//3
+		ans = obj.numSquares(13);//2
+		ans = obj.numSquares(32);//2
+		ans = obj.numSquares(22);//3
+		ans = obj.numSquares(10001);//2
+		ans = obj.numSquares(9999);//4
+	}
+}
+namespace Jun_day28_stack
+{
+	class Solution {
+	private:
+		std::unordered_map<	std::string, std::map<std::string,int> > map;
+		int numTickets = 0;
+		std::vector<std::vector<std::string>> validRoutes;
+	public:
+		std::vector<std::string> findItinerary(std::vector<std::vector<std::string>>& tickets) 
+		{
+			for (auto vec : tickets)
+			{
+				map[vec[0]][vec[1]]++;
+				numTickets++;
+			}
+			struct routeData
+			{
+				std::vector<std::string> routeVec;
+				std::unordered_map<	std::string, std::map<std::string, int>> usedTickets;
+			};
+			std::stack<routeData> stack; 
+			{
+				routeData init; init.routeVec = { "JFK" };
+				stack.push(init);
+			}
+			while (!stack.empty())
+			{
+				if (stack.size() > 100)
+				{
+					int k = 0;
+				}
+				routeData curRoute = stack.top(); stack.pop();
+				if (curRoute.routeVec.size() == numTickets + 1) return curRoute.routeVec;
+				std::string current = curRoute.routeVec.back();
+				//for (const auto& dest : map[current])
+				for (auto it = map[current].rbegin(); it!=map[current].rend();it++)
+				{
+					if (curRoute.usedTickets[current][it->first] < it->second) // flights available
+					{
+						curRoute.routeVec.push_back(it->first);
+						curRoute.usedTickets[current][it->first]++;
+						stack.push(curRoute);
+						curRoute.routeVec.pop_back();
+						curRoute.usedTickets[current][it->first]--;
+					}
+				}
+			}
+			return {};
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<std::string>> tickets;
+		std::vector<std::string> ans;
+		
+		tickets = { {"JFK" ,"B"} ,{"JFK","B"},{"B","C"},{"B","D"},{"D","JFK"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"JFK","SFO"} ,{"JFK","ATL"},{"SFO","ATL"},{"ATL","JFK"},{"ATL","SFO"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"AXA","EZE"},{"EZE","AUA"},{"ADL","JFK"},{"ADL","TIA"},{"AUA","AXA"},{"EZE","TIA"},{"EZE","TIA"},{"AXA","EZE"},{"EZE","ADL"},{"ANU","EZE"},{"TIA","EZE"},{"JFK","ADL"},{"AUA","JFK"},{"JFK","EZE"},{"EZE","ANU"},{"ADL","AUA"},{"ANU","AXA"},{"AXA","ADL"},{"AUA","JFK"},{"EZE","ADL"},{"ANU","TIA"},{"AUA","JFK"},{"TIA","JFK"},{"EZE","AUA"},{"AXA","EZE"},{"AUA","ANU"},{"ADL","AXA"},{"EZE","ADL"},{"AUA","ANU"},{"AXA","EZE"},{"TIA","AUA"},{"AXA","EZE"},{"AUA","SYD"},{"ADL","JFK"},{"EZE","AUA"},{"ADL","ANU"},{"AUA","TIA"},{"ADL","EZE"},{"TIA","JFK"},{"AXA","ANU"},{"JFK","AXA"},{"JFK","ADL"},{"ADL","EZE"},{"AXA","TIA"},{"JFK","AUA"},{"ADL","EZE"},{"JFK","ADL"},{"ADL","AXA"},{"TIA","AUA"},{"AXA","JFK"},{"ADL","AUA"},{"TIA","JFK"},{"JFK","ADL"},{"JFK","ADL"},{"ANU","AXA"},{"TIA","AXA"},{"EZE","JFK"},{"EZE","AXA"},{"ADL","TIA"},{"JFK","AUA"},{"TIA","EZE"},{"EZE","ADL"},{"JFK","ANU"},{"TIA","AUA"},{"EZE","ADL"},{"ADL","JFK"},{"ANU","AXA"},{"AUA","AXA"},{"ANU","EZE"},{"ADL","AXA"},{"ANU","AXA"},{"TIA","ADL"},{"JFK","ADL"},{"JFK","TIA"},{"AUA","ADL"},{"AUA","TIA"},{"TIA","JFK"},{"EZE","JFK"},{"AUA","ADL"},{"ADL","AUA"},{"EZE","ANU"},{"ADL","ANU"},{"AUA","AXA"},{"AXA","TIA"},{"AXA","TIA"},{"ADL","AXA"},{"EZE","AXA"},{"AXA","JFK"},{"JFK","AUA"},{"ANU","ADL"},{"AXA","TIA"},{"ANU","AUA"},{"JFK","EZE"},{"AXA","ADL"},{"TIA","EZE"},{"JFK","AXA"},{"AXA","ADL"},{"EZE","AUA"},{"AXA","ANU"},{"ADL","EZE"},{"AUA","EZE"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = {{"INN", "TIA"}, {"BIM", "BRU"}, {"VIE", "LST"}, {"OOL", "BAH"}, {"MEL", "CRL"}, {"CNS", "ADL"}, {"AUA", "OOL"}, {"HBA", "ASD"}, {"INN", "FPO"}, {"NAS", "BZE"}, {"DRW", "BRU"}, {"NAS", "BAK"}, {"ADL", "ASD"}, {"HBA", "OOL"}, {"BZE", "BAH"}, {"TBI", "FPO"}, {"CRL", "AUA"}, {"BGI", "TIA"}, {"TCB", "ELH"}, {"AUA", "AXA"}, {"MHH", "TBI"}, {"CNS", "BNE"}, {"INN", "GGT"}, {"DRW", "EZE"}, {"CRL", "SYD"}, {"BNE", "AXA"}, {"CNS", "ADL"}, {"BGI", "SYD"}, {"CNS", "VIE"}, {"GGT", "BNE"}, {"ELH", "BNE"}, {"BNE", "DAC"}, {"DRW", "CNS"}, {"PER", "CRL"}, {"ADL", "ASD"}, {"MHH", "ANU"}, {"ELH", "NAS"}, {"TIA", "ADL"}, {"DAC", "AUA"}, {"ADL", "DAC"}, {"CRL", "OOL"}, {"DAC", "NAS"}, {"BNE", "GGT"}, {"BAH", "DAC"}, {"SYD", "GGT"}, {"CRL", "ADL"}, {"TCB", "VIE"}, {"TBI", "BAK"}, {"BRU", "BNE"}, {"GGT", "ASD"}, {"MEL", "BZE"}, {"TBI", "BAK"}, {"ANU", "CNS"}, {"BIM", "MEL"}, {"ELH", "AUA"}, {"GGT", "SYD"}, {"AXA", "MHH"}, {"GGT", "ANU"}, {"CRL", "DAC"}, {"VIE", "BAH"}, {"JFK", "LST"}, {"TIA", "CRL"}, {"MHH", "DAC"}, {"OOL", "BZE"}, {"VIE", "ELH"}, {"DRW", "INN"}, {"EZE", "INN"}, {"ASD", "TBI"}, {"BAK", "BNE"}, {"BNE", "INN"}, {"BZE", "NAS"}, {"VIE", "CRL"}, {"ADL", "SYD"}, {"INN", "DRW"}, {"BRU", "BZE"}, {"BNE", "FPO"}, {"BIM", "DAC"}, {"JFK", "MEL"}, {"BAK", "BNE"}, {"BAK", "BZE"}, {"JFK", "ASD"}, {"BNE", "DRW"}, {"EZE", "ELH"}, {"ASD", "BGI"}, {"SYD", "TCB"}, {"AUA", "MHH"}, {"INN", "AUA"}, {"SYD", "OOL"}, {"ASD", "CRL"}, {"BNE", "BRU"}, {"MEL", "BGI"}, {"BIM", "CNS"}, {"BIM", "ASD"}, {"ASD", "MEL"}, {"SYD", "DAC"}, {"OOL", "VIE"}, {"ASD", "BNE"}, {"OOL", "DAC"}, {"LST", "TIA"}, {"AUA", "MEL"}, {"ASD", "DAC"}, {"ANU", "PER"}, {"DAC", "TBI"}, {"ASD", "BNE"}, {"BAK", "MEL"}, {"CBR", "OOL"}, {"BNE", "ADL"}, {"AXA", "ELH"}, {"CBR", "DRW"}, {"ADL", "LST"}, {"BAK", "INN"}, {"FPO", "SYD"}, {"DAC", "BNE"}, {"TBI", "EZE"}, {"AXA", "DAC"}, {"DAC", "EZE"}, {"NAS", "DRW"}, {"FPO", "DRW"}, {"BAH", "BNE"}, {"MEL", "BZE"}, {"LST", "CRL"}, {"EZE", "LST"}, {"TBI", "NAS"}, {"CBR", "BAK"}, {"NAS", "DAC"}, {"JFK", "ANU"}, {"TIA", "BNE"}, {"CRL", "NAS"}, {"SYD", "ELH"}, {"OOL", "BIM"}, {"AUA", "ASD"}, {"BZE", "EZE"}, {"BAK", "BRU"}, {"HBA", "BZE"}, {"BNE", "SYD"}, {"DAC", "TIA"}, {"BRU", "TCB"}, {"ANU", "OOL"}, {"ELH", "VIE"}, {"CRL", "DRW"}, {"ANU", "VIE"}, {"PER", "BIM"}, {"BIM", "JFK"}, {"DAC", "VIE"}, {"FPO", "TCB"}, {"AUA", "CNS"}, {"CRL", "FPO"}, {"BAK", "DAC"}, {"EZE", "ANU"}, {"NAS", "DRW"}, {"BZE", "HBA"}, {"BNE", "BAK"}, {"AXA", "AUA"}, {"VIE", "PER"}, {"DAC", "AUA"}, {"BIM", "MEL"}, {"DAC", "ASD"}, {"DAC", "CRL"}, {"MHH", "HBA"}, {"BRU", "EZE"}, {"GGT", "BNE"}, {"BZE", "AXA"}, {"BZE", "CRL"}, {"TBI", "CBR"}, {"CRL", "BGI"}, {"ASD", "JFK"}, {"DAC", "BIM"}, {"ELH", "BGI"}, {"MEL", "TBI"}, {"OOL", "ASD"}, {"CNS", "BZE"}, {"TIA", "ELH"}, {"ASD", "BNE"}, {"BNE", "ASD"}, {"TIA", "LST"}, {"AUA", "AXA"}, {"CRL", "DAC"}, {"BAK", "BIM"}, {"BGI", "BNE"}, {"ELH", "BZE"}, {"ANU", "GGT"}, {"ASD", "CBR"}, {"OOL", "BIM"}, {"TBI", "INN"}, {"BRU", "ELH"}, {"CRL", "TIA"}, {"PER", "ASD"}, {"TIA", "DAC"}, {"ADL", "AUA"}, {"TCB", "AUA"}, {"HBA", "BNE"}, {"BNE", "TIA"}, {"INN", "ANU"}, {"TBI", "ADL"}, {"ELH", "AXA"}, {"BGI", "ANU"}, {"TIA", "BAK"}, {"PER", "TBI"}, {"EZE", "MHH"}, {"BZE", "NAS"}, {"JFK", "BNE"}, {"BRU", "ASD"}, {"AUA", "CBR"}, {"NAS", "JFK"}, {"ELH", "BIM"}, {"BNE", "TBI"}, {"BAK", "CNS"}, {"BNE", "GGT"}, {"OOL", "PER"}, {"BNE", "BRU"}, {"MEL", "PER"}, {"BAH", "MEL"}, {"TCB", "CRL"}, {"CNS", "OOL"}, {"BZE", "VIE"}, {"ASD", "CRL"}, {"LST", "BZE"}, {"ANU", "BRU"}, {"AUA", "BRU"}, {"ASD", "BGI"}, {"AUA", "TCB"}, {"TCB", "CRL"}, {"SYD", "CRL"}, {"BRU", "HBA"}, {"DRW", "ASD"}, {"TCB", "FPO"}, {"TIA", "CRL"}, {"BZE", "CNS"}, {"ELH", "TCB"}, {"OOL", "CRL"}, {"CRL", "ELH"}, {"MEL", "ASD"}, {"ASD", "BIM"}, {"CRL", "JFK"}, {"DAC", "BNE"}, {"HBA", "JFK"}, {"NAS", "OOL"}, {"DAC", "CRL"}, {"ELH", "CNS"}, {"ASD", "ELH"}, {"DRW", "ELH"}, {"FPO", "BAK"}, {"OOL", "BAK"}, {"ELH", "OOL"}, {"ADL", "OOL"}, {"BNE", "INN"}, {"DAC", "TIA"}, {"INN", "NAS"}, {"BAH", "BNE"}, {"BAH", "JFK"}, {"AUA", "BIM"}, {"PER", "TIA"}, {"BZE", "ADL"}, {"BAK", "BNE"}, {"JFK", "PER"}, {"JFK", "AXA"}, {"GGT", "FPO"}, {"FPO", "MHH"}, {"ASD", "HBA"}, {"BNE", "INN"}, {"LST", "ANU"}, {"AXA", "BZE"}, {"JFK", "ANU"}, {"ASD", "LST"}, {"VIE", "EZE"}, {"ELH", "TBI"}, {"DAC", "TBI"}, {"DRW", "JFK"}, {"CRL", "TCB"}, {"TBI", "ASD"}, {"FPO", "AXA"}, {"NAS", "BAH"}, {"EZE", "DRW"}, {"AXA", "BAK"}, {"BIM", "JFK"}, {"JFK", "ASD"}, {"BZE", "HBA"}, {"LST", "DAC"}, {"AXA", "AUA"}, {"GGT", "TBI"}, {"CRL", "ELH"}, {"VIE", "BAH"}, {"BGI", "DAC"}, {"LST", "GGT"}, {"BNE", "GGT"}, {"CNS", "NAS"}, {"BNE", "BAK"}, {"ANU", "ELH"}, {"DRW", "AUA"}, {"ANU", "AUA"}};
+		ans = Solution().findItinerary(tickets);
+	}
+}
+namespace Jun_day28 // LC332 Reconstruct Itinerary
+{
+	class Solution {
+	private:
+		std::unordered_map<	std::string, std::map<std::string, int> > map;
+		int numTickets = 0;
+		std::vector<std::string> validRoute = {"JFK"};
+	public:
+		void dfs()
+		{
+			if (validRoute.size() == numTickets + 1) return;
+			auto current = validRoute.back();
+			for (auto it = map[current].begin(); it != map[current].end(); it++)
+			{
+				if (it->second > 0)
+				{
+					validRoute.push_back(it->first);
+					it->second--;
+					dfs();
+					if (validRoute.size() == numTickets + 1) return;
+					validRoute.pop_back();
+					it->second++;
+				}
+			}
+		}
+		std::vector<std::string> findItinerary(std::vector<std::vector<std::string>>& tickets)
+		{
+			for (const auto& vec : tickets)
+			{
+				map[vec[0]][vec[1]]++;
+				numTickets++;
+			}
+			dfs();
+			return validRoute;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<std::string>> tickets;
+		tickets.reserve(500);
+		std::vector<std::string> ans;
+
+		tickets = { {"JFK" ,"B"} ,{"JFK","B"},{"B","C"},{"B","D"},{"D","JFK"} };
+		ans = Solution().findItinerary(tickets);
+		tickets.clear();
+
+		tickets = { {"JFK","SFO"} ,{"JFK","ATL"},{"SFO","ATL"},{"ATL","JFK"},{"ATL","SFO"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"AXA","EZE"},{"EZE","AUA"},{"ADL","JFK"},{"ADL","TIA"},{"AUA","AXA"},{"EZE","TIA"},{"EZE","TIA"},{"AXA","EZE"},{"EZE","ADL"},{"ANU","EZE"},{"TIA","EZE"},{"JFK","ADL"},{"AUA","JFK"},{"JFK","EZE"},{"EZE","ANU"},{"ADL","AUA"},{"ANU","AXA"},{"AXA","ADL"},{"AUA","JFK"},{"EZE","ADL"},{"ANU","TIA"},{"AUA","JFK"},{"TIA","JFK"},{"EZE","AUA"},{"AXA","EZE"},{"AUA","ANU"},{"ADL","AXA"},{"EZE","ADL"},{"AUA","ANU"},{"AXA","EZE"},{"TIA","AUA"},{"AXA","EZE"},{"AUA","SYD"},{"ADL","JFK"},{"EZE","AUA"},{"ADL","ANU"},{"AUA","TIA"},{"ADL","EZE"},{"TIA","JFK"},{"AXA","ANU"},{"JFK","AXA"},{"JFK","ADL"},{"ADL","EZE"},{"AXA","TIA"},{"JFK","AUA"},{"ADL","EZE"},{"JFK","ADL"},{"ADL","AXA"},{"TIA","AUA"},{"AXA","JFK"},{"ADL","AUA"},{"TIA","JFK"},{"JFK","ADL"},{"JFK","ADL"},{"ANU","AXA"},{"TIA","AXA"},{"EZE","JFK"},{"EZE","AXA"},{"ADL","TIA"},{"JFK","AUA"},{"TIA","EZE"},{"EZE","ADL"},{"JFK","ANU"},{"TIA","AUA"},{"EZE","ADL"},{"ADL","JFK"},{"ANU","AXA"},{"AUA","AXA"},{"ANU","EZE"},{"ADL","AXA"},{"ANU","AXA"},{"TIA","ADL"},{"JFK","ADL"},{"JFK","TIA"},{"AUA","ADL"},{"AUA","TIA"},{"TIA","JFK"},{"EZE","JFK"},{"AUA","ADL"},{"ADL","AUA"},{"EZE","ANU"},{"ADL","ANU"},{"AUA","AXA"},{"AXA","TIA"},{"AXA","TIA"},{"ADL","AXA"},{"EZE","AXA"},{"AXA","JFK"},{"JFK","AUA"},{"ANU","ADL"},{"AXA","TIA"},{"ANU","AUA"},{"JFK","EZE"},{"AXA","ADL"},{"TIA","EZE"},{"JFK","AXA"},{"AXA","ADL"},{"EZE","AUA"},{"AXA","ANU"},{"ADL","EZE"},{"AUA","EZE"} };
+		ans = Solution().findItinerary(tickets);
+
+		tickets = { {"INN", "TIA"}, {"BIM", "BRU"}, {"VIE", "LST"}, {"OOL", "BAH"}, {"MEL", "CRL"}, {"CNS", "ADL"}, {"AUA", "OOL"}, {"HBA", "ASD"}, {"INN", "FPO"}, {"NAS", "BZE"}, {"DRW", "BRU"}, {"NAS", "BAK"}, {"ADL", "ASD"}, {"HBA", "OOL"}, {"BZE", "BAH"}, {"TBI", "FPO"}, {"CRL", "AUA"}, {"BGI", "TIA"}, {"TCB", "ELH"}, {"AUA", "AXA"}, {"MHH", "TBI"}, {"CNS", "BNE"}, {"INN", "GGT"}, {"DRW", "EZE"}, {"CRL", "SYD"}, {"BNE", "AXA"}, {"CNS", "ADL"}, {"BGI", "SYD"}, {"CNS", "VIE"}, {"GGT", "BNE"}, {"ELH", "BNE"}, {"BNE", "DAC"}, {"DRW", "CNS"}, {"PER", "CRL"}, {"ADL", "ASD"}, {"MHH", "ANU"}, {"ELH", "NAS"}, {"TIA", "ADL"}, {"DAC", "AUA"}, {"ADL", "DAC"}, {"CRL", "OOL"}, {"DAC", "NAS"}, {"BNE", "GGT"}, {"BAH", "DAC"}, {"SYD", "GGT"}, {"CRL", "ADL"}, {"TCB", "VIE"}, {"TBI", "BAK"}, {"BRU", "BNE"}, {"GGT", "ASD"}, {"MEL", "BZE"}, {"TBI", "BAK"}, {"ANU", "CNS"}, {"BIM", "MEL"}, {"ELH", "AUA"}, {"GGT", "SYD"}, {"AXA", "MHH"}, {"GGT", "ANU"}, {"CRL", "DAC"}, {"VIE", "BAH"}, {"JFK", "LST"}, {"TIA", "CRL"}, {"MHH", "DAC"}, {"OOL", "BZE"}, {"VIE", "ELH"}, {"DRW", "INN"}, {"EZE", "INN"}, {"ASD", "TBI"}, {"BAK", "BNE"}, {"BNE", "INN"}, {"BZE", "NAS"}, {"VIE", "CRL"}, {"ADL", "SYD"}, {"INN", "DRW"}, {"BRU", "BZE"}, {"BNE", "FPO"}, {"BIM", "DAC"}, {"JFK", "MEL"}, {"BAK", "BNE"}, {"BAK", "BZE"}, {"JFK", "ASD"}, {"BNE", "DRW"}, {"EZE", "ELH"}, {"ASD", "BGI"}, {"SYD", "TCB"}, {"AUA", "MHH"}, {"INN", "AUA"}, {"SYD", "OOL"}, {"ASD", "CRL"}, {"BNE", "BRU"}, {"MEL", "BGI"}, {"BIM", "CNS"}, {"BIM", "ASD"}, {"ASD", "MEL"}, {"SYD", "DAC"}, {"OOL", "VIE"}, {"ASD", "BNE"}, {"OOL", "DAC"}, {"LST", "TIA"}, {"AUA", "MEL"}, {"ASD", "DAC"}, {"ANU", "PER"}, {"DAC", "TBI"}, {"ASD", "BNE"}, {"BAK", "MEL"}, {"CBR", "OOL"}, {"BNE", "ADL"}, {"AXA", "ELH"}, {"CBR", "DRW"}, {"ADL", "LST"}, {"BAK", "INN"}, {"FPO", "SYD"}, {"DAC", "BNE"}, {"TBI", "EZE"}, {"AXA", "DAC"}, {"DAC", "EZE"}, {"NAS", "DRW"}, {"FPO", "DRW"}, {"BAH", "BNE"}, {"MEL", "BZE"}, {"LST", "CRL"}, {"EZE", "LST"}, {"TBI", "NAS"}, {"CBR", "BAK"}, {"NAS", "DAC"}, {"JFK", "ANU"}, {"TIA", "BNE"}, {"CRL", "NAS"}, {"SYD", "ELH"}, {"OOL", "BIM"}, {"AUA", "ASD"}, {"BZE", "EZE"}, {"BAK", "BRU"}, {"HBA", "BZE"}, {"BNE", "SYD"}, {"DAC", "TIA"}, {"BRU", "TCB"}, {"ANU", "OOL"}, {"ELH", "VIE"}, {"CRL", "DRW"}, {"ANU", "VIE"}, {"PER", "BIM"}, {"BIM", "JFK"}, {"DAC", "VIE"}, {"FPO", "TCB"}, {"AUA", "CNS"}, {"CRL", "FPO"}, {"BAK", "DAC"}, {"EZE", "ANU"}, {"NAS", "DRW"}, {"BZE", "HBA"}, {"BNE", "BAK"}, {"AXA", "AUA"}, {"VIE", "PER"}, {"DAC", "AUA"}, {"BIM", "MEL"}, {"DAC", "ASD"}, {"DAC", "CRL"}, {"MHH", "HBA"}, {"BRU", "EZE"}, {"GGT", "BNE"}, {"BZE", "AXA"}, {"BZE", "CRL"}, {"TBI", "CBR"}, {"CRL", "BGI"}, {"ASD", "JFK"}, {"DAC", "BIM"}, {"ELH", "BGI"}, {"MEL", "TBI"}, {"OOL", "ASD"}, {"CNS", "BZE"}, {"TIA", "ELH"}, {"ASD", "BNE"}, {"BNE", "ASD"}, {"TIA", "LST"}, {"AUA", "AXA"}, {"CRL", "DAC"}, {"BAK", "BIM"}, {"BGI", "BNE"}, {"ELH", "BZE"}, {"ANU", "GGT"}, {"ASD", "CBR"}, {"OOL", "BIM"}, {"TBI", "INN"}, {"BRU", "ELH"}, {"CRL", "TIA"}, {"PER", "ASD"}, {"TIA", "DAC"}, {"ADL", "AUA"}, {"TCB", "AUA"}, {"HBA", "BNE"}, {"BNE", "TIA"}, {"INN", "ANU"}, {"TBI", "ADL"}, {"ELH", "AXA"}, {"BGI", "ANU"}, {"TIA", "BAK"}, {"PER", "TBI"}, {"EZE", "MHH"}, {"BZE", "NAS"}, {"JFK", "BNE"}, {"BRU", "ASD"}, {"AUA", "CBR"}, {"NAS", "JFK"}, {"ELH", "BIM"}, {"BNE", "TBI"}, {"BAK", "CNS"}, {"BNE", "GGT"}, {"OOL", "PER"}, {"BNE", "BRU"}, {"MEL", "PER"}, {"BAH", "MEL"}, {"TCB", "CRL"}, {"CNS", "OOL"}, {"BZE", "VIE"}, {"ASD", "CRL"}, {"LST", "BZE"}, {"ANU", "BRU"}, {"AUA", "BRU"}, {"ASD", "BGI"}, {"AUA", "TCB"}, {"TCB", "CRL"}, {"SYD", "CRL"}, {"BRU", "HBA"}, {"DRW", "ASD"}, {"TCB", "FPO"}, {"TIA", "CRL"}, {"BZE", "CNS"}, {"ELH", "TCB"}, {"OOL", "CRL"}, {"CRL", "ELH"}, {"MEL", "ASD"}, {"ASD", "BIM"}, {"CRL", "JFK"}, {"DAC", "BNE"}, {"HBA", "JFK"}, {"NAS", "OOL"}, {"DAC", "CRL"}, {"ELH", "CNS"}, {"ASD", "ELH"}, {"DRW", "ELH"}, {"FPO", "BAK"}, {"OOL", "BAK"}, {"ELH", "OOL"}, {"ADL", "OOL"}, {"BNE", "INN"}, {"DAC", "TIA"}, {"INN", "NAS"}, {"BAH", "BNE"}, {"BAH", "JFK"}, {"AUA", "BIM"}, {"PER", "TIA"}, {"BZE", "ADL"}, {"BAK", "BNE"}, {"JFK", "PER"}, {"JFK", "AXA"}, {"GGT", "FPO"}, {"FPO", "MHH"}, {"ASD", "HBA"}, {"BNE", "INN"}, {"LST", "ANU"}, {"AXA", "BZE"}, {"JFK", "ANU"}, {"ASD", "LST"}, {"VIE", "EZE"}, {"ELH", "TBI"}, {"DAC", "TBI"}, {"DRW", "JFK"}, {"CRL", "TCB"}, {"TBI", "ASD"}, {"FPO", "AXA"}, {"NAS", "BAH"}, {"EZE", "DRW"}, {"AXA", "BAK"}, {"BIM", "JFK"}, {"JFK", "ASD"}, {"BZE", "HBA"}, {"LST", "DAC"}, {"AXA", "AUA"}, {"GGT", "TBI"}, {"CRL", "ELH"}, {"VIE", "BAH"}, {"BGI", "DAC"}, {"LST", "GGT"}, {"BNE", "GGT"}, {"CNS", "NAS"}, {"BNE", "BAK"}, {"ANU", "ELH"}, {"DRW", "AUA"}, {"ANU", "AUA"} };
+		ans = Solution().findItinerary(tickets);
+	}
+}
+namespace Jun_day30 // LC212 Word search II
+{
+	struct Node
+	{
+		Node* next[27] = { nullptr };
+	};
+	class Trie {
+	public:
+		Node* root;
+	public:
+		/** Initialize your data structure here. */
+		Trie()
+			:
+			root(new Node)
+		{}
+		void VisitAndDelete(Node* n)
+		{
+			for (size_t i = 0; i < 26; ++i)
+			{
+				if (n->next[i])
+				{
+					VisitAndDelete(n->next[i]);
+				}
+			}
+			delete n;
+			n = nullptr;
+		}
+		~Trie()
+		{
+			VisitAndDelete(root);
+			//delete root;
+			root = nullptr;
+		}
+		/** Inserts a word into the trie. */
+		void insert(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (!pRunner->next[word[i] - 'a'])
+				{
+					pRunner->next[word[i] - 'a'] = new Node;
+				}
+				pRunner = pRunner->next[word[i] - 'a'];
+			}
+			pRunner->next[26] = root;
+		}
+		/** Returns if the word is in the trie. */
+		bool search(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (pRunner->next[word[i] - 'a'])
+				{
+					pRunner = pRunner->next[word[i] - 'a'];
+				}
+				else return false;
+			}
+			if (pRunner->next[26]) return true;
+			return false;
+		}
+		/** Returns if there is any word in the trie that starts with the given prefix. */
+		bool startsWith(std::string prefix)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < prefix.size(); ++i)
+			{
+				if (pRunner->next[prefix[i] - 'a'])
+				{
+					pRunner = pRunner->next[prefix[i] - 'a'];
+				}
+				else return false;
+			}
+			return true;
+		}
+		int test(std::string str)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				if (pRunner->next[str[i] - 'a'])
+				{
+					pRunner = pRunner->next[str[i] - 'a'];
+				}
+				else return 0; // no prefix match
+			}
+			if (pRunner->next[26]) return 2; // word match
+			return 1; // prefix match
+		}
+	};
+	class Solution {
+	private: // data members
+		Trie* trie;
+		std::unordered_set<long long> visited;
+		std::unordered_set<std::string> matchedWords;
+		std::string wrd;
+	private: // data structures
+		struct Pos
+		{
+			int row;
+			int col;
+		};
+	private: // methods
+		static constexpr long long hash(const Pos& p)
+		{
+			return ((long long)p.row << 32 | p.col);
+		}
+		void dfs(const Pos curpos,std::vector<std::vector<char>>& board, std::vector<std::string>& words)
+		{
+			long long curposHash = hash(curpos);
+			const auto it = visited.insert(curposHash);
+			if (!it.second) return;
+			wrd += board[curpos.row][curpos.col];
+			
+			int test = trie->test(wrd);
+			if (test != 0) // wrd is prefix in Trie
+			{
+				if (test == 2) // wrd is match in Trie; add wrd to matchedWords 
+				{
+					matchedWords.insert(wrd);
+				}
+				// Continue DFS
+				if (curpos.row > 0)						dfs({ curpos.row - 1,curpos.col }, board, words); // Try NORTH
+				if (curpos.row < board.size() - 1)		dfs({ curpos.row + 1,curpos.col }, board, words); // Try SOUTH
+				if (curpos.col > 0)						dfs({ curpos.row,curpos.col - 1 }, board, words); // Try WEST
+				if (curpos.col < board[0].size() - 1)	dfs({ curpos.row,curpos.col + 1 }, board, words); // Try EAST
+			}																						  
+			// Back track
+			wrd.pop_back();
+			visited.erase(it.first);
+			return;
+		}
+	public: // interface
+		Solution()
+			:
+			trie(new Trie())
+		{}
+		std::vector<std::string> findWords(std::vector<std::vector<char>>& board, std::vector<std::string>& words) 
+		{
+			// Initialize and fill Trie
+			if (words.size() == 0 || board.size() == 0 || board[0].size() == 0) return {};
+			for (auto s : words) trie->insert(s);
+			
+			// DFS
+			for (int row = 0; row < board.size(); row++)
+			{
+				for (int col = 0; col < board[0].size(); col++)
+				{
+					Pos curpos({ row, col });
+					dfs(curpos,board,words);
+				}
+			}
+			return { matchedWords.begin(),matchedWords.end() };
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> board;
+		std::vector<std::string> words;
+		std::vector<std::string> ret;
+		
+		board = {
+			{'o','a','a','n'},
+			{'e','t','a','e'},
+			{'i','h','k','r'},
+			{'i','f','l','v'}
+		};
+		words = { "oathh","oathkree","oate","oatae" };
+		ret = Solution().findWords(board, words); // 2
+		
+		words = { "oathkr","oate","oatae" }; 
+		ret = Solution().findWords(board, words); // 3
+		
+		words = { "oet","oat" }; 
+		ret = Solution().findWords(board, words); // 2
+
+		board = { 
+			{'o'},
+			{'a'},
+			{'t'}
+		};
+		words = { "oat", "oa"};
+		ret = Solution().findWords(board, words); // 2
+
+		board = { {'a'},{'a'} };
+		words = { "a" };
+		ret = Solution().findWords(board, words); // 1
+
+		board = {
+			{'b', 'a', 'a', 'b', 'a', 'b'}, 
+			{'a', 'b', 'a', 'a', 'a', 'a'}, 
+			{'a', 'b', 'a', 'a', 'a', 'b'}, 
+			{'a', 'b', 'a', 'b', 'b', 'a'}, 
+			{'a', 'a', 'b', 'b', 'a', 'b'}, 
+			{'a', 'a', 'b', 'b', 'b', 'a'}, 
+			{'a', 'a', 'b', 'a', 'a', 'b'}};
+		words = { 
+			"bbaabaabaaaaabaababaaaaababb", 
+			"aabbaaabaaabaabaaaaaabbaaaba", 
+			"babaababbbbbbbaabaababaabaaa", 
+			"bbbaaabaabbaaababababbbbbaaa", 
+			"babbabbbbaabbabaaaaaabbbaaab", 
+			"bbbababbbbbbbababbabbbbbabaa", 
+			"babababbababaabbbbabbbbabbba", 
+			"abbbbbbaabaaabaaababaabbabba", 
+			"aabaabababbbbbbababbbababbaa", 
+			"aabbbbabbaababaaaabababbaaba", 
+			"ababaababaaabbabbaabbaabbaba", 
+			"abaabbbaaaaababbbaaaaabbbaab", 
+			"aabbabaabaabbabababaaabbbaab", 
+			"baaabaaaabbabaaabaabababaaaa", 
+			"aaabbabaaaababbabbaabbaabbaa", 
+			"aaabaaaaabaabbabaabbbbaabaaa", 
+			"abbaabbaaaabbaababababbaabbb", 
+			"baabaababbbbaaaabaaabbababbb", 
+			"aabaababbaababbaaabaabababab", 
+			"abbaaabbaabaabaabbbbaabbbbbb", 
+			"aaababaabbaaabbbaaabbabbabab", 
+			"bbababbbabbbbabbbbabbbbbabaa", 
+			"abbbaabbbaaababbbababbababba",
+			"bbbbbbbabbbababbabaabababaab", 
+			"aaaababaabbbbabaaaaabaaaaabb", 
+			"bbaaabbbbabbaaabbaabbabbaaba", 
+			"aabaabbbbaabaabbabaabababaaa", 
+			"abbababbbaababaabbababababbb", 
+			"aabbbabbaaaababbbbabbababbbb", 
+			"babbbaabababbbbbbbbbaabbabaa" };
+		ret = Solution().findWords(board, words); // 3
 	}
 }

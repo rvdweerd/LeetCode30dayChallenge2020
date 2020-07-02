@@ -14,6 +14,8 @@
 #include <limits>
 #include <algorithm>
 #include <numeric>
+#include "Vec3.h"
+#include "Vec2.h"
 
 namespace LC36 //  Is Valid Sudoko
 {
@@ -1570,6 +1572,160 @@ namespace Knapsack
 
 		vec = { {1,1},{3,4},{4,5},{5,7} }; // {size,value}
 		ans = Solution().maxValueDP(vec, 7); // max size/ ans: 9
+
+
+	}
+}
+namespace TriangleIntersect
+	//	This function calculates intersection points (vectors in R3) of two triangles (each defined by 3 vertices in R3)
+	//	Algorithm implmemented based on paper "A Fast Triangle-Triangle Intersection Test" by Tomas Moeller
+	//
+{
+	template <typename T> int sgn(T val) {
+		return (T(0) < val) - (val < T(0));
+	}
+	std::pair<Vec3,Vec3> TrianglesIntersect(Vec3& v1_0, Vec3& v1_1, Vec3& v1_2, const Vec3& v2_0, const Vec3& v2_1, const Vec3& v2_2)
+	{
+		// Plane equation for Plane2
+		Vec3 N2 = (v2_1 - v2_0) % (v2_2 - v2_0);
+		//N2 /= N2.Len();
+		float d2 = -N2 * v2_0;
+
+		// Plane equation for Plane1
+		Vec3 N1 = (v1_1 - v1_0) % (v1_2 - v1_0);
+		//N1 /= N1.Len();
+		float d1 = -N1 * v1_0;
+
+		// signed distances from T1 vertices to Plane2
+		float d_v1_0 = N2 * v1_0 + d2;
+		float d_v1_1 = N2 * v1_1 + d2;
+		float d_v1_2 = N2 * v1_2 + d2;
+		
+		// Test: triangle 1 is coplanar
+		assert(!(d_v1_0 == 0 && d_v1_1 == 0 && d_v1_2 == 0));
+
+		// Test: triangle 1 is not fully on 1 side of P2
+		bool NoT1VertexOnPlane2 = (d_v1_0 != 0 && d_v1_1 != 0 && d_v1_2 != 0);
+		bool T1DistancesHaveSameSign = (d_v1_0 > 0 && d_v1_1 > 0 && d_v1_2 > 0) || (d_v1_0 < 0 && d_v1_1 < 0 && d_v1_2 < 0);
+		assert(!(NoT1VertexOnPlane2 && T1DistancesHaveSameSign));
+		
+		// Ensure that v1_0 is solitary (two other vertices are on other side of T2)
+		if (sgn(d_v1_0) == sgn(d_v1_1))
+		{
+			std::swap(d_v1_0, d_v1_2);
+			//std::swap(v1_0, v1_2); NEED TO IMPLEMENT MOVE CONSTRUCTOR FOR Vec3 FOR THIS TO WORK
+			Vec3 tmp = v1_0;
+			v1_0 = v1_2;
+			v1_2 = tmp;
+			
+			// Plane equation for Plane2
+			N2 = (v2_1 - v2_0) % (v2_2 - v2_0);
+			//N2 /= N2.Len();
+			d2 = -N2 * v2_0;
+			// Plane equation for Plane1
+			N1 = (v1_1 - v1_0) % (v1_2 - v1_0);
+			//N1 /= N1.Len();
+			d1 = -N1 * v1_0;
+			// signed distances from T1 vertices to Plane2
+			//d_v1_0 = N2 * v1_0 + d2;
+			//d_v1_1 = N2 * v1_1 + d2;
+			//d_v1_2 = N2 * v1_2 + d2;
+		}
+		else if (sgn(d_v1_0) == sgn(d_v1_2))
+		{
+			std::swap(d_v1_0, d_v1_1);
+			Vec3 tmp = v1_0;
+			v1_0 = v1_1;
+			v1_1 = tmp;
+
+			// Plane equation for Plane2
+			N2 = (v2_1 - v2_0) % (v2_2 - v2_0);
+			//N2 /= N2.Len();
+			d2 = -N2 * v2_0;
+			// Plane equation for Plane1
+			N1 = (v1_1 - v1_0) % (v1_2 - v1_0);
+			//N1 /= N1.Len();
+			d1 = -N1 * v1_0;
+			// signed distances from T1 vertices to Plane2
+			//d_v1_0 = N2 * v1_0 + d2;
+			//d_v1_1 = N2 * v1_1 + d2;
+			//d_v1_2 = N2 * v1_2 + d2;
+		}
+
+		// Intersection line L = O + t*D (O = any point on line, D = direction), this represents the nullspace Ax=0)
+		Vec3 D = N1 % N2;
+		D /= D.Len();
+		// Particular point on line (Ax=b, particular solution)
+		// Find largest entry of D
+		Vec3 O;
+		if (abs(D.x) >= abs(D.y) && abs(D.x) >= abs(D.z)) // D.x largest component
+		{
+			float a = N1.y, b = N1.z;
+			float c = N2.y, d = N2.z;
+			float det = 1 / (a * d - b * c);
+			float O_y = det * (d * (-d1) - b * (-d2));
+			float O_z = det * (-c * (-d1) + a * (-d2));
+			O = { 0,O_y,O_z };
+		}
+		else if (abs(D.y) >= abs(D.x) && abs(D.y) >= abs(D.z)) // D.y largest component
+		{
+			float a = N1.x, b = N1.z;
+			float c = N2.x, d = N2.z;
+			float det = 1 / (a * d - b * c);
+			float O_x = det * (d * (-d1) - b * (-d2));
+			float O_z = det * (-c * (-d1) + a * (-d2));
+			O = { O_x,0,O_z };
+		} 
+		else // D.z largest component
+		{
+			float a = N1.x, b = N1.y;
+			float c = N2.x, d = N2.y;
+			float det = 1 / (a * d - b * c);
+			float O_x = det * (d * (-d1) - b * (-d2));
+			float O_y = det * (-c * (-d1) + a * (-d2));
+			O = { O_x,O_y,0 };
+		}
+		//assert(N1 * (O + D * 20) == -d1);
+		//assert(N2 * (O + D * 10) == -d2);
+		float test2_1 = N2 * (O + D * 10);
+		float test2_2 = test2_1 + d2;
+		if (test2_2 != -d2)
+		{
+			int k = 0;
+		}
+
+		// Project vertices of T1 onto Intersection Line L
+		Vec3 p_v1_0 = D * (D * (v1_0 - O)) / (D * D) + O;
+		Vec3 p_v1_1 = D * (D * (v1_1 - O)) / (D * D) + O;
+		Vec3 p_v1_2 = D * (D * (v1_2 - O)) / (D * D) + O;
+
+		// Interpolation to find t1
+		float S = abs((p_v1_1 - p_v1_0).Len());
+		float a = abs((p_v1_0 - v1_0).Len());
+		float b = abs((p_v1_1 - v1_1).Len());
+		float p = a * S / (b + a);
+		Vec3 t1 = p_v1_1 + (p_v1_0 - p_v1_1)*p;
+
+		// Interpolation to find t2
+		S = abs((p_v1_2 - p_v1_0).Len());
+		a = abs((p_v1_0 - v1_0).Len());
+		b = abs((p_v1_2 - v1_2).Len());
+		p = a * S / (b + a);
+		Vec3 t2 = p_v1_2 + (p_v1_0 - p_v1_2) * p;
+		return { t1,t2 };
+	}
+	void RunExample()
+	{
+		//Vec3 v1_0 = { -1,1,0 }, v1_1 = { 2,-2,-1 }, v1_2 = { 2,-2,1 }; // Triangle 1
+		//Vec3 v2_0 = { 1,1,-1 }, v2_1 = { 1,-2,0 }, v2_2 = { 1,1,1 };  // Triangle 2
+		Vec3 v1_0 = { 0.5f,-0.5f,2.0f }, v1_1 = { -0.5f,-0.5f,2.0f }, v1_2 = { 0.0f,0.5f,2.0f }; // Triangle 1
+		Vec3 v2_0 = { 0.35f,-0.215f,2.57f }, v2_1 = { -0.34f,-0.615f,2.0f }, v2_2 = { 0.0f,0.415f,1.715f };  // Triangle 2
+		
+		std::pair<Vec3,Vec3> ans = TrianglesIntersect(v1_1, v1_0, v1_2, v2_0, v2_1, v2_2);
+		ans = TrianglesIntersect(v1_0, v1_1, v1_2, v2_0, v2_1, v2_2);
+		ans = TrianglesIntersect(v1_0, v1_1, v1_2, v2_0, v2_2, v2_1);
+		ans = TrianglesIntersect(v1_0, v1_1, v1_2, v2_2, v2_1, v2_0);
+		ans = TrianglesIntersect(v1_2, v1_1, v1_0, v2_2, v2_1, v2_0);
 
 
 	}
