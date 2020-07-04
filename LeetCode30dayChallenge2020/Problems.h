@@ -1730,3 +1730,77 @@ namespace TriangleIntersect
 
 	}
 }
+namespace LC133 // Clone Graph
+{
+
+	class Node {
+	public:
+		int val;
+		std::vector<Node*> neighbors;
+
+		Node() {
+			val = 0;
+			neighbors = std::vector<Node*>();
+		}
+
+		Node(int _val) {
+			val = _val;
+			neighbors = std::vector<Node*>();
+		}
+
+		Node(int _val, std::vector<Node*> _neighbors) {
+			val = _val;
+			neighbors = _neighbors;
+		}
+	};
+
+	class Solution {
+	public:
+		std::set<Node*> visited;
+		std::map<int,Node*> created;
+		void traverse(Node* rt, Node* rt_cpy)
+		{
+			if (visited.find(rt) == visited.end())
+			{
+				visited.insert(rt);
+				for (Node* n : rt->neighbors)
+				{
+					if (created.find(n->val) == created.end())
+					{
+						rt_cpy->neighbors.push_back(new Node(n->val));
+						created[n->val] = rt_cpy->neighbors.back();
+					}
+					else
+					{
+						rt_cpy->neighbors.push_back(created[n->val]);
+					}
+					traverse(n, rt_cpy->neighbors.back());
+				}
+			}
+		}
+
+		Node* cloneGraph(Node* node) 
+		{
+			if (node == nullptr) return nullptr;
+			Node* new_root = new Node(node->val);
+			Node* new_root_cpy = new_root;
+			created[node->val] = new_root_cpy;
+			traverse(node, new_root_cpy);
+			return new_root;
+		}
+	};
+	void RunExample()
+	{
+		std::map<int, Node*> nodeMap;
+		nodeMap[1] = new Node(1);
+		nodeMap[2] = new Node(2);
+		nodeMap[3] = new Node(3);
+		nodeMap[4] = new Node(4);
+		
+		Node* root = nodeMap[1]; root->neighbors = {nodeMap[2],nodeMap[4]};
+		nodeMap[2]->neighbors = { nodeMap[1],nodeMap[3] };
+		nodeMap[3]->neighbors = { nodeMap[2],nodeMap[4] };
+		nodeMap[4]->neighbors = { nodeMap[1],nodeMap[3] };		
+		Node* root_cpy = Solution().cloneGraph(root);
+	}
+}
