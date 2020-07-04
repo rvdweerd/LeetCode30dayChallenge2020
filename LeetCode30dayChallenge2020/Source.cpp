@@ -115,11 +115,11 @@ size_t allocated=0;
 int main()
 {
 
-	Jul_day2::RunExample();
+	Jul_day4::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
 	//LC85::RunExample();
-	LC133::RunExample();
+	//LC133::RunExample();
 
 	//TestTriangleIntersections();
 	//auto p1 = FTTI::check_type_of_intersection({ 0,0,2 }, { 0, 2, 2 }, { 2, 1, 0 }, { 2,0,2 }, { 2,2,2 }, { 0,1,0 });
