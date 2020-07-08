@@ -132,13 +132,12 @@ namespace Jul_day8_duplicates
 		auto ans = Solution().threeSum(nums);
 	}
 }
-namespace Jul_day8 // 3Sum
+namespace Jul_day8
 {
 	class Solution {
 	public:
 		std::vector<std::vector<int>> threeSum(std::vector<int>& nums)
 		{
-			if (nums.size() < 3) return {};
 			std::vector<std::vector<int>> ans;
 			std::sort(nums.begin(), nums.end());
 			for (int i = 0; i < nums.size() - 2; i++)
@@ -148,15 +147,14 @@ namespace Jul_day8 // 3Sum
 				int l = i + 1; int r = nums.size() - 1;
 				while (l < r)
 				{
-					const int total = nums[l] + nums[r];
-					if (total == -nums[i])
+					if (nums[l] + nums[r] == -nums[i])
 					{
 						ans.push_back({ nums[i],nums[l],nums[r] });
 						while (l < r && nums[l+1] == nums[l]) l++; 
 						while (l < r && nums[r-1] == nums[r]) r--;
 						l++; r--;
 					}
-					else if (total < -nums[i])
+					else if (nums[l] + nums[r] < -nums[i])
 					{
 						while (l < r && nums[l + 1] == nums[l]) l++;
 						l++;
