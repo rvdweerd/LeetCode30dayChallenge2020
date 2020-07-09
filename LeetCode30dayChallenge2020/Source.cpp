@@ -115,7 +115,7 @@ size_t allocated=0;
 int main()
 {
 
-	Jul_day8::RunExample();
+	Jul_day9::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
 	//LC85::RunExample();
