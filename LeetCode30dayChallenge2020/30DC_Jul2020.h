@@ -177,3 +177,30 @@ namespace Jul_day8 // 3Sum
 		auto ans = Solution().threeSum(nums);
 	}
 }
+namespace Jul_day11
+{
+	class Solution {
+	public:
+		void fill(std::vector<std::vector<int>>& vec, const std::vector<int>& nums, std::vector<int> sofar, int i)
+		{
+			if (i == nums.size())
+			{
+				vec.push_back(sofar);
+				return;
+			}
+			fill(vec, nums, sofar, i + 1);
+			sofar.push_back(nums[i]);
+			fill(vec, nums, sofar, i + 1);
+		}
+		std::vector<std::vector<int>> subsets(const std::vector<int>& nums)
+		{
+			std::vector<std::vector<int>> retVec;
+			fill(retVec, nums, {}, 0);
+			return std::move(retVec);
+		}
+	};
+	void RunExample()
+	{
+		auto ans = Solution().subsets({ 1,2,3 });
+	}
+}
