@@ -177,6 +177,103 @@ namespace Jul_day8 // 3Sum
 		auto ans = Solution().threeSum(nums);
 	}
 }
+namespace Jul_day9 // LC662 Maximum width of binary tree
+{
+	struct TreeNode {
+		int val;
+		TreeNode* left;
+		TreeNode* right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode* left, TreeNode* right) : val(x), left(left), right(right) {}
+	};
+
+	class Solution {
+	public:
+		struct Data
+		{
+			int l = INT_MAX;
+			int r = INT_MIN;
+		};
+		std::unordered_map<int, Data> map;
+		int max_w = 0;
+		void traverse(TreeNode* node, int d, int pos)
+		{
+			if (pos > 1300000000) pos = 1;
+			if (!node) return;
+			const int L_min = std::min(map[d].l, pos);
+			const int R_max = std::max(map[d].r, pos);
+			//map[d].l = std::min(map[d].l,pos);
+			//map[d].r = std::max(map[d].r,pos);
+
+			map[d].l = L_min;
+			map[d].r = R_max;
+			max_w = std::max(max_w, R_max - L_min);
+			traverse(node->left, d + 1, 2 * pos);
+			traverse(node->right, d + 1, 2 * pos + 1);
+		}
+		int widthOfBinaryTree(TreeNode* root)
+		{
+			traverse(root, 0, 0);
+			int ans = 0;
+			//for (auto p:map)
+			//{
+			//    ans=std::max(ans,p.second.r-p.second.l);
+			// }
+			//return ans+1;
+			return max_w + 1;
+		}
+	};
+	void RunExample()
+	{
+		TreeNode* root = new TreeNode(1, nullptr, new TreeNode(3));
+		root->right->left = new TreeNode(5);
+		root->right->right = new TreeNode(3);
+		//TreeNode* root = new TreeNode(1, nullptr, new TreeNode(3));
+		//root->right->right = new TreeNode(10, new TreeNode(0),nullptr);
+		int ans = Solution().widthOfBinaryTree(root);
+	}
+}
+namespace Jul_day10 // Flatten a Multilevel Doubly Linked List
+{
+	class Node {
+	public:
+		int val;
+		Node* prev;
+		Node* next;
+		Node* child;
+	};
+	class Solution {
+	public:
+		void connectChild(Node* node)
+		{
+			Node* pReconnect = node->next;
+			node->next = node->child;
+			node->child = nullptr;
+			node->next->prev = node;
+			Node* pLastChild = traverse(node->next);
+			pLastChild->next = pReconnect;
+			if (pReconnect) pReconnect->prev = pLastChild;
+		}
+		Node* traverse(Node* node)
+		{
+			if (!node) return nullptr;
+			while (true)
+			{
+				while (node->child == nullptr && node->next != nullptr) node = node->next;
+				if (node->child) connectChild(node);
+				if (node->next == nullptr) break;
+			}
+			return node;
+		}
+
+		Node* flatten(Node* head)
+		{
+			traverse(head);
+			return head;
+		}
+	};
+}
 namespace Jul_day11
 {
 	class Solution {
