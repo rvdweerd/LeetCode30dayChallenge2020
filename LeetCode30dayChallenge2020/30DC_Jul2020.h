@@ -301,3 +301,35 @@ namespace Jul_day11
 		auto ans = Solution().subsets({ 1,2,3 });
 	}
 }
+namespace Jul_day12 // Reverse bits
+{
+	class Solution {
+	private:
+		std::vector<uint32_t> masks{1u};
+	public:
+		Solution()
+		{
+			//masks.push_back(1u);
+			for (size_t i = 0; i < 32-1; i++)
+			{
+				masks.push_back(masks[i] << 1);
+			}
+		}
+		uint32_t reverseBits(uint32_t n) 
+		{
+			uint32_t ans = 0;
+			for (size_t i = 1; n>0; n>>=1, i++)
+			{
+				if (n & 1) ans |= masks[32-i];
+			}
+			return ans;
+		}
+	};
+	void RunExample()
+	{
+		auto ans = Solution().reverseBits(43261596u);
+		ans = Solution().reverseBits(4294967293u);
+		ans = Solution().reverseBits(0u);
+
+	}
+}
