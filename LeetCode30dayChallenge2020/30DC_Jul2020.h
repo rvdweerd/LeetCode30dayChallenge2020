@@ -333,3 +333,43 @@ namespace Jul_day12 // Reverse bits
 
 	}
 }
+namespace Jul_day17 //LC347 Top K Frequent Elements
+{
+	class Solution
+	{
+	public:
+		std::vector<int> topKFrequent(std::vector<int>& nums, int k)
+		{
+			std::unordered_map<int, int> map;
+			for (auto v : nums)
+			{
+				map[v]++;
+			}
+			std::multimap<int, int> mm;
+			for (auto it = map.begin(); it != map.end(); ++it)
+			{
+				mm.insert({ it->second,it->first });
+			}
+			std::vector<int> vec;
+			for (size_t i =0 ; i < k; i++)
+			{
+				vec.push_back(std::prev(mm.end(), i+1)->second);
+			}
+			return vec;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> vec;
+		std::vector<int> ans;
+
+		vec = { 1,1,1,2,2,3 };
+		ans = Solution().topKFrequent(vec,2);
+
+		vec = { 1 };
+		ans = Solution().topKFrequent(vec, 1);
+
+		vec = {  };
+		ans = Solution().topKFrequent(vec, 0);
+	}
+}
