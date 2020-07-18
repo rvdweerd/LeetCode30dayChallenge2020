@@ -373,3 +373,72 @@ namespace Jul_day17 //LC347 Top K Frequent Elements
 		ans = Solution().topKFrequent(vec, 0);
 	}
 }
+namespace Jul_day18
+{
+	class Solution {
+	private:	
+		bool canFinish(int numCourses, std::vector<std::vector<int>>& prerequisites)
+		{
+			Graph<int> graphT(prerequisites);
+			Graph<int> graph = graphT.GetInverse();
+			auto g = graph.StronglyConnectedComponents();
+			for (auto v : g)
+			{
+				if (v.size() > 1) return false;
+			}
+			return true;
+		}
+		void dfs(int i)
+		{
+			visited.insert(i);
+			for (int v : nodeList[i])
+			{
+				if (visited.find(v) == visited.end())
+				{
+					dfs(v);
+				}
+				//arr[current_last] = i;
+				//current_last--;
+			}
+			arr[current_last++] = i;
+			//current_last++;
+		}
+		int current_last;
+		std::set<int> visited;
+		std::vector<int> arr;
+		std::map<int, std::vector<int>> nodeList;
+	public:
+		std::vector<int> findOrder(int numCourses, std::vector<std::vector<int>>& prerequisites) 
+		{	
+			if (!canFinish(numCourses, prerequisites)) return {};
+			arr.resize(numCourses, 0);
+			current_last = 0;// numCourses - 1;
+			for (auto vec : prerequisites)
+			{
+				nodeList[vec[0]].push_back(vec[1]);
+			}
+
+			for (int i = 0; i < numCourses; i++)
+			{
+				if (visited.find(i) == visited.end())
+				{
+					dfs(i);
+				}
+			}
+			return arr;
+			//return { arr.rbegin(),arr.rend() };
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec;
+		std::vector<int> ans;
+
+		vec = { {1,0},{2,0},{3,1},{3,2} ,{1,2} };
+		ans = Solution().findOrder(4, vec); // 0,2,1,3
+
+		vec = { {1,0},{2,0},{2,1},{4,1},{3,2},{3,4} };
+		ans = Solution().findOrder(5, vec); // 0,1,4,2,3 or 0,1,2,4,3
+
+	}
+}
