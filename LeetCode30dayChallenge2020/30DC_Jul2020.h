@@ -504,6 +504,136 @@ namespace Jul_day18
 
 	}
 }
+namespace Jul_day18_kosaraju
+{
+	class Solution {
+
+	private: 
+		// Graph representation
+		std::vector<std::vector<int>> out;
+		std::vector<std::vector<int>> in;
+		// SCC data
+		std::vector<std::vector<int>> allSCC;
+		std::vector<int> curSCC;
+		int countSCC=0;
+		// Bookkeeping data for Kosaraju
+		std::stack<int> fTimesStack;
+		int t = 0;
+		std::vector<int> visited;
+		bool AbortIfCircFound = false;
+		bool CircFound = false;
+	private:
+		void dfs(int n, int mode) // [mode = 1]:Traverse normal, [mode = -1]:Traverse inverted
+		{
+			if (AbortIfCircFound && CircFound) return;
+			visited[n]=mode;
+			if (mode == 1)
+			{
+				for (int vert : out[n])
+				{
+					if (visited[vert] != mode)
+					{
+						dfs(vert, mode);
+					}
+				}
+			}
+			else if (mode == -1)
+			{
+				curSCC.push_back(n);
+				if (curSCC.size() > 1) CircFound = true;
+				for (int vert : in[n])
+				{
+					if (visited[vert] != mode)
+					{
+						dfs(vert, mode);
+					}
+				}
+			}
+			else assert(false);
+			fTimesStack.push(n);
+		}
+	public:
+		int nSCC(int nVerts, std::vector<std::vector<int>>& edges)
+		{
+			// Initialize graph
+			out.resize(nVerts);
+			in.resize(nVerts);
+			for (const auto& vec : edges)
+			{
+				out[vec[1]].push_back(vec[0]);
+				in[vec[0]].push_back(vec[1]);
+			}
+
+			// Kosaraju 1st pass (on G)
+			visited.resize(nVerts, 0);
+			for (int i = nVerts - 1; i >= 0; i--)
+			{
+				if (visited[i] != 1)
+				{
+					dfs(i,1);
+				}
+			}
+			// Kosaraju 2nd pass (on inv(G))
+			while (!fTimesStack.empty())
+			{
+				int i = fTimesStack.top(); fTimesStack.pop();
+				if (visited[i] != -1)
+				{
+					dfs(i,-1);
+					allSCC.push_back(curSCC);
+					countSCC++;
+					curSCC.clear();
+				}
+			}
+			return countSCC;
+		}
+		bool hasCirculants(int nVerts, std::vector<std::vector<int>>& edges)
+		{
+			// Initialize graph
+			out.resize(nVerts);
+			in.resize(nVerts);
+			for (const auto& vec : edges)
+			{
+				out[vec[1]].push_back(vec[0]);
+				in[vec[0]].push_back(vec[1]);
+			}
+
+			// Kosaraju 1st pass (on G)
+			visited.resize(nVerts, 0);
+			for (int i = nVerts - 1; i >= 0; i--)
+			{
+				if (visited[i] != 1)
+				{
+					dfs(i, 1);
+				}
+			}
+			// Kosaraju 2nd pass (on inv(G))
+			AbortIfCircFound = true;
+			while (!fTimesStack.empty())
+			{
+				int i = fTimesStack.top(); fTimesStack.pop();
+				if (visited[i] != -1)
+				{
+					dfs(i, -1);
+					if (CircFound) return true;
+					//allSCC.push_back(curSCC);
+					//countSCC++;
+					curSCC.clear();
+				}
+			}
+			return false;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec;
+		std::vector<int> ans;
+
+		vec = { {7,1},{4,7},{1,4},{9,7},{9,3},{3,6},{6,9},{8,6},{2,8},{5,2},{8,5},{1,0} };
+		int nSCC = Solution().nSCC(10,vec); // 4 Strongly Connected Components
+		bool circFound = Solution().hasCirculants(10, vec);
+	}
+}
 namespace Jul_day19 // LC67 Add Binary
 {
 	class Solution {
