@@ -446,38 +446,30 @@ namespace Jul_day18_ineff
 namespace Jul_day18
 {
 	class Solution {
-	private:
-		struct PayLoad
-		{
-			std::vector<int> out;
-			int inDegree = 0;
-		};
-		std::unordered_map<int, PayLoad> nodeList;
-		std::vector<int> arr;
-		std::stack<int> stack;
+	
 	public:
 		std::vector<int> findOrder(int numCourses, std::vector<std::vector<int>>& prerequisites)
 		{
-			for (int i = 0; i < numCourses; i++)
+			std::vector<std::vector<int>> out(numCourses);
+			std::vector<int> inDegree(numCourses,0);
+			std::vector<int> arr; arr.reserve(numCourses);
+			std::stack<int> stack;			
+			for (const auto& vec : prerequisites)
 			{
-				nodeList[i];
+				inDegree[vec[0]]++;
+				out[vec[1]].push_back(vec[0]);
 			}
-			for (auto vec : prerequisites)
+			for (size_t i = 0; i<numCourses; i++)
 			{
-				nodeList[vec[0]].inDegree++;
-				nodeList[vec[1]].out.push_back(vec[0]);
-			}
-			for (auto n : nodeList)
-			{
-				if (!n.second.inDegree) stack.push(n.first);
+				if (inDegree[i]==0) stack.push(i);
 			}
 			while (!stack.empty())
 			{
 				const int orphanNode = stack.top(); stack.pop();
 				arr.push_back(orphanNode);
-				for (int n : nodeList[orphanNode].out)
+				for (int n : out[orphanNode])
 				{
-					if (nodeList[n].inDegree-- == 1)
+					if (--inDegree[n] == 0)
 					{
 						stack.push(n);
 					}
@@ -497,6 +489,9 @@ namespace Jul_day18
 
 		vec = {  };
 		ans = Solution().findOrder(1, vec); // 0
+
+		vec = {  };
+		ans = Solution().findOrder(2, vec); // 1,0 or 0,1
 
 		vec = { {1,0},{2,0},{3,1},{3,2} ,{1,2} };
 		ans = Solution().findOrder(4, vec); // 0,2,1,3
