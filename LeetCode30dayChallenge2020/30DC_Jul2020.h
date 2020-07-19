@@ -373,7 +373,7 @@ namespace Jul_day17 //LC347 Top K Frequent Elements
 		ans = Solution().topKFrequent(vec, 0);
 	}
 }
-namespace Jul_day18
+namespace Jul_day18_ineff
 {
 	class Solution {
 	private:	
@@ -409,6 +409,8 @@ namespace Jul_day18
 		std::map<int, std::vector<int>> nodeList;
 	public:
 		std::vector<int> findOrder(int numCourses, std::vector<std::vector<int>>& prerequisites) 
+			// Performs topological sort by following DFS (with outer loop) to end nodes that are not visited yet
+			// (can be improvedd by integrating Kosaraju into the main loop instead of pre-check)
 		{	
 			if (!canFinish(numCourses, prerequisites)) return {};
 			arr.resize(numCourses, 0);
@@ -426,7 +428,6 @@ namespace Jul_day18
 				}
 			}
 			return arr;
-			//return { arr.rbegin(),arr.rend() };
 		}
 	};
 	void RunExample()
@@ -436,6 +437,72 @@ namespace Jul_day18
 
 		vec = { {1,0},{2,0},{3,1},{3,2} ,{1,2} };
 		ans = Solution().findOrder(4, vec); // 0,2,1,3
+
+		vec = { {1,0},{2,0},{2,1},{4,1},{3,2},{3,4} };
+		ans = Solution().findOrder(5, vec); // 0,1,4,2,3 or 0,1,2,4,3
+
+	}
+}
+namespace Jul_day18
+{
+	class Solution {
+	private:
+		struct PayLoad
+		{
+			std::vector<int> out;
+			int inDegree = 0;
+		};
+		std::unordered_map<int, PayLoad> nodeList;
+		std::vector<int> arr;
+		std::stack<int> stack;
+	public:
+		std::vector<int> findOrder(int numCourses, std::vector<std::vector<int>>& prerequisites)
+		{
+			for (int i = 0; i < numCourses; i++)
+			{
+				nodeList[i];
+			}
+			for (auto vec : prerequisites)
+			{
+				nodeList[vec[0]].inDegree++;
+				nodeList[vec[1]].out.push_back(vec[0]);
+			}
+			for (auto n : nodeList)
+			{
+				if (!n.second.inDegree) stack.push(n.first);
+			}
+			while (!stack.empty())
+			{
+				const int orphanNode = stack.top(); stack.pop();
+				arr.push_back(orphanNode);
+				for (int n : nodeList[orphanNode].out)
+				{
+					if (nodeList[n].inDegree-- == 1)
+					{
+						stack.push(n);
+					}
+				}
+			}
+			if (arr.size() == numCourses) return arr;
+			else return {};
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> vec;
+		std::vector<int> ans;
+
+		vec = { {1,0} };
+		ans = Solution().findOrder(2, vec); // 0,1
+
+		vec = {  };
+		ans = Solution().findOrder(1, vec); // 0
+
+		vec = { {1,0},{2,0},{3,1},{3,2} ,{1,2} };
+		ans = Solution().findOrder(4, vec); // 0,2,1,3
+
+		vec = { {0,4}, {1,0},{0,2},{3,1},{3,2} ,{2,1} };
+		ans = Solution().findOrder(5, vec); // {}
 
 		vec = { {1,0},{2,0},{2,1},{4,1},{3,2},{3,4} };
 		ans = Solution().findOrder(5, vec); // 0,1,4,2,3 or 0,1,2,4,3
