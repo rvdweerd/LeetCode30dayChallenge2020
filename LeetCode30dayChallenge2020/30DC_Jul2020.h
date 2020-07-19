@@ -504,3 +504,112 @@ namespace Jul_day18
 
 	}
 }
+namespace Jul_day19 // LC67 Add Binary
+{
+	class Solution {
+	private:
+		std::vector<int> base;
+		std::string ToBin(unsigned int n, int min_digits = 0)
+		{
+			std::string bin_str;
+			for (int count = 0; n != 0 || count < min_digits; n >>= 1, count++)
+			{
+				bin_str.push_back(bool(n & 0b1) ? '1' : '0');
+			}
+			std::reverse(bin_str.begin(), bin_str.end());
+			return bin_str;
+		}
+		int ToInt(std::string bin_str)
+		{
+			int total = 0;
+			size_t base_index = 0;
+			while (bin_str.size() > 0)
+			{
+				total += (bin_str.back() - '0') * base[base_index++];
+				bin_str.pop_back();
+			}
+			return total;
+		}
+	public:
+		Solution()
+		{
+			base.resize(32);
+			base[0] = 1;
+			for (size_t i = 1; i < 31; i++)
+			{
+				base[i] = 2 * base[i - 1];
+			}
+		}
+		std::string addBinary2(std::string a, std::string b)
+		{
+			if (a.size() < 33 && b.size() < 33) return ToBin(ToInt(a) + ToInt(b), 1);
+			else return "Can't process >32 bit input";
+		}
+		std::string addBinary(std::string a, std::string b)
+		{
+			std::string out;
+			char remain = 0;
+			char ch_a, ch_b;
+			int i_a = a.size() - 1;
+			int i_b = b.size() - 1;
+			while (i_a >= 0 || i_b >= 0)
+			{
+				if (i_a >= 0) ch_a = a[i_a--] - '0'; else ch_a = 0;
+				if (i_b >= 0) ch_b = b[i_b--] - '0'; else ch_b = 0;
+				if (ch_a + ch_b == 0)
+				{
+					out += ('0' + remain);
+					remain = 0;
+				}
+				else if (ch_a + ch_b == 1)
+				{
+					if (remain == 0) out += '1';
+					else out += '0';
+				}
+				else
+				{
+					if (remain == 0)
+					{
+						out += '0';
+						remain = 1;
+					}
+					else
+					{
+						out += '1';
+					}
+				}
+			}
+			if (remain == 1) out += '1';
+			std::reverse(out.begin(), out.end());
+			return out;
+		}
+	};
+	void RunExample()
+	{
+		Solution s;
+
+		std::string a; 
+		std::string b; 
+		std::string ans; 
+
+		a = "0";
+		b = "0";
+		ans = s.addBinary2(a, b);
+		ans = s.addBinary(a, b); // 0
+
+		a = "10100000100100110110010000010101111011011001101110111111111101000000101111001110001111100001101";
+		b = "110101001011101110001111100110001010100001101011101010000011011011001011101111001100000011011110011";
+		ans = s.addBinary(a, b); // "110111101100010011000101110110100000011101000101011001000011011000001100011110011010010011000000000"
+		ans = s.addBinary2(a, b);
+
+		a = "11";
+		b = "1";
+		ans = s.addBinary2(a, b);
+		ans = s.addBinary(a, b); // 100
+
+		a = "1010";
+		b = "1011";
+		ans = s.addBinary2(a, b);
+		ans = s.addBinary(a, b); // 10101
+	}
+}
