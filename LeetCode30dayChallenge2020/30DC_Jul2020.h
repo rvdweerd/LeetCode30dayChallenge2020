@@ -743,3 +743,44 @@ namespace Jul_day19 // LC67 Add Binary
 		ans = s.addBinary(a, b); // 10101
 	}
 }
+namespace Jul_day20 // LC203 Remove Linked List Elements
+{
+	struct ListNode {
+		int val;
+		ListNode *next;
+		ListNode() : val(0), next(nullptr) {}
+		ListNode(int x) : val(x), next(nullptr) {}
+		ListNode(int x, ListNode *next) : val(x), next(next) {}
+	};
+
+	class Solution {
+	public:
+		ListNode* removeElements(ListNode* head, int val)
+		{
+			if (!head) return nullptr;
+			while (head && head->val == val)
+			{
+				ListNode* tmp = head;
+				head = head->next;
+				delete tmp;
+			}
+			ListNode* pRunner = head;
+			while (pRunner)
+			{
+				if (pRunner->next && pRunner->next->val == val)
+				{
+					ListNode* tmp = pRunner->next;
+					pRunner->next = pRunner->next->next;
+					delete tmp;
+				}
+				pRunner = pRunner->next;
+			}
+			return head;
+		}
+	};
+	void RunExample()
+	{
+		ListNode* head = new ListNode(1);
+		ListNode* ans = Solution().removeElements(head,2);
+	}
+}
