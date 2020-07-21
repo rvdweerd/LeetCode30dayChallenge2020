@@ -747,10 +747,10 @@ namespace Jul_day20 // LC203 Remove Linked List Elements
 {
 	struct ListNode {
 		int val;
-		ListNode *next;
+		ListNode* next;
 		ListNode() : val(0), next(nullptr) {}
 		ListNode(int x) : val(x), next(nullptr) {}
-		ListNode(int x, ListNode *next) : val(x), next(next) {}
+		ListNode(int x, ListNode* next) : val(x), next(next) {}
 	};
 
 	class Solution {
@@ -781,46 +781,87 @@ namespace Jul_day20 // LC203 Remove Linked List Elements
 	void RunExample()
 	{
 		ListNode* head = new ListNode(1);
-		ListNode* ans = Solution().removeElements(head,2);
+		ListNode* ans = Solution().removeElements(head, 2);
 	}
-
-	namespace Jul_day21
+}
+namespace Jul_day21
+{
+	class Solution
 	{
-		class Solution {
-		private:
-			struct Pos
+	private:
+		struct Pos
+		{
+			int y;
+			int x;
+			int i;
+		};
+		long long Hash(Pos& p)
+		{
+			return ((((long long)p.y) << 32) | p.x);
+		}
+	public:
+		bool exist(std::vector<std::vector<char>>& board, std::string word)
+		{
+			if (word.size() == 0) return true;
+			if (board.size() == 0 || board[0].size() == 0) return false;
+			for (int row = 0; row < board.size(); row++)
 			{
-				int y;
-				int x;
-				int i;
-			}
-			long long Hash(Pos& p)
-			{
-				return ((((long long)p.y) << 32) | p.x);
-			}
-		public:
-			bool exist(vector<vector<char>>& board, string word)
-			{
-				for (int row = 0; row < board.size(); row++)
+				for (int col = 0; col < board[0].size(); col++)
 				{
-					for (int col = 0; col < board[0].size(); col++)
+					if (board[row][col] == word[0])
 					{
-						if (board[row][col] == word[0])
+						std::set<long long> visited;
+						std::stack<Pos> stack;
+						stack.push({ row,col,0 });
+						while (!stack.empty())
 						{
-							std::set<long long> visited;
-							std::stack<Pos> stack;
-							stack.push({ row,col,1 });
-							while (!stack.emtpy())
-							{
-								Pos curPos = stack.top(); stack.pop();
-								visited.insert(Hash(curPos));
-								if (row > 0 &&)
-
-							}
+							Pos curPos = stack.top(); stack.pop();
+							if (visited.find(Hash(curPos)) != visited.end()) continue;
+							if (curPos.i == word.size() - 1) return true;
+							visited.insert(Hash(curPos));
+							if (curPos.y > 0 && board[curPos.y - 1][curPos.x] == word[curPos.i + 1]) stack.push({ curPos.y - 1,curPos.x,curPos.i + 1 });
+							if (curPos.y < board.size() - 1 && board[curPos.y + 1][curPos.x] == word[curPos.i + 1]) stack.push({ curPos.y + 1,curPos.x,curPos.i + 1 });
+							if (curPos.x > 0 && board[curPos.y][curPos.x - 1] == word[curPos.i + 1]) stack.push({ curPos.y,curPos.x - 1,curPos.i + 1 });
+							if (curPos.x < board[0].size() - 1 && board[curPos.y][curPos.x + 1] == word[curPos.i + 1]) stack.push({ curPos.y,curPos.x + 1,curPos.i + 1 });
 						}
 					}
 				}
-			}
-		};
 
+			}
+			return false;
+		}
+
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<char>> board;
+		std::string word;
+		bool ans;
+
+		board = {
+			{'s','e','s'},
+			{'s','t','e'},
+			{'a','d','s'}
+		};
+		word = "test";
+		ans = Solution().exist(board, word);
+
+		board = {
+			{'A','B','C','E'},
+			{'S','F','C','S'},
+			{'A','D','E','E'}
+		};
+		word = "ABCB";
+		ans = Solution().exist(board, word);
+
+		board = {
+			{'A','B','C','E'},
+			{'S','F','E','S'},
+			{'A','D','E','E'}
+		};
+		word = "ABCESEEEFS";
+		ans = Solution().exist(board, word); // TRUE
+
+		int k = 0;
 	}
+}
