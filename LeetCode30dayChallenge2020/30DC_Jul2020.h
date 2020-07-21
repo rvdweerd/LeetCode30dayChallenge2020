@@ -783,4 +783,44 @@ namespace Jul_day20 // LC203 Remove Linked List Elements
 		ListNode* head = new ListNode(1);
 		ListNode* ans = Solution().removeElements(head,2);
 	}
-}
+
+	namespace Jul_day21
+	{
+		class Solution {
+		private:
+			struct Pos
+			{
+				int y;
+				int x;
+				int i;
+			}
+			long long Hash(Pos& p)
+			{
+				return ((((long long)p.y) << 32) | p.x);
+			}
+		public:
+			bool exist(vector<vector<char>>& board, string word)
+			{
+				for (int row = 0; row < board.size(); row++)
+				{
+					for (int col = 0; col < board[0].size(); col++)
+					{
+						if (board[row][col] == word[0])
+						{
+							std::set<long long> visited;
+							std::stack<Pos> stack;
+							stack.push({ row,col,1 });
+							while (!stack.emtpy())
+							{
+								Pos curPos = stack.top(); stack.pop();
+								visited.insert(Hash(curPos));
+								if (row > 0 &&)
+
+							}
+						}
+					}
+				}
+			}
+		};
+
+	}
