@@ -784,20 +784,45 @@ namespace Jul_day20 // LC203 Remove Linked List Elements
 		ListNode* ans = Solution().removeElements(head, 2);
 	}
 }
-namespace Jul_day21
+namespace Jul_day21 // LC79 Word Search
 {
 	class Solution
 	{
 	private:
-		struct Pos
+		//std::unordered_set<long long> visited;
+		//inline long long Hash(int y, int x)
+		//{
+		//	return ((((long long)y) << 32) | x);
+		//}
+		//void Mark(int y, int x)
+		//{
+		//	visited.insert(Hash(y, x));
+		//}
+		//void Unmark(int y, int x)
+		//{
+		//	visited.erase(Hash(y, x));
+		//}
+		//bool NotVisited(int y, int x)
+		//{
+		//	return (visited.find(Hash(y, x)) == visited.end());
+		//}
+		bool dfs(int y, int x, int i, std::vector<std::vector<char>>& board, std::string& word)
 		{
-			int y;
-			int x;
-			int i;
-		};
-		long long Hash(Pos& p)
-		{
-			return ((((long long)p.y) << 32) | p.x);
+			if (i == word.size() - 1) return true;
+			std::vector<std::pair<int,int>> availableNeighbors;
+			if ( y > 0					 && board[y - 1][x] == word[i + 1] ) availableNeighbors.push_back({ y - 1, x }); // CHECK NORTH
+			if ( y < board.size() - 1	 && board[y + 1][x] == word[i + 1] ) availableNeighbors.push_back({ y + 1, x }); // CHECK SOUTH
+			if ( x > 0					 && board[y][x - 1] == word[i + 1] ) availableNeighbors.push_back({ y, x - 1 }); // CHECK WEST
+			if ( x < board[0].size() - 1 && board[y][x + 1] == word[i + 1] ) availableNeighbors.push_back({ y, x + 1 }); // CHECK EAST
+
+			for (auto p : availableNeighbors)
+			{
+				char tmp = board[p.first][p.second];
+				board[p.first][p.second] = '0'; // mark
+				if (dfs(p.first, p.second, i + 1, board, word)) return true;
+				board[p.first][p.second] = tmp; // unmark
+			}
+			return false;
 		}
 	public:
 		bool exist(std::vector<std::vector<char>>& board, std::string word)
@@ -808,29 +833,18 @@ namespace Jul_day21
 			{
 				for (int col = 0; col < board[0].size(); col++)
 				{
-					if (board[row][col] == word[0])
+					char tmp = board[row][col];
+					if (tmp == word[0])
 					{
-						std::set<long long> visited;
-						std::stack<Pos> stack;
-						stack.push({ row,col,0 });
-						while (!stack.empty())
-						{
-							Pos curPos = stack.top(); stack.pop();
-							if (visited.find(Hash(curPos)) != visited.end()) continue;
-							if (curPos.i == word.size() - 1) return true;
-							visited.insert(Hash(curPos));
-							if (curPos.y > 0 && board[curPos.y - 1][curPos.x] == word[curPos.i + 1]) stack.push({ curPos.y - 1,curPos.x,curPos.i + 1 });
-							if (curPos.y < board.size() - 1 && board[curPos.y + 1][curPos.x] == word[curPos.i + 1]) stack.push({ curPos.y + 1,curPos.x,curPos.i + 1 });
-							if (curPos.x > 0 && board[curPos.y][curPos.x - 1] == word[curPos.i + 1]) stack.push({ curPos.y,curPos.x - 1,curPos.i + 1 });
-							if (curPos.x < board[0].size() - 1 && board[curPos.y][curPos.x + 1] == word[curPos.i + 1]) stack.push({ curPos.y,curPos.x + 1,curPos.i + 1 });
-						}
+						board[row][col]='0'; // mark
+						if (dfs(row,col,0, board, word)) return true;
+						board[row][col]=tmp; // unmark
 					}
 				}
 
 			}
 			return false;
 		}
-
 	};
 	void RunExample()
 	{
@@ -841,10 +855,10 @@ namespace Jul_day21
 		board = {
 			{'s','e','s'},
 			{'s','t','e'},
-			{'a','d','s'}
+			{'a','t','s'}
 		};
 		word = "test";
-		ans = Solution().exist(board, word);
+		ans = Solution().exist(board, word); // TRUE
 
 		board = {
 			{'A','B','C','E'},
@@ -852,7 +866,7 @@ namespace Jul_day21
 			{'A','D','E','E'}
 		};
 		word = "ABCB";
-		ans = Solution().exist(board, word);
+		ans = Solution().exist(board, word); // FALSE
 
 		board = {
 			{'A','B','C','E'},
