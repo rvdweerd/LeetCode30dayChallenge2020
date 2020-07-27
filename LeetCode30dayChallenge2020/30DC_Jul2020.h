@@ -809,11 +809,11 @@ namespace Jul_day21 // LC79 Word Search
 		bool dfs(int y, int x, int i, std::vector<std::vector<char>>& board, std::string& word)
 		{
 			if (i == word.size() - 1) return true;
-			std::vector<std::pair<int,int>> availableNeighbors;
-			if ( y > 0					 && board[y - 1][x] == word[i + 1] ) availableNeighbors.push_back({ y - 1, x }); // CHECK NORTH
-			if ( y < board.size() - 1	 && board[y + 1][x] == word[i + 1] ) availableNeighbors.push_back({ y + 1, x }); // CHECK SOUTH
-			if ( x > 0					 && board[y][x - 1] == word[i + 1] ) availableNeighbors.push_back({ y, x - 1 }); // CHECK WEST
-			if ( x < board[0].size() - 1 && board[y][x + 1] == word[i + 1] ) availableNeighbors.push_back({ y, x + 1 }); // CHECK EAST
+			std::vector<std::pair<int, int>> availableNeighbors;
+			if (y > 0 && board[y - 1][x] == word[i + 1]) availableNeighbors.push_back({ y - 1, x }); // CHECK NORTH
+			if (y < board.size() - 1 && board[y + 1][x] == word[i + 1]) availableNeighbors.push_back({ y + 1, x }); // CHECK SOUTH
+			if (x > 0 && board[y][x - 1] == word[i + 1]) availableNeighbors.push_back({ y, x - 1 }); // CHECK WEST
+			if (x < board[0].size() - 1 && board[y][x + 1] == word[i + 1]) availableNeighbors.push_back({ y, x + 1 }); // CHECK EAST
 
 			for (auto p : availableNeighbors)
 			{
@@ -836,9 +836,9 @@ namespace Jul_day21 // LC79 Word Search
 					char tmp = board[row][col];
 					if (tmp == word[0])
 					{
-						board[row][col]='0'; // mark
-						if (dfs(row,col,0, board, word)) return true;
-						board[row][col]=tmp; // unmark
+						board[row][col] = '0'; // mark
+						if (dfs(row, col, 0, board, word)) return true;
+						board[row][col] = tmp; // unmark
 					}
 				}
 
@@ -877,5 +877,116 @@ namespace Jul_day21 // LC79 Word Search
 		ans = Solution().exist(board, word); // TRUE
 
 		int k = 0;
+	}
+}
+namespace Jul_day27 // LC Construct Binary Tree from Inorder and Postorder Traversal
+{
+
+ 
+	struct TreeNode {
+		int val;
+		TreeNode *left;
+		TreeNode *right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	};
+	void PrintPre(TreeNode* tree)
+	{
+		if (!tree) return;
+		std::cout << tree->val << ",";
+		PrintPre(tree->left);
+		PrintPre(tree->right);
+	}
+	void PrintIn(TreeNode* tree)
+	{
+		if (!tree) return;
+		PrintIn(tree->left);
+		std::cout << tree->val << ",";
+		PrintIn(tree->right);
+	}
+	void PrintPost(TreeNode* tree)
+	{
+		if (!tree) return;
+		PrintPost(tree->left);
+		PrintPost(tree->right);
+		std::cout << tree->val << ",";
+	}
+	void Print(TreeNode* tree)
+	{
+		std::cout << "Pre:  ["; PrintPre(tree); std::cout << "]"<<std::endl;
+		std::cout << "In:   ["; PrintIn(tree); std::cout << "]" << std::endl;
+		std::cout << "Post: ["; PrintPost(tree); std::cout << "]" << std::endl;
+	}
+	class Solution {
+	private:
+		std::stack<TreeNode*> stack;
+		inline TreeNode* UnrollRight(TreeNode* n, std::vector<int>& postorder, int& i)
+		{
+			n->right = new TreeNode(postorder[i]);
+			n = n->right;
+			stack.push(n);
+			i--;
+			return n;
+		}
+		inline TreeNode* UnrollLeft(TreeNode* n, std::vector<int>& postorder, int& i)
+		{
+			n->left= new TreeNode(postorder[i]);
+			n = n->left;
+			stack.push(n);
+			i--;
+			return n;
+		}
+
+	public:
+		TreeNode* buildTree(std::vector<int>& inorder, std::vector<int>& postorder) 
+		{
+			int i = postorder.size() - 1; int j = i;
+			TreeNode* master = new TreeNode();
+			TreeNode* ptr = master;
+
+			if (i == 0) return nullptr;
+			ptr = UnrollRight(ptr, postorder, i);
+			
+			while (i >= 0)
+			{
+				while (!stack.empty() && stack.top()->val != inorder[j])
+				{
+					ptr = UnrollRight(ptr, postorder, i);
+				}
+				while (!stack.empty() && inorder[j] == stack.top()->val)
+				{
+					ptr = stack.top(); stack.pop();
+					j--;
+				}
+				if (i >= 0)
+				{
+					ptr = UnrollLeft(ptr, postorder, i);
+				}
+			}
+			ptr = master->right;
+			delete master;
+			return ptr;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> inorder = {3,2,1,5,7,9,4,6,10,8,11};
+		std::vector<int> postorder = {3,2,9,7,5,10,11,8,6,4,1};
+
+		TreeNode* tree = new TreeNode(1, new TreeNode(2, new TreeNode(3), nullptr), new TreeNode(4, new TreeNode(5), new TreeNode(6)));
+		tree->right->left->right = new TreeNode(7, nullptr, new TreeNode(9));
+		tree->right->right->right = new TreeNode(8, new TreeNode(10), new TreeNode(11));
+		Print(tree);
+
+		TreeNode* ans = Solution().buildTree(inorder, postorder);
+
+		TreeNode* tree2 = new TreeNode(1, nullptr, new TreeNode(2));
+		Print(tree2);
+
+		inorder = { 1,2 };
+		postorder = { 2,1 };
+		ans = Solution().buildTree(inorder, postorder);
+
 	}
 }
