@@ -1088,3 +1088,343 @@ namespace Jul_day28 // LC621 Task Scheduler
 		
 	}
 }
+namespace Jul_day30_LC139
+{
+	struct Node
+	{
+		Node* next[27] = { nullptr };
+	};
+	class Trie 
+	{
+	public:
+		Node* root;
+	public:
+		/** Initialize your data structure here. */
+		Trie()
+			:
+			root(new Node)
+		{}
+		void VisitAndDelete(Node* n)
+		{
+			for (size_t i = 0; i < 26; ++i)
+			{
+				if (n->next[i])
+				{
+					VisitAndDelete(n->next[i]);
+				}
+			}
+			delete n;
+			n = nullptr;
+		}
+		~Trie()
+		{
+			VisitAndDelete(root);
+			//delete root;
+			root = nullptr;
+		}
+		/** Inserts a word into the trie. */
+		void insert(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (!pRunner->next[word[i] - 'a'])
+				{
+					pRunner->next[word[i] - 'a'] = new Node;
+				}
+				pRunner = pRunner->next[word[i] - 'a'];
+			}
+			pRunner->next[26] = root;
+		}
+		/** Returns if the word is in the trie. */
+		bool search(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (pRunner->next[word[i] - 'a'])
+				{
+					pRunner = pRunner->next[word[i] - 'a'];
+				}
+				else return false;
+			}
+			if (pRunner->next[26]) return true;
+			return false;
+		}
+		/** Returns if there is any word in the trie that starts with the given prefix. */
+		bool startsWith(std::string prefix)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < prefix.size(); ++i)
+			{
+				if (pRunner->next[prefix[i] - 'a'])
+				{
+					pRunner = pRunner->next[prefix[i] - 'a'];
+				}
+				else return false;
+			}
+			return true;
+		}
+		int test(std::string str)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				if (pRunner->next[str[i] - 'a'])
+				{
+					pRunner = pRunner->next[str[i] - 'a'];
+				}
+				else return 0; // no prefix match
+			}
+			if (pRunner->next[26]) return 2; // word match
+			return 1; // prefix match
+		}
+	};
+	class Solution 
+	{
+	private:
+		Trie trie;
+		std::vector<int> cache;
+	public:
+		bool canDesect(std::string s)
+		{
+			if ((s.size()) == 0) return true;
+			if (cache[s.size()-1] == 0) return false;
+			std::string test;
+			bool subres = false;
+			for (size_t i = 0; i < s.size(); i++)
+			{
+				test += s[i];
+				if (trie.test(test) == 2)
+				{
+					std::cout << test << ",";
+					std::string sub = s.substr(i+1, s.size());
+					subres = canDesect(sub);
+					if (subres) return true;
+				}
+			}
+			std::cout << '\n';
+			cache[s.size()-1] = 0;
+			return false;
+
+		}
+		bool wordBreak(std::string s, std::vector<std::string>& wordDict) 
+		{
+			cache = std::vector<int>(s.size(), -1);
+			for (auto str : wordDict)
+			{
+				trie.insert(str);
+			}
+			return canDesect(s);
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::string> wordDict;
+		std::string s;
+		bool ans;
+	
+		wordDict = { "leet","code"};
+		s = "leetcode";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+		
+		wordDict = { "apple","pen"};
+		s = "applepenapple";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+
+		wordDict = { "cats","dog","sand","and","cat" };
+		s = "catsandog";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+
+		wordDict = { "a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa" };
+		s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+	}
+}
+namespace Jul_day30
+{
+	struct Node
+	{
+		Node* next[27] = { nullptr };
+	};
+	class Trie
+	{
+	public:
+		Node* root;
+	public:
+		/** Initialize your data structure here. */
+		Trie()
+			:
+			root(new Node)
+		{}
+		void VisitAndDelete(Node* n)
+		{
+			for (size_t i = 0; i < 26; ++i)
+			{
+				if (n->next[i])
+				{
+					VisitAndDelete(n->next[i]);
+				}
+			}
+			delete n;
+			n = nullptr;
+		}
+		~Trie()
+		{
+			VisitAndDelete(root);
+			//delete root;
+			root = nullptr;
+		}
+		/** Inserts a word into the trie. */
+		void insert(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (!pRunner->next[word[i] - 'a'])
+				{
+					pRunner->next[word[i] - 'a'] = new Node;
+				}
+				pRunner = pRunner->next[word[i] - 'a'];
+			}
+			pRunner->next[26] = root;
+		}
+		/** Returns if the word is in the trie. */
+		bool search(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (pRunner->next[word[i] - 'a'])
+				{
+					pRunner = pRunner->next[word[i] - 'a'];
+				}
+				else return false;
+			}
+			if (pRunner->next[26]) return true;
+			return false;
+		}
+		/** Returns if there is any word in the trie that starts with the given prefix. */
+		bool startsWith(std::string prefix)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < prefix.size(); ++i)
+			{
+				if (pRunner->next[prefix[i] - 'a'])
+				{
+					pRunner = pRunner->next[prefix[i] - 'a'];
+				}
+				else return false;
+			}
+			return true;
+		}
+		int test(std::string str)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				if (pRunner->next[str[i] - 'a'])
+				{
+					pRunner = pRunner->next[str[i] - 'a'];
+				}
+				else return 0; // no prefix match
+			}
+			if (pRunner->next[26]) return 2; // word match
+			return 1; // prefix match
+		}
+	};
+	class Solution
+	{
+	private:
+		Trie trie;
+		std::vector<int> cache;
+		std::vector<std::string> returnVec;
+	public:
+		bool canDesect(std::string s)
+		{
+			if ((s.size()) == 0) return true;
+			if (cache[s.size() - 1] == 0) return false;
+			std::string test;
+			bool subres = false;
+			for (size_t i = 0; i < s.size(); i++)
+			{
+				test += s[i];
+				if (trie.test(test) == 2)
+				{
+					std::cout << test << ",";
+					std::string sub = s.substr(i + 1, s.size());
+					subres = canDesect(sub);
+					if (subres) return true;
+				}
+			}
+			cache[s.size() - 1] = 0;
+			return false;
+		}
+		void Segment(std::string s, int tracker)
+		{
+			std::string test;
+			for (size_t i = tracker; i < s.size(); i++)
+			{
+				test += s[i];
+				if (trie.test(test) == 2)
+				{
+					if (i == s.size()-1)
+					{
+						returnVec.push_back(s);
+					}
+					else
+					{
+						s.insert(i + 1, 1, ' ');
+						Segment(s, i + 2);
+						s.erase(i + 1, 1);
+					}
+				}
+			}
+		}
+		std::vector<std::string> wordBreak(std::string s, std::vector<std::string>& wordDict)
+		{
+			if (wordDict.size() == 0) return {};
+			cache = std::vector<int>(s.size(), -1);
+			for (auto str : wordDict)
+			{
+				trie.insert(str);
+			}
+			if (canDesect(s))
+			{
+				Segment(s, 0);
+			}
+			return returnVec;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::string> wordDict;
+		std::string s;
+		std::vector<std::string> ans;
+
+		wordDict = { "a","aa","aaa" };
+		s = "aaaaaaaaaab";
+		ans = Solution().wordBreak(s, wordDict);
+
+		wordDict = { "a", "b","cc" };
+		s = "abcc";
+		ans = Solution().wordBreak(s, wordDict);
+
+		wordDict = { "cats","dog","sand","and","cat" };
+		s = "catsanddog";
+		ans = Solution().wordBreak(s, wordDict);
+
+
+		wordDict = { "leet","code" };
+		s = "leetcode";
+		ans = Solution().wordBreak(s, wordDict);
+
+		wordDict = { "apple","pen" };
+		s = "applepenapple";
+		ans = Solution().wordBreak(s, wordDict);
+	}
+}
