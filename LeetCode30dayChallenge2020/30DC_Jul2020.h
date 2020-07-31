@@ -1428,3 +1428,62 @@ namespace Jul_day30
 		ans = Solution().wordBreak(s, wordDict);
 	}
 }
+namespace Jul_day31
+{
+	class Solution {
+	public:
+		void DiagonalMatrixExponential2x2(double arr[],int k)
+		{
+			arr[0] = std::pow(arr[0], k);
+			arr[3] = std::pow(arr[3], k);
+			return;
+		}
+		double* MatrixMultiplication2x2(double A[], double B[])
+		{
+			double* C = new double[4];
+			C[0] = A[0] * B[0] + A[1] * B[2];
+			C[1] = A[0] * B[1] + A[1] * B[3];
+			C[2] = A[2] * B[0] + A[3] * B[2];
+			C[3] = A[2] * B[1] + A[3] * B[3];
+			return C;
+		}
+		double* MatrixInverse2x2(double* A)
+		{
+			double* Inv = new double[4];
+			double invdet = 1 / (A[0] * A[3] - A[1] * A[2]);
+			Inv[0] =  A[3] * invdet;
+			Inv[1] = -A[1] * invdet;
+			Inv[2] = -A[2] * invdet;
+			Inv[3] =  A[1] * invdet;
+			return Inv;
+		}
+		double* VectorMatrixMultiplication2x2(double A[], double x[])
+		{
+			double* C = new double[2];
+			C[0] = A[0] * x[0] + A[1] * x[1];
+			C[1] = A[2] * x[0] + A[3] * x[1];
+			return C;
+		}
+		int climbStairs(int n) 
+		{
+			double f1 = 0.5 + 0.5 * sqrt(5);
+			double f2 = f1-sqrt(5);
+			double L[4] = { f1,0,0,f2 };
+			double X[4] = { 1,1,-f2,-f1};
+			DiagonalMatrixExponential2x2(L,n);
+			double* Xinv = MatrixInverse2x2(X);
+			double* C = MatrixMultiplication2x2(L,Xinv);
+			double* D = MatrixMultiplication2x2(X, C);
+			double u0[2] = { 1,0 };
+			double* un = VectorMatrixMultiplication2x2(D, u0);
+			int ans = (int)(un[0] + 0.0000001);
+			delete[] Xinv,C,D,un;
+			return ans;
+		}
+	};
+	void RunExample()
+	{
+		int n = 12;
+		int ans = Solution().climbStairs(n);
+	}
+}
