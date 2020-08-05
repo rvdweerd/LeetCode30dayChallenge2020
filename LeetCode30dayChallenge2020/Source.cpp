@@ -14,7 +14,8 @@
 //#include "30DC_Apr2020.h"
 //#include "30DC_May2020.h"
 //#include "30DC_Jun2020.h"
-#include "30DC_Jul2020.h"
+//#include "30DC_Jul2020.h"
+#include "30DC_Aug2020.h"
 //#include "GraphClass.h" 
 //#include "FTTI.h"
 //#include "FTI.h" 
@@ -115,7 +116,7 @@ size_t allocated=0;
 int main()
 {
 
-	Jul_day28::RunExample();
+	Aug_day5::RunExample();
 	//Knapsack::RunExample();
 	//Karatsuba::RunExample();
 	//LC85::RunExample();
