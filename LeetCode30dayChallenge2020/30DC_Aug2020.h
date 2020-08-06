@@ -89,3 +89,47 @@ namespace Aug_day5
 
 	}
 }
+namespace Aug_day6
+{
+	class Solution {
+		int tmp;
+		int n;
+	public:
+		std::vector<int> findDuplicates(std::vector<int>& nums)
+		{
+			std::vector<int> out;
+			for (size_t i = 0; i < nums.size(); i++)
+			{
+				if (nums[i] > 0)
+				{
+					n = nums[i];
+					nums[i] = 0;
+					while (nums[n - 1] > 0)
+					{
+						tmp = nums[n - 1];
+						nums[n - 1] = -1;
+						n = tmp; 
+					}
+					if (nums[n - 1]--==-1) out.push_back(n);
+				}
+			}
+			return std::move(out);
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> nums;
+		std::vector<int> ans;
+		nums = { 4,3,2,7,8,2,3,1 };
+		ans = Solution().findDuplicates(nums); //{2,3}
+
+		nums = { 1,1 };
+		ans = Solution().findDuplicates(nums); // {1}
+
+		nums = { 1 };
+		ans = Solution().findDuplicates(nums); // {}
+
+		nums = { };
+		ans = Solution().findDuplicates(nums); // {}
+	}
+}
