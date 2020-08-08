@@ -50,5 +50,11 @@
     <ClInclude Include="FTI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="30DC_Jul2020.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="30DC_Aug2020.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

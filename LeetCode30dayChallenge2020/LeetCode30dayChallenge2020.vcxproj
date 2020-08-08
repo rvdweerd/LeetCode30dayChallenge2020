@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="30DC_Apr2020.h" />
+    <ClInclude Include="30DC_Aug2020.h" />
     <ClInclude Include="30DC_Jul2020.h" />
     <ClInclude Include="30DC_Jun2020.h" />
     <ClInclude Include="30DC_May2020.h" />

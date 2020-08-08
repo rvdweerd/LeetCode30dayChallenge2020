@@ -784,20 +784,45 @@ namespace Jul_day20 // LC203 Remove Linked List Elements
 		ListNode* ans = Solution().removeElements(head, 2);
 	}
 }
-namespace Jul_day21
+namespace Jul_day21 // LC79 Word Search
 {
 	class Solution
 	{
 	private:
-		struct Pos
+		//std::unordered_set<long long> visited;
+		//inline long long Hash(int y, int x)
+		//{
+		//	return ((((long long)y) << 32) | x);
+		//}
+		//void Mark(int y, int x)
+		//{
+		//	visited.insert(Hash(y, x));
+		//}
+		//void Unmark(int y, int x)
+		//{
+		//	visited.erase(Hash(y, x));
+		//}
+		//bool NotVisited(int y, int x)
+		//{
+		//	return (visited.find(Hash(y, x)) == visited.end());
+		//}
+		bool dfs(int y, int x, int i, std::vector<std::vector<char>>& board, std::string& word)
 		{
-			int y;
-			int x;
-			int i;
-		};
-		long long Hash(Pos& p)
-		{
-			return ((((long long)p.y) << 32) | p.x);
+			if (i == word.size() - 1) return true;
+			std::vector<std::pair<int, int>> availableNeighbors;
+			if (y > 0 && board[y - 1][x] == word[i + 1]) availableNeighbors.push_back({ y - 1, x }); // CHECK NORTH
+			if (y < board.size() - 1 && board[y + 1][x] == word[i + 1]) availableNeighbors.push_back({ y + 1, x }); // CHECK SOUTH
+			if (x > 0 && board[y][x - 1] == word[i + 1]) availableNeighbors.push_back({ y, x - 1 }); // CHECK WEST
+			if (x < board[0].size() - 1 && board[y][x + 1] == word[i + 1]) availableNeighbors.push_back({ y, x + 1 }); // CHECK EAST
+
+			for (auto p : availableNeighbors)
+			{
+				char tmp = board[p.first][p.second];
+				board[p.first][p.second] = '0'; // mark
+				if (dfs(p.first, p.second, i + 1, board, word)) return true;
+				board[p.first][p.second] = tmp; // unmark
+			}
+			return false;
 		}
 	public:
 		bool exist(std::vector<std::vector<char>>& board, std::string word)
@@ -808,29 +833,18 @@ namespace Jul_day21
 			{
 				for (int col = 0; col < board[0].size(); col++)
 				{
-					if (board[row][col] == word[0])
+					char tmp = board[row][col];
+					if (tmp == word[0])
 					{
-						std::set<long long> visited;
-						std::stack<Pos> stack;
-						stack.push({ row,col,0 });
-						while (!stack.empty())
-						{
-							Pos curPos = stack.top(); stack.pop();
-							if (visited.find(Hash(curPos)) != visited.end()) continue;
-							if (curPos.i == word.size() - 1) return true;
-							visited.insert(Hash(curPos));
-							if (curPos.y > 0 && board[curPos.y - 1][curPos.x] == word[curPos.i + 1]) stack.push({ curPos.y - 1,curPos.x,curPos.i + 1 });
-							if (curPos.y < board.size() - 1 && board[curPos.y + 1][curPos.x] == word[curPos.i + 1]) stack.push({ curPos.y + 1,curPos.x,curPos.i + 1 });
-							if (curPos.x > 0 && board[curPos.y][curPos.x - 1] == word[curPos.i + 1]) stack.push({ curPos.y,curPos.x - 1,curPos.i + 1 });
-							if (curPos.x < board[0].size() - 1 && board[curPos.y][curPos.x + 1] == word[curPos.i + 1]) stack.push({ curPos.y,curPos.x + 1,curPos.i + 1 });
-						}
+						board[row][col] = '0'; // mark
+						if (dfs(row, col, 0, board, word)) return true;
+						board[row][col] = tmp; // unmark
 					}
 				}
 
 			}
 			return false;
 		}
-
 	};
 	void RunExample()
 	{
@@ -841,10 +855,10 @@ namespace Jul_day21
 		board = {
 			{'s','e','s'},
 			{'s','t','e'},
-			{'a','d','s'}
+			{'a','t','s'}
 		};
 		word = "test";
-		ans = Solution().exist(board, word);
+		ans = Solution().exist(board, word); // TRUE
 
 		board = {
 			{'A','B','C','E'},
@@ -852,7 +866,7 @@ namespace Jul_day21
 			{'A','D','E','E'}
 		};
 		word = "ABCB";
-		ans = Solution().exist(board, word);
+		ans = Solution().exist(board, word); // FALSE
 
 		board = {
 			{'A','B','C','E'},
@@ -863,5 +877,643 @@ namespace Jul_day21
 		ans = Solution().exist(board, word); // TRUE
 
 		int k = 0;
+	}
+}
+namespace Jul_day27 // LC Construct Binary Tree from Inorder and Postorder Traversal
+{
+
+ 
+	struct TreeNode {
+		int val;
+		TreeNode *left;
+		TreeNode *right;
+		TreeNode() : val(0), left(nullptr), right(nullptr) {}
+		TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+		TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+	};
+	void PrintPre(TreeNode* tree)
+	{
+		if (!tree) return;
+		std::cout << tree->val << ",";
+		PrintPre(tree->left);
+		PrintPre(tree->right);
+	}
+	void PrintIn(TreeNode* tree)
+	{
+		if (!tree) return;
+		PrintIn(tree->left);
+		std::cout << tree->val << ",";
+		PrintIn(tree->right);
+	}
+	void PrintPost(TreeNode* tree)
+	{
+		if (!tree) return;
+		PrintPost(tree->left);
+		PrintPost(tree->right);
+		std::cout << tree->val << ",";
+	}
+	void Print(TreeNode* tree)
+	{
+		std::cout << "Pre:  ["; PrintPre(tree); std::cout << "]"<<std::endl;
+		std::cout << "In:   ["; PrintIn(tree); std::cout << "]" << std::endl;
+		std::cout << "Post: ["; PrintPost(tree); std::cout << "]" << std::endl;
+	}
+	class Solution {
+	private:
+		std::stack<TreeNode*> stack;
+		inline TreeNode* UnrollRight(TreeNode* n, std::vector<int>& postorder, int& i)
+		{
+			n->right = new TreeNode(postorder[i]);
+			n = n->right;
+			stack.push(n);
+			i--;
+			return n;
+		}
+		inline TreeNode* UnrollLeft(TreeNode* n, std::vector<int>& postorder, int& i)
+		{
+			n->left= new TreeNode(postorder[i]);
+			n = n->left;
+			stack.push(n);
+			i--;
+			return n;
+		}
+
+	public:
+		TreeNode* buildTree(std::vector<int>& inorder, std::vector<int>& postorder) 
+		{
+			int i = postorder.size() - 1; int j = i;
+			TreeNode* master = new TreeNode();
+			TreeNode* ptr = master;
+
+			if (i == 0) return nullptr;
+			ptr = UnrollRight(ptr, postorder, i);
+			
+			while (i >= 0)
+			{
+				while (!stack.empty() && stack.top()->val != inorder[j])
+				{
+					ptr = UnrollRight(ptr, postorder, i);
+				}
+				while (!stack.empty() && inorder[j] == stack.top()->val)
+				{
+					ptr = stack.top(); stack.pop();
+					j--;
+				}
+				if (i >= 0)
+				{
+					ptr = UnrollLeft(ptr, postorder, i);
+				}
+			}
+			ptr = master->right;
+			delete master;
+			return ptr;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<int> inorder = {3,2,1,5,7,9,4,6,10,8,11};
+		std::vector<int> postorder = {3,2,9,7,5,10,11,8,6,4,1};
+
+		TreeNode* tree = new TreeNode(1, new TreeNode(2, new TreeNode(3), nullptr), new TreeNode(4, new TreeNode(5), new TreeNode(6)));
+		tree->right->left->right = new TreeNode(7, nullptr, new TreeNode(9));
+		tree->right->right->right = new TreeNode(8, new TreeNode(10), new TreeNode(11));
+		Print(tree);
+
+		TreeNode* ans = Solution().buildTree(inorder, postorder);
+
+		TreeNode* tree2 = new TreeNode(1, nullptr, new TreeNode(2));
+		Print(tree2);
+
+		inorder = { 1,2 };
+		postorder = { 2,1 };
+		ans = Solution().buildTree(inorder, postorder);
+
+	}
+}
+namespace Jul_day28 // LC621 Task Scheduler
+{
+	class Solution
+	{
+	public:
+		struct Job
+		{
+			char ch;
+			int n;
+			int t_last;
+		};
+		struct cmp
+		{
+			bool operator()(const Job& left, const Job& right) const
+			{
+				return (left.n < right.n);
+
+			}
+		};
+		std::priority_queue<Job, std::vector<Job>, cmp> pqueue;
+		std::queue<Job> temp;
+		std::map<char, int> map;
+	public:
+		int leastInterval(std::vector<char>& tasks, int n)
+		{
+			for (char c : tasks)
+			{
+				map[c]++;
+			}
+			for (auto p : map)
+			{
+				pqueue.push(Job{ p.first, p.second, -1 });
+			}
+			int t = 0;
+			while (!pqueue.empty())
+			{
+				int incr = INT_MAX;
+				int queueSize = pqueue.size();
+				bool hit = false;
+				auto cur = pqueue.top(); pqueue.pop();
+				while (!hit)
+				{
+					if (cur.t_last < t)
+					{
+						hit = true;
+						//std::cout << "t=" << t << "," << cur.ch << ",";
+						// count++;
+						if (cur.n > 1)
+						{
+							pqueue.push({ cur.ch, cur.n - 1, t + n });
+						}
+						//cur = pqueue.top(); pqueue.pop();
+					}
+					else
+					{
+						temp.push(cur);
+						incr = std::min(incr, cur.t_last - t);
+						if (pqueue.empty()) break;
+						cur = pqueue.top(); pqueue.pop();
+					}
+				}
+				while (!temp.empty())
+				{
+					if (queueSize == temp.size())
+					{
+						//std::cout << "[..]" << ",";
+						t += incr;
+					}
+					pqueue.push(temp.front());
+					temp.pop();
+				}
+				t++;
+				//count++;
+			}
+			return t;
+		}
+		int leastInterval2(std::vector<char>& tasks, int n)
+		{
+			std::vector<int> arr(26);
+			for (char c : tasks)
+			{
+				arr[c-'A']++;
+			}
+			int t = 0;
+			int totalCount=0;
+			while (true)
+			{
+				int remain = 0;
+				int counter = 0;
+				for (size_t i = 0; i < arr.size() && counter<=n; i++)
+				{
+					if (arr[i] > 0)
+					{
+						arr[i]--;
+						remain += arr[i];
+						counter++;
+					}
+				}
+				totalCount += counter;
+				t += counter;
+				if (totalCount == tasks.size()) break;
+				if (counter <= n) t += n - counter+1;
+			}
+			return t;
+		}
+
+	};
+	void RunExample()
+	{
+		std::vector<char> tasks;
+		int ans = 0;
+
+		tasks = {'A', 'B', 'C', 'D', 'A', 'B', 'V'};
+		ans = Solution().leastInterval2(tasks, 3); //
+
+
+		tasks = { 'A', 'A', 'A', 'B', 'B', 'B' };
+		ans = Solution().leastInterval2(tasks, 0); //6
+
+		tasks = { 'A', 'A', 'A', 'B', 'B', 'B' };
+		ans = Solution().leastInterval2(tasks, 2); //8
+
+		tasks = { 'A', 'A', 'A', 'A', 'A', 'A', 'B', 'C', 'D', 'E', 'F', 'G' };
+		ans = Solution().leastInterval2(tasks, 2);  // 16
+
+		
+	}
+}
+namespace Jul_day30_LC139
+{
+	struct Node
+	{
+		Node* next[27] = { nullptr };
+	};
+	class Trie 
+	{
+	public:
+		Node* root;
+	public:
+		/** Initialize your data structure here. */
+		Trie()
+			:
+			root(new Node)
+		{}
+		void VisitAndDelete(Node* n)
+		{
+			for (size_t i = 0; i < 26; ++i)
+			{
+				if (n->next[i])
+				{
+					VisitAndDelete(n->next[i]);
+				}
+			}
+			delete n;
+			n = nullptr;
+		}
+		~Trie()
+		{
+			VisitAndDelete(root);
+			//delete root;
+			root = nullptr;
+		}
+		/** Inserts a word into the trie. */
+		void insert(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (!pRunner->next[word[i] - 'a'])
+				{
+					pRunner->next[word[i] - 'a'] = new Node;
+				}
+				pRunner = pRunner->next[word[i] - 'a'];
+			}
+			pRunner->next[26] = root;
+		}
+		/** Returns if the word is in the trie. */
+		bool search(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (pRunner->next[word[i] - 'a'])
+				{
+					pRunner = pRunner->next[word[i] - 'a'];
+				}
+				else return false;
+			}
+			if (pRunner->next[26]) return true;
+			return false;
+		}
+		/** Returns if there is any word in the trie that starts with the given prefix. */
+		bool startsWith(std::string prefix)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < prefix.size(); ++i)
+			{
+				if (pRunner->next[prefix[i] - 'a'])
+				{
+					pRunner = pRunner->next[prefix[i] - 'a'];
+				}
+				else return false;
+			}
+			return true;
+		}
+		int test(std::string str)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				if (pRunner->next[str[i] - 'a'])
+				{
+					pRunner = pRunner->next[str[i] - 'a'];
+				}
+				else return 0; // no prefix match
+			}
+			if (pRunner->next[26]) return 2; // word match
+			return 1; // prefix match
+		}
+	};
+	class Solution 
+	{
+	private:
+		Trie trie;
+		std::vector<int> cache;
+	public:
+		bool canDesect(std::string s)
+		{
+			if ((s.size()) == 0) return true;
+			if (cache[s.size()-1] == 0) return false;
+			std::string test;
+			bool subres = false;
+			for (size_t i = 0; i < s.size(); i++)
+			{
+				test += s[i];
+				if (trie.test(test) == 2)
+				{
+					std::cout << test << ",";
+					std::string sub = s.substr(i+1, s.size());
+					subres = canDesect(sub);
+					if (subres) return true;
+				}
+			}
+			std::cout << '\n';
+			cache[s.size()-1] = 0;
+			return false;
+
+		}
+		bool wordBreak(std::string s, std::vector<std::string>& wordDict) 
+		{
+			cache = std::vector<int>(s.size(), -1);
+			for (auto str : wordDict)
+			{
+				trie.insert(str);
+			}
+			return canDesect(s);
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::string> wordDict;
+		std::string s;
+		bool ans;
+	
+		wordDict = { "leet","code"};
+		s = "leetcode";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+		
+		wordDict = { "apple","pen"};
+		s = "applepenapple";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+
+		wordDict = { "cats","dog","sand","and","cat" };
+		s = "catsandog";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+
+		wordDict = { "a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaa", "aaaaaaa", "aaaaaaaa", "aaaaaaaaa", "aaaaaaaaaa" };
+		s = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab";
+		ans = Solution().wordBreak(s, wordDict);
+		std::cout << ans;
+	}
+}
+namespace Jul_day30
+{
+	struct Node
+	{
+		Node* next[27] = { nullptr };
+	};
+	class Trie
+	{
+	public:
+		Node* root;
+	public:
+		/** Initialize your data structure here. */
+		Trie()
+			:
+			root(new Node)
+		{}
+		void VisitAndDelete(Node* n)
+		{
+			for (size_t i = 0; i < 26; ++i)
+			{
+				if (n->next[i])
+				{
+					VisitAndDelete(n->next[i]);
+				}
+			}
+			delete n;
+			n = nullptr;
+		}
+		~Trie()
+		{
+			VisitAndDelete(root);
+			//delete root;
+			root = nullptr;
+		}
+		/** Inserts a word into the trie. */
+		void insert(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (!pRunner->next[word[i] - 'a'])
+				{
+					pRunner->next[word[i] - 'a'] = new Node;
+				}
+				pRunner = pRunner->next[word[i] - 'a'];
+			}
+			pRunner->next[26] = root;
+		}
+		/** Returns if the word is in the trie. */
+		bool search(std::string word)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < word.size(); ++i)
+			{
+				if (pRunner->next[word[i] - 'a'])
+				{
+					pRunner = pRunner->next[word[i] - 'a'];
+				}
+				else return false;
+			}
+			if (pRunner->next[26]) return true;
+			return false;
+		}
+		/** Returns if there is any word in the trie that starts with the given prefix. */
+		bool startsWith(std::string prefix)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < prefix.size(); ++i)
+			{
+				if (pRunner->next[prefix[i] - 'a'])
+				{
+					pRunner = pRunner->next[prefix[i] - 'a'];
+				}
+				else return false;
+			}
+			return true;
+		}
+		int test(std::string str)
+		{
+			Node* pRunner = root;
+			for (size_t i = 0; i < str.size(); ++i)
+			{
+				if (pRunner->next[str[i] - 'a'])
+				{
+					pRunner = pRunner->next[str[i] - 'a'];
+				}
+				else return 0; // no prefix match
+			}
+			if (pRunner->next[26]) return 2; // word match
+			return 1; // prefix match
+		}
+	};
+	class Solution
+	{
+	private:
+		Trie trie;
+		std::vector<int> cache;
+		std::vector<std::string> returnVec;
+	public:
+		bool canDesect(std::string s)
+		{
+			if ((s.size()) == 0) return true;
+			if (cache[s.size() - 1] == 0) return false;
+			std::string test;
+			bool subres = false;
+			for (size_t i = 0; i < s.size(); i++)
+			{
+				test += s[i];
+				if (trie.test(test) == 2)
+				{
+					std::cout << test << ",";
+					std::string sub = s.substr(i + 1, s.size());
+					subres = canDesect(sub);
+					if (subres) return true;
+				}
+			}
+			cache[s.size() - 1] = 0;
+			return false;
+		}
+		void Segment(std::string s, int tracker)
+		{
+			std::string test;
+			for (size_t i = tracker; i < s.size(); i++)
+			{
+				test += s[i];
+				if (trie.test(test) == 2)
+				{
+					if (i == s.size()-1)
+					{
+						returnVec.push_back(s);
+					}
+					else
+					{
+						s.insert(i + 1, 1, ' ');
+						Segment(s, i + 2);
+						s.erase(i + 1, 1);
+					}
+				}
+			}
+		}
+		std::vector<std::string> wordBreak(std::string s, std::vector<std::string>& wordDict)
+		{
+			if (wordDict.size() == 0) return {};
+			cache = std::vector<int>(s.size(), -1);
+			for (auto str : wordDict)
+			{
+				trie.insert(str);
+			}
+			if (canDesect(s))
+			{
+				Segment(s, 0);
+			}
+			return returnVec;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::string> wordDict;
+		std::string s;
+		std::vector<std::string> ans;
+
+		wordDict = { "a","aa","aaa" };
+		s = "aaaaaaaaaab";
+		ans = Solution().wordBreak(s, wordDict);
+
+		wordDict = { "a", "b","cc" };
+		s = "abcc";
+		ans = Solution().wordBreak(s, wordDict);
+
+		wordDict = { "cats","dog","sand","and","cat" };
+		s = "catsanddog";
+		ans = Solution().wordBreak(s, wordDict);
+
+
+		wordDict = { "leet","code" };
+		s = "leetcode";
+		ans = Solution().wordBreak(s, wordDict);
+
+		wordDict = { "apple","pen" };
+		s = "applepenapple";
+		ans = Solution().wordBreak(s, wordDict);
+	}
+}
+namespace Jul_day31
+{
+	class Solution {
+	public:
+		void DiagonalMatrixExponential2x2(double arr[],int k)
+		{
+			arr[0] = std::pow(arr[0], k);
+			arr[3] = std::pow(arr[3], k);
+			return;
+		}
+		double* MatrixMultiplication2x2(double A[], double B[])
+		{
+			double* C = new double[4];
+			C[0] = A[0] * B[0] + A[1] * B[2];
+			C[1] = A[0] * B[1] + A[1] * B[3];
+			C[2] = A[2] * B[0] + A[3] * B[2];
+			C[3] = A[2] * B[1] + A[3] * B[3];
+			return C;
+		}
+		double* MatrixInverse2x2(double* A)
+		{
+			double* Inv = new double[4];
+			double invdet = 1 / (A[0] * A[3] - A[1] * A[2]);
+			Inv[0] =  A[3] * invdet;
+			Inv[1] = -A[1] * invdet;
+			Inv[2] = -A[2] * invdet;
+			Inv[3] =  A[1] * invdet;
+			return Inv;
+		}
+		double* VectorMatrixMultiplication2x2(double A[], double x[])
+		{
+			double* C = new double[2];
+			C[0] = A[0] * x[0] + A[1] * x[1];
+			C[1] = A[2] * x[0] + A[3] * x[1];
+			return C;
+		}
+		int climbStairs(int n) 
+		{
+			double f1 = 0.5 + 0.5 * sqrt(5);
+			double f2 = f1-sqrt(5);
+			double L[4] = { f1,0,0,f2 };
+			double X[4] = { 1,1,-f2,-f1};
+			DiagonalMatrixExponential2x2(L,n);
+			double* Xinv = MatrixInverse2x2(X);
+			double* C = MatrixMultiplication2x2(L,Xinv);
+			double* D = MatrixMultiplication2x2(X, C);
+			double u0[2] = { 1,0 };
+			double* un = VectorMatrixMultiplication2x2(D, u0);
+			int ans = (int)(un[0] + 0.0000001);
+			delete[] Xinv,C,D,un;
+			return ans;
+		}
+	};
+	void RunExample()
+	{
+		int n = 12;
+		int ans = Solution().climbStairs(n);
 	}
 }
