@@ -17,6 +17,145 @@
 #include "Vec3.h"
 #include "Vec2.h"
 
+
+namespace LC773 // Sliding puzzle
+{
+	class Solution
+	{
+		size_t m = 2;
+		size_t n = 3;
+		std::vector<std::string> GetMoves(std::string& brd)
+		{
+			char pos0 = brd.back();
+			std::vector<std::string> outVec;
+			switch (pos0)
+			{
+			case 0:
+				//outVec.resize(2, brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				std::swap(outVec[0][0], outVec[0][1]);
+				std::swap(outVec[1][0], outVec[1][3]);
+				outVec[0].pop_back(); outVec[0].push_back(1);
+				outVec[1].pop_back(); outVec[1].push_back(3);
+				break;
+			case 1:
+				//outVec.resize(3, brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				std::swap(outVec[0][1], outVec[0][0]);
+				std::swap(outVec[1][1], outVec[1][2]);
+				std::swap(outVec[2][1], outVec[2][4]); 
+				outVec[0].pop_back(); outVec[0].push_back(0);
+				outVec[1].pop_back(); outVec[1].push_back(2); 
+				outVec[2].pop_back(); outVec[2].push_back(4);
+				break;
+			case 2:
+				//outVec.resize(2, brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				std::swap(outVec[0][2], outVec[0][1]);
+				std::swap(outVec[1][2], outVec[1][5]);
+				outVec[0].pop_back(); outVec[0].push_back(1);
+				outVec[1].pop_back(); outVec[1].push_back(5);
+				break;
+			case 3:
+				//outVec.resize(2, brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				std::swap(outVec[0][3], outVec[0][0]);
+				std::swap(outVec[1][3], outVec[1][4]);
+				outVec[0].pop_back(); outVec[0].push_back(0);
+				outVec[1].pop_back(); outVec[1].push_back(4);
+				break;
+			case 4:
+				//outVec.resize(3, brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				std::swap(outVec[0][4], outVec[0][1]);
+				std::swap(outVec[1][4], outVec[1][3]);
+				std::swap(outVec[2][4], outVec[2][5]);
+				outVec[0].pop_back(); outVec[0].push_back(1);
+				outVec[1].pop_back(); outVec[1].push_back(3);
+				outVec[2].pop_back(); outVec[2].push_back(5);
+				break;
+			case 5:
+				//outVec.resize(2, brd);
+				outVec.push_back(brd);
+				outVec.push_back(brd);
+				std::swap(outVec[0][5], outVec[0][2]);
+				std::swap(outVec[1][5], outVec[1][4]);
+				outVec[0].pop_back(); outVec[0].push_back(2);
+				outVec[1].pop_back(); outVec[1].push_back(4);
+				break;
+			default:
+				assert(false);
+			}
+			return std::move(outVec);
+		}
+	public:
+		int slidingPuzzle(std::vector<std::vector<int>>& board) 
+		{
+			std::string brd;
+			char pos0=255;
+			for (size_t row = 0; row<board.size();row++)
+			{
+				for (size_t col=0; col<board[0].size();col++)
+				{
+					brd.append(1,board[row][col] + 'a');
+					if (board[row][col] == 0) pos0 = char(row * n + col);
+				}
+			}
+			brd.append(1, pos0);
+			struct Pos
+			{
+				std::string brd;
+				int counter=0;
+			};
+			std::unordered_set<std::string> visited;
+			std::queue<Pos> queue;
+			queue.push({ brd,0 });
+			while (!queue.empty())
+			{
+				Pos curPos = queue.front(); queue.pop();
+				visited.insert(curPos.brd);
+				if (curPos.brd.back() == 5) 
+				{ 
+					if (curPos.brd == ("bcdefa\x5")) return curPos.counter; 
+				}
+				for (std::string newBrd : GetMoves(curPos.brd))
+				{
+					if (visited.find(newBrd) == visited.end())
+					{
+						queue.push({ newBrd,curPos.counter+1 });
+					}
+				}
+			}
+			return -1;
+		}
+	};
+	void RunExample()
+	{
+		std::vector<std::vector<int>> board;
+		int ans;
+
+		board = { {1,2,3},{4,0,5} };
+		ans = Solution().slidingPuzzle(board); // 1
+		
+		board = { {1,2,3},{5,4,0} };
+		ans = Solution().slidingPuzzle(board); // -1
+
+		board = { {4,1,2},{5,0,3} };
+		ans = Solution().slidingPuzzle(board); // 5
+
+		board = { {3,2,4},{1,5,} };
+		ans = Solution().slidingPuzzle(board); // 14
+
+	}
+}
+
 namespace LC36 //  Is Valid Sudoko
 {
 	class Solution {
